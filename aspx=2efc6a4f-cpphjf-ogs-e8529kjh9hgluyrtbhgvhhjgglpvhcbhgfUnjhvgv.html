@@ -4,25 +4,91 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Official Document Layout</title>
-    <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Nokora:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f2f5;
+            font-family: 'Nokora', sans-serif;
+        }
+
+        .document-container {
+            background: white;
+            width: 380px;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border: 1px solid #ddd;
+        }
+
+        .header { text-align: center; margin-bottom: 10px; }
+        .crest-logo { width: 60px; height: auto; margin-bottom: 5px; }
+        
+        .title-section p { 
+            margin: 2px 0; 
+            font-size: 14px; 
+            /* Applied Bold and Navy Blue to all titles in header */
+            font-weight: bold;
+            color: #003399; 
+        }
+
+        .photo-section { text-align: center; margin: 20px 0; }
+        .person-photo { 
+            width: 110px; 
+            height: 140px; 
+            border: 1px solid #000; 
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .name-section { text-align: center; margin-bottom: 15px; }
+        .name { font-size: 22px; font-weight: bold; color: #d32f2f; margin: 0; }
+
+        .details-section { font-size: 12.5px; line-height: 1.9; margin-bottom: 20px; }
+        .label { font-weight: bold; color: #333; }
+
+        .blue-highlight-box {
+            background-color: #0077be;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85em;
+        }
+
+        .date-item { white-space: nowrap; }
+
+        footer {
+            text-align: center;
+            font-size: 10px;
+            margin-top: 20px;
+            color: #555;
+            line-height: 1.5;
+        }
+        footer a { color: #003399; text-decoration: none; font-weight: bold; }
+    </style>
 </head>
 <body>
+
     <div class="document-container">
         <header class="header">
-            <div class="logo-section">
-                <img src="police logo.jpg" alt="Cambodian Police Crest" class="crest-logo">
-            </div>
+            <img src="police logo.jpg" alt="Logo" class="crest-logo">
             <div class="title-section">
-                <p class="ministry-title">ក្រសួងមហាផ្ទៃ</p>
-                <p class="department-title">អគ្គស្នងការដ្ឋាននគរបាលជាតិ</p>
-                <p class="service-title">នាយកដ្ឋាននគរបាលការពារព្រំដែនគោក</p>
+                <p>ក្រសួងមហាផ្ទៃ</p>
+                <p>អគ្គស្នងការដ្ឋាននគរបាលជាតិ</p>
+                <p>នាយកដ្ឋាននគរបាលការពារព្រំដែនគោក</p>
             </div>
         </header>
 
-        <main class="main-content">
+        <main>
             <div class="photo-section">
-                <img src="52457.jpg" alt="Official Portrait" class="person-photo">
+                <img src="52457.jpg" alt="Photo" class="person-photo">
             </div>
 
             <div class="name-section">
@@ -30,44 +96,30 @@
             </div>
 
             <div class="details-section">
-                <p class="detail-row">
-                    <span class="label">អត្តលេខ</span> : <span class="value">៥២៤៥៧</span>
-                    <span class="separator"></span>
-                    <span class="label">ស្ថានភាព</span> : <span class="value">បម្រើការងារ</span>
-                </p>
-                <p class="detail-row">
-                    <span class="label">ឆ្នាំកំណើត</span> : <span class="value">០១ កុម្ភះ ១៩៩៩</span>
-                    <span class="separator"></span>
-                    <span class="label">ភេទ</span> : <span class="value">ប្រុស</span>
-                </p>
-                <p class="detail-row">
-                    <span class="label">ឋានន្តរស័ក្តិ</span> : <span class="value">វរសេនីយ៍ទោ</span>
-                </p>
-                <p class="detail-row job-title">
-                    <span class="label">មុខតំណែង</span> : <span class="value">នាយរងការិយាល័យប្រចាំគោលដៅទី២ទិសឧត្តមានជ័យ</span>
-                </p>
-                <p class="detail-row office-address">
-                    <span class="label">អាសយដ្ឋាន</span> : <span class="value">ភូមិព្រែកជីក, ឃុំសោប, ស្រុកព្រែកប្រសព្វ, ខេត្តក្រចេះ</span>
-                </p>
+                <div><span class="label">អត្តលេខ</span> : ៥២៤៥៧ &nbsp;&nbsp;&nbsp; <span class="label">ស្ថានភាព</span> : បម្រើការងារ</div>
+                <div><span class="label">ឆ្នាំកំណើត</span> : ០១ កុម្ភះ ១៩៩៩ &nbsp;&nbsp;&nbsp; <span class="label">ភេទ</span> : ប្រុស</div>
+                <div><span class="label">ឋានន្តរស័ក្តិ</span> : វរសេនីយ៍ទោ</div>
+                <div><span class="label">មុខតំណែង</span> : នាយរងការិយាល័យប្រចាំគោលដៅទី២ទិសឧត្តមានជ័យ</div>
+                <div><span class="label">អាសយដ្ឋាន</span> : ភូមិព្រែកជីក, ឃុំសោប, ស្រុកព្រែកប្រសព្វ, ខេត្តក្រចេះ</div>
             </div>
 
-            <div class="date-section">
-                <div class="date-box">
-                    <p class="label">លេខកាត</p> :
-                    <p class="value">២២-៥៤២១៩១</p
+            <div class="blue-highlight-box">
+                <div class="date-item">
+                    <span style="font-weight: bold;">លេខកាត</span>: ២២-៥៤២១៩១
                 </div>
-                <p class="issue-date">
-                    <span class="label">សុពលភាពដល់</span> : <span class="value">២៦ មីនា ២០៣០</span>
-                </p>
+                <div class="date-item">
+                    <span style="font-weight: bold;">សុពលភាពដល់</span>: ២៦ មីនា ២០៣០
+                </div>
             </div>
         </main>
 
         <footer>
-            <p class="footer-text">
-                ចុះក្នុងអគ្គនាយកដ្ឋានអត្តសញ្ញាណកម្មត្រូវត្រួតពិនិត្យភាព<br>
-                ត្រឹមត្រូវតាមរយៈកម្មវិធី: <a href="http://www.psnb.app">www.psnb.app</a>
+            <p>
+                ចុះក្នុងអគ្គនាយកដ្ឋានអត្តសញ្ញាណកម្មត្រូវត្រួតពិនិត្យភាពត្រឹមត្រូវ<br>
+                តាមរយៈកម្មវិធី: <a href="http://www.psnb.app">www.psnb.app</a>
             </p>
         </footer>
     </div>
+
 </body>
 </html>
