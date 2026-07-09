@@ -158,7 +158,6 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- ខោ -->
                 <tr class="item-row">
                     <td><input type="checkbox" class="item-check" onchange="calculateTotal()"></td>
                     <td class="item-name">ខោ</td>
@@ -172,7 +171,6 @@
                     </td>
                     <td><span class="sub-total">0</span></td>
                 </tr>
-                <!-- អាវ -->
                 <tr class="item-row">
                     <td><input type="checkbox" class="item-check" onchange="calculateTotal()"></td>
                     <td class="item-name">អាវ</td>
@@ -186,7 +184,6 @@
                     </td>
                     <td><span class="sub-total">0</span></td>
                 </tr>
-                <!-- មួក -->
                 <tr class="item-row">
                     <td><input type="checkbox" class="item-check" onchange="calculateTotal()"></td>
                     <td class="item-name">មួក</td>
@@ -200,7 +197,6 @@
                     </td>
                     <td><span class="sub-total">0</span></td>
                 </tr>
-                <!-- ខ្សែក្រវាត់ -->
                 <tr class="item-row">
                     <td><input type="checkbox" class="item-check" onchange="calculateTotal()"></td>
                     <td class="item-name">ខ្សែក្រវាត់</td>
@@ -214,7 +210,6 @@
                     </td>
                     <td><span class="sub-total">0</span></td>
                 </tr>
-                <!-- កាបូប -->
                 <tr class="item-row">
                     <td><input type="checkbox" class="item-check" onchange="calculateTotal()"></td>
                     <td class="item-name">កាបូប</td>
@@ -228,7 +223,6 @@
                     </td>
                     <td><span class="sub-total">0</span></td>
                 </tr>
-                <!-- ស្បែកជើង -->
                 <tr class="item-row">
                     <td><input type="checkbox" class="item-check" onchange="calculateTotal()"></td>
                     <td class="item-name">ស្បែកជើង</td>
@@ -343,9 +337,13 @@
 
         let url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
         
+        // កូដកែសម្រួលបន្ថែម mode: 'cors' សម្រាប់ដំណើរការលើ Website (Server)
         fetch(url, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            mode: 'cors',
+            headers: { 
+                'Content-Type': 'application/json' 
+            },
             body: JSON.stringify({
                 chat_id: TELEGRAM_CHAT_ID,
                 text: message,
@@ -360,12 +358,13 @@
                 document.querySelectorAll('.qty-input').forEach(input => input.value = 0);
                 calculateTotal();
             } else {
-                alert("❌ មានបញ្ហាក្នុងការផ្ញើ! សូមពិនិត្យមើលថាតើបងបានទាញ Bot ចូលគ្រុបហើយឬនៅ។");
+                alert("❌ មានបញ្ហាក្នុងការផ្ញើ! សូមពិនិត្យមើលការកំណត់របស់ Bot ក្នុងគ្រុបឡើងវិញ។");
                 console.error(data);
             }
         })
         .catch(error => {
-            alert("❌ មិនអាចភ្ជាប់ទៅកាន់ Telegram បានទេ!");
+            alert("❌ មិនអាចភ្ជាប់ទៅកាន់ Telegram API បានទេ! សូមពិនិត្យមើលប្រព័ន្ធអ៊ីនធឺណិត ឬ SSL របស់ Website។");
+            console.error(error);
         });
     }
 </script>
