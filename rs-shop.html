@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>របាយការណ៍លក់ប្រចាំថ្ងៃ - RS Shop</title>
+    <style>
+        body {
+            font-family: 'Khmer OS Battambang', 'Segoe UI', sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 10px;
+            color: #333;
+        }
+        .invoice-box {
+            max-width: 100%;
+            margin: auto;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        }
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            font-family: 'Khmer OS Muol Light', sans-serif;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        th, td {
+            padding: 10px 6px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            font-size: 0.9rem;
+        }
+        th {
+            background-color: #34495e;
+            color: white;
+        }
+        .price-input {
+            width: 85px;
+            padding: 8px 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        .qty-container {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+        .btn-qty {
+            width: 32px;
+            height: 32px;
+            background-color: #e0e0e0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        .btn-qty:active {
+            background-color: #cbd5e1;
+        }
+        .qty-input {
+            width: 35px;
+            height: 30px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            font-weight: bold;
+        }
+        .total-section {
+            text-align: right;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 2px solid #34495e;
+            color: #c0392b;
+        }
+        .payment-method {
+            margin-top: 15px;
+            padding: 12px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border-left: 5px solid #007bff;
+        }
+        .payment-method h4 {
+            margin: 0 0 8px 0;
+            font-size: 0.95rem;
+        }
+        .payment-options {
+            display: flex;
+            gap: 20px;
+        }
+        .payment-method label {
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.95rem;
+        }
+        .payment-method input[type="radio"] {
+            transform: scale(1.2);
+        }
+        .btn-telegram {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background-color: #0088cc;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            text-align: center;
+            box-shadow: 0 3px 6px rgba(0,136,204,0.2);
+        }
+        .btn-telegram:active {
+            background-color: #006699;
+        }
+        input[type="checkbox"] {
+            transform: scale(1.3);
+            margin-left: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="invoice-box">
+    <h2>របាយការណ៍លក់ / RS Shop (ប្រាក់រៀល)</h2>
+
+    <form id="invoiceForm" onsubmit="sendToTelegram(event)">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 8%;">ជ្រើស</th>
+                    <th style="width: 25%;">ទំនិញ</th>
+                    <th style="width: 27%;">តម្លៃរាយ (៛)</th>
+                    <th style="width: 20%;">ចំនួន</th>
+                    <th style="width: 20%;">សរុប (៛)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- ខោ -->
+                <tr class="item-row">
+                    <td><input type="checkbox" class="item-check" onchange="calculateTotal()"></td>
+                    <td class="item-name">ខោ</td>
+                    <td><input type="number" pattern="[0-9]*" inputmode="numeric" class="price-input" placeholder="តម្លៃ" oninput="calculateTotal()"></td>
+                    <td>
+                        <div class="qty-container">
+                            <div class="btn-qty" onclick="changeQty(this, -1)">-</div>
+                            <input type="number" class="qty-input" value="0" min="0" readonly>
+                            <div class="btn-qty" onclick="changeQty(this, 1)">+</div>
+                        </div>
+                    </td>
+                    <td><span class="sub-total">0</span></td>
+                </tr>
+                <!-- អាវ -->
+                <tr class="item-row">
+                    <td><input type="checkbox" class="item-check" onchange="calculateTotal()"></td>
+                    <td class="item-name">អាវ</td>
+                    <td><input type="number" pattern="[0-9]*" inputmode="numeric" class="price-input" placeholder="តម្លៃ" oninput="calculateTotal()"></td>
+                    <td>
+                        <div class="qty-container">
+                            <div class="btn-qty" onclick="changeQty(this, -1)">-</div>
+                            <input type="number" class="qty-input" value="0" min="0" readonly>
+                            <div class="btn-qty" onclick="changeQty(this, 1)">+</div>
+                        </div>
+                    </td>
+                    <td><span class="sub-total">0</span></td>
+                </tr>
+                <!-- មួក -->
+                <tr class="item-row">
+                    <td><input type="checkbox" class="item-check" onchange="calculateTotal()"></td>
+                    <td class="item-name">មួក</td>
+                    <td><input type="number" pattern="[0-9]*" inputmode="numeric" class="price-input" placeholder="តម្លៃ" oninput="calculateTotal()"></td>
+                    <td>
+                        <div class="qty-container">
+                            <div class="btn-qty" onclick="changeQty(this, -1)">-</div>
+                            <input type="number" class="qty-input" value="0" min="0" readonly>
+                            <div class="btn-qty" onclick="changeQty(this, 1)">+</div>
+                        </div>
+                    </td>
+                    <td><span class="sub-total">0</span></td>
+                </tr>
+                <!-- ខ្សែក្រវាត់ -->
+                <tr class="item-row">
+                    <td><input type="checkbox" class="item-check" onchange="calculateTotal()"></td>
+                    <td class="item-name">ខ្សែក្រវាត់</td>
+                    <td><input type="number" pattern="[0-9]*" inputmode="numeric" class="price-input" placeholder="តម្លៃ" oninput="calculateTotal()"></td>
+                    <td>
+                        <div class="qty-container">
+                            <div class="btn-qty" onclick="changeQty(this, -1)">-</div>
+                            <input type="number" class="qty-input" value="0" min="0" readonly>
+                            <div class="btn-qty" onclick="changeQty(this, 1)">+</div>
+                        </div>
+                    </td>
+                    <td><span class="sub-total">0</span></td>
+                </tr>
+                <!-- កាបូប -->
+                <tr class="item-row">
+                    <td><input type="checkbox" class="item-check" onchange="calculateTotal()"></td>
+                    <td class="item-name">កាបូប</td>
+                    <td><input type="number" pattern="[0-9]*" inputmode="numeric" class="price-input" placeholder="តម្លៃ" oninput="calculateTotal()"></td>
+                    <td>
+                        <div class="qty-container">
+                            <div class="btn-qty" onclick="changeQty(this, -1)">-</div>
+                            <input type="number" class="qty-input" value="0" min="0" readonly>
+                            <div class="btn-qty" onclick="changeQty(this, 1)">+</div>
+                        </div>
+                    </td>
+                    <td><span class="sub-total">0</span></td>
+                </tr>
+                <!-- ស្បែកជើង -->
+                <tr class="item-row">
+                    <td><input type="checkbox" class="item-check" onchange="calculateTotal()"></td>
+                    <td class="item-name">ស្បែកជើង</td>
+                    <td><input type="number" pattern="[0-9]*" inputmode="numeric" class="price-input" placeholder="តម្លៃ" oninput="calculateTotal()"></td>
+                    <td>
+                        <div class="qty-container">
+                            <div class="btn-qty" onclick="changeQty(this, -1)">-</div>
+                            <input type="number" class="qty-input" value="0" min="0" readonly>
+                            <div class="btn-qty" onclick="changeQty(this, 1)">+</div>
+                        </div>
+                    </td>
+                    <td><span class="sub-total">0</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="total-section">
+            សរុបរួម: <span id="grandTotal">0</span> ៛
+        </div>
+
+        <div class="payment-method">
+            <h4>វិធីសាស្ត្រទូទាត់ប្រាក់៖</h4>
+            <div class="payment-options">
+                <label><input type="radio" name="payment_type" value="លុយក្រៅ" checked> លុយក្រៅ</label>
+                <label><input type="radio" name="payment_type" value="លុយ QR"> លុយ QR</label>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-telegram">🚀 ផ្ញើទៅ Telegram គ្រុប</button>
+    </form>
+</div>
+
+<script>
+    // ការកំណត់ TOKEN និង GROUP ID របស់ RS Shop
+    const TELEGRAM_BOT_TOKEN = '8875601366:AAHrCpV6w2FijHcJqQ9WBskEJYf6-ReD7CU'; 
+    const TELEGRAM_CHAT_ID = '-1003443301584'; 
+
+    function changeQty(element, amount) {
+        let container = element.parentElement;
+        let qtyInput = container.querySelector('.qty-input');
+        let row = container.closest('.item-row');
+        let checkBox = row.querySelector('.item-check');
+        
+        let currentQty = parseInt(qtyInput.value) || 0;
+        let newQty = currentQty + amount;
+        
+        if (newQty < 0) newQty = 0;
+        qtyInput.value = newQty;
+        
+        if (newQty > 0) {
+            checkBox.checked = true;
+        } else {
+            checkBox.checked = false;
+        }
+        
+        calculateTotal();
+    }
+
+    function calculateTotal() {
+        let rows = document.querySelectorAll('.item-row');
+        let grandTotal = 0;
+
+        rows.forEach(row => {
+            let isChecked = row.querySelector('.item-check').checked;
+            let price = parseInt(row.querySelector('.price-input').value) || 0;
+            let qty = parseInt(row.querySelector('.qty-input').value) || 0;
+            let subTotalSpan = row.querySelector('.sub-total');
+            
+            let subTotal = 0;
+            if (isChecked && qty > 0 && price > 0) {
+                subTotal = price * qty;
+            }
+            
+            subTotalSpan.innerText = subTotal.toLocaleString('en-US');
+            grandTotal += subTotal;
+        });
+
+        document.getElementById('grandTotal').innerText = grandTotal.toLocaleString('en-US');
+    }
+
+    function sendToTelegram(event) {
+        event.preventDefault();
+        
+        let grandTotal = document.getElementById('grandTotal').innerText;
+        let paymentType = document.querySelector('input[name="payment_type"]:checked').value;
+        
+        if (grandTotal === "0") {
+            alert("សូមជ្រើសរើសទំនិញ វាយបញ្ចូលតម្លៃ និងចំនួនលក់ឱ្យបានត្រឹមត្រូវ!");
+            return;
+        }
+
+        let message = `📊 *របាយការណ៍លក់ថ្មី (RS Shop)*\n`;
+        message += `-------------------------\n`;
+        
+        let rows = document.querySelectorAll('.item-row');
+        rows.forEach(row => {
+            let isChecked = row.querySelector('.item-check').checked;
+            if (isChecked) {
+                let name = row.querySelector('.item-name').innerText;
+                let price = parseInt(row.querySelector('.price-input').value) || 0;
+                let qty = row.querySelector('.qty-input').value;
+                let subTotal = row.querySelector('.sub-total').innerText;
+                
+                message += `🛍 *${name}*:\n   » ចំនួន: ${qty} | តម្លៃ: ${price.toLocaleString('en-US')} ៛\n   » សរុប: ${subTotal} ៛\n`;
+            }
+        });
+        
+        message += `-------------------------\n`;
+        message += `💰 *ទឹកប្រាក់សរុបរួម:* ${grandTotal} ៛\n`;
+        message += `💳 *វិធីទូទាត់:* ${paymentType}\n`;
+        message += `⏰ *កាលបរិច្ឆេទ:* ${new Date().toLocaleString('km-KH')}`;
+
+        let url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+        
+        fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: TELEGRAM_CHAT_ID,
+                text: message,
+                parse_mode: 'Markdown'
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.ok) {
+                alert("📢 របាយការណ៍លក់ត្រូវបានផ្ញើចូលគ្រុប RS Shop រួចរាល់ហើយ!");
+                document.getElementById('invoiceForm').reset();
+                document.querySelectorAll('.qty-input').forEach(input => input.value = 0);
+                calculateTotal();
+            } else {
+                alert("❌ មានបញ្ហាក្នុងការផ្ញើ! សូមពិនិត្យមើលថាតើបងបានទាញ Bot ចូលគ្រុបហើយឬនៅ។");
+                console.error(data);
+            }
+        })
+        .catch(error => {
+            alert("❌ មិនអាចភ្ជាប់ទៅកាន់ Telegram បានទេ!");
+        });
+    }
+</script>
+
+</body>
+</html>
