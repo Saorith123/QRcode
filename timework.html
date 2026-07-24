@@ -63,7 +63,7 @@
 
     <div class="form-group">
         <label for="employeePin">🔒 បញ្ចូលលេខសម្ងាត់បុគ្គលិក (PIN):</label>
-        <input type="password" id="employeePin" placeholder="បញ្ចូល PIN របស់អ្នក" oninput="verifyPin()">
+        <input type="password" id="employeePin" pattern="[0-9]*" inputmode="numeric" placeholder="បញ្ចូល PIN របស់អ្នក" oninput="verifyPin()">
         <div id="employeeStatus" class="employee-badge"></div>
     </div>
 
@@ -107,8 +107,10 @@
     // ទាញយកទិន្នន័យប្រវត្តិវត្តមានពី Google Sheets ពេលបើក HTML ដំបូង
     async function fetchAttendanceData() {
         try {
-            const response = await fetch(GOOGLE_SHEET_URL);
-            attendanceHistory = await response.json();
+            const response = await fetch(GOOGLE_SHEET_URL, { method: 'GET', redirect: 'follow' });
+            if (response.ok) {
+                attendanceHistory = await response.json();
+            }
         } catch (e) {
             console.error("មិនអាចទាញទិន្នន័យបានទេ:", e);
         }
@@ -158,21 +160,35 @@
         let totalMinutes = 0;
         let totalPenaltyKHR = 0;
 
-        attendanceHistory.forEach(row => {
-            if (row.employee === empName && row.date) {
-                // បំបែកថ្ងៃខែពី String (DD/MM/YYYY)
-                const parts = row.date.split('/');
-                if (parts.length === 3) {
-                    const rowDate = new Date(parts[2], parts[1] - 1, parts[0]);
+        if (Array.isArray(attendanceHistory)) {
+            attendanceHistory.forEach(row => {
+                // ពិនិត្យឈ្មោះបុគ្គលិក (Safe String Comparison)
+                if (row.employee && String(row.employee).trim() === String(empName).trim() && row.date) {
                     
-                    // ពិនិត្យមើលថាតើទិន្នន័យស្ថិតក្នុងខែ និងឆ្នាំបច្ចុប្បន្នដែរឬទេ
-                    if (rowDate.getMonth() === currentMonth && rowDate.getFullYear() === currentYear) {
-                        totalMinutes += parseInt(row.lateMinutes) || 0;
-                        totalPenaltyKHR += parseInt(row.penaltyKHR) || 0;
+                    // បំបែកថ្ងៃខែពី String (គាំទ្រទាំង DD/MM/YYYY និង YYYY-MM-DD)
+                    let day, month, year;
+                    const strDate = String(row.date).trim();
+                    
+                    if (strDate.includes('/')) {
+                        const parts = strDate.split('/');
+                        day = parseInt(parts[0], 10);
+                        month = parseInt(parts[1], 10) - 1; // 0-11
+                        year = parseInt(parts[2], 10);
+                    } else if (strDate.includes('-')) {
+                        const parts = strDate.split('-');
+                        year = parseInt(parts[0], 10);
+                        month = parseInt(parts[1], 10) - 1;
+                        day = parseInt(parts[2], 10);
+                    }
+
+                    // ផ្ទៀងផ្ទាត់ថាតើត្រូវនឹងខែ និងឆ្នាំបច្ចុប្បន្នដែរឬទេ
+                    if (month === currentMonth && year === currentYear) {
+                        totalMinutes += parseInt(row.lateMinutes, 10) || 0;
+                        totalPenaltyKHR += parseInt(row.penaltyKHR, 10) || 0;
                     }
                 }
-            }
-        });
+            });
+        }
 
         // គណនាជា ម៉ោង និង នាទី
         const hours = Math.floor(totalMinutes / 60);
