@@ -21,7 +21,7 @@
         .cash-box h4 { margin: 0; color: #2e7d32; font-size: 15px; }
         .cash-box .amount-usd { font-size: 28px; font-weight: bold; color: #1b5e20; margin-top: 4px; }
         .cash-box .amount-khr { font-size: 18px; font-weight: bold; color: #d32f2f; margin-top: 2px; }
-        .form-group { margin-bottom: 15px; }
+        .form-group { margin-bottom: 15px; position: relative; }
         label { display: block; margin-bottom: 6px; font-weight: bold; color: #34495e; font-size: 14px; }
         input, select { 
             width: 100%; padding: 12px; border: 1px solid #cccccc; 
@@ -42,6 +42,41 @@
             display: flex; align-items: center; gap: 10px; cursor: pointer; margin: 0; font-weight: normal; font-size: 14px;
         }
         .radio-group input[type="radio"] { width: auto; margin: 0; }
+        
+        /* 🔍 Custom Search Dropdown សម្រាប់ទូរសព្ទដៃ */
+        .custom-dropdown-list {
+            position: absolute;
+            top: 100%; left: 0; right: 0;
+            max-height: 220px;
+            overflow-y: auto;
+            background: white;
+            border: 2px solid #007bff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 9999;
+            display: none;
+        }
+        .dropdown-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .dropdown-item:active {
+            background-color: #e9ecef;
+        }
+        .stock-tag {
+            font-size: 12px;
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-weight: bold;
+        }
+
         button { 
             width: 100%; padding: 14px; background-color: #28a745; 
             color: white; border: none; border-radius: 8px; font-size: 16px; 
@@ -85,7 +120,7 @@
             <label for="itemCategory">ប្រភេទទំនិញ/សេវាកម្ម:</label>
             <select id="itemCategory" onchange="handleCategoryChange()">
                 <option value="phone">📱 ទូរសព្ទ (ដកស្តុក)</option>
-                <option value="charger">🔌 ឆ្នាំងសាក</option>
+                <option value="charger">🔌 ឆ្នាំងសាក / ខ្សែកាប</option>
                 <option value="screen">📱 អ៊ុត Screen</option>
                 <option value="repair">🛠️ សេវាជួសជុលទូរសព្ទ</option>
                 <option value="earphone">🎧 កាស / គ្រឿងបន្លាស់</option>
@@ -93,13 +128,11 @@
             </select>
         </div>
 
-        <!-- 🔍 កន្លែង Search និង ជ្រើសរើសម៉ូឌែលទូរសព្ទ -->
+        <!-- 🔍 កន្លែង Search ម៉ូឌែលទូរសព្ទថ្មី (ដើរលើទូរសព្ទ ១០០%) -->
         <div class="form-group" id="phoneModelGroup">
-            <label for="phoneModelInput">🔍 ស្វែងរក / ជ្រើសរើសម៉ូឌែលទូរសព្ទ:</label>
-            <input type="text" id="phoneModelInput" list="phoneModelList" placeholder="🔍 វាយឈ្មោះម៉ូឌែលដើម្បី Search..." autocomplete="off">
-            <datalist id="phoneModelList">
-                <!-- ម៉ូឌែលនឹងទាញចេញពី Google Sheet មកទីនេះស្វ័យប្រវត្តិ -->
-            </datalist>
+            <label for="phoneSearchInput">🔍 ស្វែងរក / ជ្រើសរើសម៉ូឌែលទូរសព្ទ:</label>
+            <input type="text" id="phoneSearchInput" placeholder="🔍 ចុចទីនេះដើម្បី Search..." oninput="filterPhoneModels()" onfocus="showPhoneDropdown()" autocomplete="off">
+            <div id="phoneDropdownList" class="custom-dropdown-list"></div>
         </div>
 
         <!-- កន្លែងបញ្ជាក់ឈ្មោះទំនិញផ្សេងៗ -->
@@ -254,7 +287,6 @@
             }
             
             renderStock();
-            updateDatalist();
         } catch (error) {
             console.error("Error fetching data:", error);
             document.getElementById('stockTable').innerHTML = '<tr><td colspan="4" style="color:red;">មិនអាចទាញយកទិន្នន័យបានទេ។</td></tr>';
@@ -281,16 +313,47 @@
         });
     }
 
-    // 🔍 មុខងារបន្ថែមបញ្ជីឈ្មោះទូរសព្ទចូលទៅក្នុង Search List
-    function updateDatalist() {
-        const datalist = document.getElementById('phoneModelList');
-        datalist.innerHTML = '';
-        inventory.forEach(item => {
-            let remaining = item.initial - item.sold;
-            // បង្ហាញឈ្មោះម៉ូឌែល និង ចំនួនស្តុកនៅសល់ពេល Search
-            datalist.innerHTML += `<option value="${item.model}">នៅសល់៖ ${remaining} គ្រឿង</option>`;
-        });
+    // 🔍 មុខងារ Search ម៉ូឌែលទូរសព្ទ និង បង្ហាញ Dropdown លើទូរសព្ទដៃ
+    function filterPhoneModels() {
+        const query = document.getElementById('phoneSearchInput').value.toLowerCase().trim();
+        const dropdown = document.getElementById('phoneDropdownList');
+        dropdown.innerHTML = '';
+
+        const filtered = inventory.filter(item => item.model.toLowerCase().includes(query));
+
+        if (filtered.length === 0) {
+            dropdown.innerHTML = '<div style="padding:12px; text-align:center; color:#888;">មិនរកឃើញម៉ូឌែលនេះទេ</div>';
+        } else {
+            filtered.forEach(item => {
+                let remaining = item.initial - item.sold;
+                let div = document.createElement('div');
+                div.className = 'dropdown-item';
+                div.innerHTML = `<span><b>${item.model}</b></span> <span class="stock-tag">នៅសល់ ${remaining} គ្រឿង</span>`;
+                div.onclick = function() {
+                    selectPhoneModel(item.model);
+                };
+                dropdown.appendChild(div);
+            });
+        }
+        dropdown.style.display = 'block';
     }
+
+    function showPhoneDropdown() {
+        filterPhoneModels();
+    }
+
+    function selectPhoneModel(modelName) {
+        document.getElementById('phoneSearchInput').value = modelName;
+        document.getElementById('phoneDropdownList').style.display = 'none';
+    }
+
+    // បិទ Dropdown ពេលចុចកន្លែងផ្សេង
+    document.addEventListener('click', function(e) {
+        const container = document.getElementById('phoneModelGroup');
+        if (container && !container.contains(e.target)) {
+            document.getElementById('phoneDropdownList').style.display = 'none';
+        }
+    });
 
     async function submitSale() {
         if (!currentVerifiedSeller) {
@@ -308,7 +371,7 @@
         let isPhone = false;
 
         if (category === 'phone') {
-            itemName = document.getElementById('phoneModelInput').value.trim();
+            itemName = document.getElementById('phoneSearchInput').value.trim();
             isPhone = true;
         } else {
             const categoryText = document.getElementById('itemCategory').options[document.getElementById('itemCategory').selectedIndex].text;
@@ -325,7 +388,7 @@
             let item = inventory.find(i => i.model.toLowerCase() === itemName.toLowerCase());
             
             if (!item) {
-                alert("ម៉ូឌែលទូរសព្ទនេះមិនមានក្នុងស្តុកទេ! សូមពិនិត្យឈ្មោះឡើងវិញ។");
+                alert("ម៉ូឌែលទូរសព្ទនេះមិនមានក្នុងស្តុកទេ! សូមចុចជ្រើសរើសចេញពីបញ្ជី Dropdown។");
                 return;
             }
 
@@ -334,7 +397,6 @@
                 alert(`ស្តុកមិនគ្រប់គ្រាន់ទេ! នៅសល់ត្រឹមតែ ${remaining} គ្រឿងប៉ុណ្ណោះ។`);
                 return;
             }
-            // ប្រើប្រាស់ឈ្មោះផ្លូវការចេញពីស្តុក
             itemName = item.model; 
         }
 
@@ -386,7 +448,7 @@
             document.getElementById('sellerPin').value = '';
             document.getElementById('employeeNameStatus').innerText = '';
             currentVerifiedSeller = "";
-            document.getElementById('phoneModelInput').value = '';
+            document.getElementById('phoneSearchInput').value = '';
             document.getElementById('otherItemName').value = '';
             document.getElementById('totalPrice').value = '';
             document.getElementById('sellQty').value = '1';
