@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ប្រព័ន្ធគ្រប់គ្រងការលក់ និងសាច់ប្រាក់</title>
+    <style>
+        body { 
+            font-family: 'Khmer OS Battambang', Arial, sans-serif; 
+            margin: 0; padding: 15px; background-color: #f4f6f9; 
+        }
+        .container { 
+            max-width: 800px; margin: auto; background: white; 
+            padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); 
+        }
+        h2, h3 { color: #2c3e50; text-align: center; margin-bottom: 15px; font-size: 20px; }
+        .cash-box {
+            background-color: #e8f5e9; border: 2px solid #28a745;
+            border-radius: 10px; padding: 12px; text-align: center; margin-bottom: 20px;
+        }
+        .cash-box h4 { margin: 0; color: #2e7d32; font-size: 15px; }
+        .cash-box .amount-usd { font-size: 28px; font-weight: bold; color: #1b5e20; margin-top: 4px; }
+        .cash-box .amount-khr { font-size: 18px; font-weight: bold; color: #d32f2f; margin-top: 2px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 6px; font-weight: bold; color: #34495e; font-size: 14px; }
+        input, select { 
+            width: 100%; padding: 12px; border: 1px solid #cccccc; 
+            border-radius: 8px; box-sizing: border-box; font-size: 15px;
+        }
+        .price-input-container {
+            display: flex; gap: 8px;
+        }
+        .price-input-container input { flex: 2; }
+        .price-input-container select { flex: 1.2; }
+        .employee-badge {
+            margin-top: 6px; font-weight: bold; font-size: 13px; transition: all 0.3s ease;
+        }
+        .radio-group {
+            display: flex; flex-direction: column; gap: 10px; background: #eef2f5; padding: 12px; border-radius: 8px;
+        }
+        .radio-group label {
+            display: flex; align-items: center; gap: 10px; cursor: pointer; margin: 0; font-weight: normal; font-size: 14px;
+        }
+        .radio-group input[type="radio"] { width: auto; margin: 0; }
+        button { 
+            width: 100%; padding: 14px; background-color: #28a745; 
+            color: white; border: none; border-radius: 8px; font-size: 16px; 
+            font-weight: bold; cursor: pointer; margin-top: 10px;
+        }
+        button:hover { background-color: #218838; }
+        .expense-btn { background-color: #fd7e14; }
+        .expense-btn:hover { background-color: #e06b0d; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
+        th, td { border: 1px solid #dee2e6; padding: 10px 6px; text-align: center; }
+        th { background-color: #007bff; color: white; }
+        tr:nth-child(even) { background-color: #f8f9fa; }
+        .section-box {
+            background-color: #f8f9fa; border: 1px solid #e9ecef;
+            padding: 15px; border-radius: 10px; margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>📱 ប្រព័ន្ធគ្រប់គ្រងការលក់ និងសាច់ប្រាក់</h2>
+
+    <div class="cash-box">
+        <h4>💵 សាច់ប្រាក់ស្រស់ក្នុងដៃ (Cash Balance)</h4>
+        <div class="amount-usd" id="cashBalanceDisplay">$0.00</div>
+        <div class="amount-khr" id="cashBalanceKHRDisplay">≈ 0 ៛</div>
+    </div>
+
+    <div class="section-box">
+        <h3>🛒 កត់ត្រាការលក់ & សេវាកម្ម</h3>
+        
+        <!-- កន្លែងបញ្ចូលលេខកូដសម្ងាត់បុគ្គលិក -->
+        <div class="form-group">
+            <label for="sellerPin">🔒 លេខសម្ងាត់បុគ្គលិក (PIN/ID):</label>
+            <input type="password" id="sellerPin" placeholder="បញ្ចូលលេខសម្ងាត់បុគ្គលិក" oninput="verifyEmployeePin()">
+            <div id="employeeNameStatus" class="employee-badge"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="itemCategory">ប្រភេទទំនិញ/សេវាកម្ម:</label>
+            <select id="itemCategory" onchange="handleCategoryChange()">
+                <option value="phone">📱 ទូរសព្ទ (ដកស្តុក)</option>
+                <option value="charger">🔌 ឆ្នាំងសាក</option>
+                <option value="screen">📱 អ៊ុត Screen</option>
+                <option value="repair">🛠️ សេវាជួសជុលទូរសព្ទ</option>
+                <option value="earphone">🎧 កាស / គ្រឿងបន្លាស់</option>
+                <option value="other">📦 ផ្សេងៗ</option>
+            </select>
+        </div>
+
+        <!-- 🔍 កន្លែង Search និង ជ្រើសរើសម៉ូឌែលទូរសព្ទ -->
+        <div class="form-group" id="phoneModelGroup">
+            <label for="phoneModelInput">🔍 ស្វែងរក / ជ្រើសរើសម៉ូឌែលទូរសព្ទ:</label>
+            <input type="text" id="phoneModelInput" list="phoneModelList" placeholder="🔍 វាយឈ្មោះម៉ូឌែលដើម្បី Search..." autocomplete="off">
+            <datalist id="phoneModelList">
+                <!-- ម៉ូឌែលនឹងទាញចេញពី Google Sheet មកទីនេះស្វ័យប្រវត្តិ -->
+            </datalist>
+        </div>
+
+        <!-- កន្លែងបញ្ជាក់ឈ្មោះទំនិញផ្សេងៗ -->
+        <div class="form-group" id="otherItemGroup" style="display: none;">
+            <label for="otherItemName">ឈ្មោះទំនិញ/ការជួសជុល:</label>
+            <input type="text" id="otherItemName" placeholder="ឧទាហរណ៍៖ ដូរអេក្រង់ iPhone 11 Pro">
+        </div>
+
+        <div class="form-group">
+            <label for="sellQty">ចំនួន (គ្រឿង/ដង):</label>
+            <input type="number" id="sellQty" min="1" value="1">
+        </div>
+
+        <!-- កន្លែងបញ្ចូលតម្លៃ និងជ្រើសរើសរូបិយប័ណ្ណ ($ ឬ ៛) -->
+        <div class="form-group">
+            <label for="totalPrice">តម្លៃសរុប និង រូបិយប័ណ្ណទទួល៖</label>
+            <div class="price-input-container">
+                <input type="number" id="totalPrice" placeholder="បញ្ចូលចំនួនទឹកប្រាក់">
+                <select id="currencyType">
+                    <option value="USD">💵 ដុល្លារ ($)</option>
+                    <option value="KHR">៛ រៀល (៛)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- ប្រភេទសាច់ប្រាក់ -->
+        <div class="form-group">
+            <label>💳 ប្រភេទសាច់ប្រាក់ទទួល៖</label>
+            <div class="radio-group">
+                <label>
+                    <input type="radio" name="paymentType" value="cash" checked> 
+                    💵 លុយស្រស់ (បូកចូលប្រាក់ក្នុងដៃ)
+                </label>
+                <label>
+                    <input type="radio" name="paymentType" value="bank"> 
+                    💳 លុយកុង/QR (មិនបូកចូលប្រាក់ក្នុងដៃ)
+                </label>
+            </div>
+        </div>
+
+        <button id="submitSaleBtn" onclick="submitSale()">📤 កត់ត្រាការលក់ & ផ្ញើទៅ Telegram</button>
+    </div>
+
+    <div class="section-box">
+        <h3>💸 កត់ត្រាការដកលុយ / ទទួលបញ្ចាំ (- លុយចេញ)</h3>
+        <div class="form-group">
+            <label for="expenseReason">មូលហេតុ (ឧទាហរណ៍៖ ទទួលបញ្ចាំ, ដកថ្លៃបាយ...):</label>
+            <input type="text" id="expenseReason" placeholder="បញ្ជាក់មូលហេតុដកលុយ">
+        </div>
+
+        <div class="form-group">
+            <label for="expenseAmount">ចំនួនលុយដកចេញពីប្រាក់ក្នុងដៃ៖</label>
+            <div class="price-input-container">
+                <input type="number" id="expenseAmount" placeholder="បញ្ចូលចំនួនទឹកប្រាក់">
+                <select id="expenseCurrencyType">
+                    <option value="USD">💵 ដុល្លារ ($)</option>
+                    <option value="KHR">៛ រៀល (៛)</option>
+                </select>
+            </div>
+        </div>
+
+        <button class="expense-btn" id="submitExpenseBtn" onclick="submitExpense()">💸 កត់ត្រាការដកលុយ & ផ្ញើទៅ Telegram</button>
+    </div>
+
+    <hr style="margin: 25px 0; border: 0; border-top: 1px solid #eee;">
+
+    <h3>📊 របាយការណ៍ស្តុកទូរសព្ទ</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ម៉ូឌែលទូរសព្ទ</th>
+                <th>ស្តុកដើម</th>
+                <th>លក់បាន</th>
+                <th>នៅសល់</th>
+            </tr>
+        </thead>
+        <tbody id="stockTable">
+            <tr><td colspan="4">កំពុងទាញយកទិន្នន័យ...</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    const TELEGRAM_BOT_TOKEN = '8875601366:AAHrCpV6w2FijHcJqQ9WBskEJYf6-ReD7CU'; 
+    const TELEGRAM_CHAT_ID = '-1004473550210'; 
+    const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbzYy7tamlJaWK0TyOquRH6Fi3gvzfw73KJ38ymi2QcYev_3dODd_Q7O6KAeWdScPPVU/exec'; 
+
+    // 🔑 បញ្ជីលេខសម្ងាត់បុគ្គលិក
+    const EMPLOYEE_CODES = {
+        "04": "សីហា",
+        "102": "វិចិត្រ",
+        "103": "ធារ៉ា",
+        "999": "មេហាង"
+    };
+
+    const EXCHANGE_RATE = 4000; // 1 USD = 4000 KHR
+    let inventory = [];
+    let currentVerifiedSeller = "";
+
+    function verifyEmployeePin() {
+        const pinInput = document.getElementById('sellerPin').value.trim();
+        const statusDiv = document.getElementById('employeeNameStatus');
+
+        if (pinInput === "") {
+            statusDiv.innerText = "";
+            currentVerifiedSeller = "";
+            return;
+        }
+
+        if (EMPLOYEE_CODES[pinInput]) {
+            currentVerifiedSeller = EMPLOYEE_CODES[pinInput];
+            statusDiv.style.color = "#28a745";
+            statusDiv.innerText = `✅ បុគ្គលិក៖ ${currentVerifiedSeller}`;
+        } else {
+            currentVerifiedSeller = "";
+            statusDiv.style.color = "#dc3545";
+            statusDiv.innerText = "❌ លេខសម្ងាត់មិនត្រឹមត្រូវទេ!";
+        }
+    }
+
+    function handleCategoryChange() {
+        const category = document.getElementById('itemCategory').value;
+        const phoneGroup = document.getElementById('phoneModelGroup');
+        const otherGroup = document.getElementById('otherItemGroup');
+
+        if (category === 'phone') {
+            phoneGroup.style.display = 'block';
+            otherGroup.style.display = 'none';
+        } else {
+            phoneGroup.style.display = 'none';
+            otherGroup.style.display = 'block';
+        }
+    }
+
+    async function fetchData() {
+        try {
+            const res = await fetch(GOOGLE_SHEET_URL);
+            const data = await res.json();
+            
+            if (data.error) {
+                alert("មានបញ្ហាចេញពី Google Sheet: " + data.error);
+                return;
+            }
+
+            if (data && data.inventory) {
+                inventory = data.inventory;
+                let balanceUsd = data.balance || 0;
+                let balanceKhr = balanceUsd * EXCHANGE_RATE;
+
+                document.getElementById('cashBalanceDisplay').innerText = `$${balanceUsd.toFixed(2)}`;
+                document.getElementById('cashBalanceKHRDisplay').innerText = `≈ ${balanceKhr.toLocaleString()} ៛`;
+            }
+            
+            renderStock();
+            updateDatalist();
+        } catch (error) {
+            console.error("Error fetching data:", error);
+            document.getElementById('stockTable').innerHTML = '<tr><td colspan="4" style="color:red;">មិនអាចទាញយកទិន្នន័យបានទេ។</td></tr>';
+        }
+    }
+
+    function renderStock() {
+        const tbody = document.getElementById('stockTable');
+        tbody.innerHTML = '';
+        if (inventory.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4">គ្មានទិន្នន័យស្តុកទេ</td></tr>';
+            return;
+        }
+        inventory.forEach(item => {
+            let remaining = item.initial - item.sold;
+            tbody.innerHTML += `
+                <tr>
+                    <td><b>${item.model}</b></td>
+                    <td>${item.initial}</td>
+                    <td style="color: #dc3545; font-weight: bold;">${item.sold}</td>
+                    <td style="color: #28a745; font-weight: bold;">${remaining}</td>
+                </tr>
+            `;
+        });
+    }
+
+    // 🔍 មុខងារបន្ថែមបញ្ជីឈ្មោះទូរសព្ទចូលទៅក្នុង Search List
+    function updateDatalist() {
+        const datalist = document.getElementById('phoneModelList');
+        datalist.innerHTML = '';
+        inventory.forEach(item => {
+            let remaining = item.initial - item.sold;
+            // បង្ហាញឈ្មោះម៉ូឌែល និង ចំនួនស្តុកនៅសល់ពេល Search
+            datalist.innerHTML += `<option value="${item.model}">នៅសល់៖ ${remaining} គ្រឿង</option>`;
+        });
+    }
+
+    async function submitSale() {
+        if (!currentVerifiedSeller) {
+            alert("សូមបញ្ចូលលេខសម្ងាត់បុគ្គលិកឱ្យបានត្រឹមត្រូវជាមុនសិន!");
+            return;
+        }
+
+        const category = document.getElementById('itemCategory').value;
+        const qty = parseInt(document.getElementById('sellQty').value);
+        const rawPrice = parseFloat(document.getElementById('totalPrice').value);
+        const currency = document.getElementById('currencyType').value;
+        const paymentType = document.querySelector('input[name="paymentType"]:checked').value;
+
+        let itemName = "";
+        let isPhone = false;
+
+        if (category === 'phone') {
+            itemName = document.getElementById('phoneModelInput').value.trim();
+            isPhone = true;
+        } else {
+            const categoryText = document.getElementById('itemCategory').options[document.getElementById('itemCategory').selectedIndex].text;
+            const detail = document.getElementById('otherItemName').value.trim();
+            itemName = detail ? `${categoryText} (${detail})` : categoryText;
+        }
+
+        if (!itemName || isNaN(qty) || qty <= 0 || isNaN(rawPrice) || rawPrice <= 0) {
+            alert("សូមបំពេញព័ត៌មានទំនិញ/តម្លៃឱ្យបានគ្រប់គ្រាន់!");
+            return;
+        }
+
+        if (isPhone) {
+            let item = inventory.find(i => i.model.toLowerCase() === itemName.toLowerCase());
+            
+            if (!item) {
+                alert("ម៉ូឌែលទូរសព្ទនេះមិនមានក្នុងស្តុកទេ! សូមពិនិត្យឈ្មោះឡើងវិញ។");
+                return;
+            }
+
+            let remaining = item.initial - item.sold;
+            if (qty > remaining) {
+                alert(`ស្តុកមិនគ្រប់គ្រាន់ទេ! នៅសល់ត្រឹមតែ ${remaining} គ្រឿងប៉ុណ្ណោះ។`);
+                return;
+            }
+            // ប្រើប្រាស់ឈ្មោះផ្លូវការចេញពីស្តុក
+            itemName = item.model; 
+        }
+
+        // គណនាតម្លៃជា USD និង KHR
+        let priceInUSD = 0;
+        let displayPriceText = "";
+
+        if (currency === 'USD') {
+            priceInUSD = rawPrice;
+            let priceInKHR = rawPrice * EXCHANGE_RATE;
+            displayPriceText = `$${rawPrice} (${priceInKHR.toLocaleString()} ៛)`;
+        } else {
+            priceInUSD = rawPrice / EXCHANGE_RATE;
+            displayPriceText = `${rawPrice.toLocaleString()} ៛ (≈ $${priceInUSD.toFixed(2)})`;
+        }
+
+        const btn = document.getElementById('submitSaleBtn');
+        btn.disabled = true;
+        btn.innerText = "កំពុងរក្សាទុក...";
+
+        try {
+            await fetch(GOOGLE_SHEET_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ 
+                    action: 'sell', 
+                    model: isPhone ? itemName : '', 
+                    qty: qty, 
+                    price: priceInUSD,
+                    paymentType: paymentType 
+                })
+            });
+
+            let paymentText = (paymentType === 'cash') ? "💵 លុយស្រស់ (ចូលប្រាក់ក្នុងដៃ)" : "💳 លុយកុង/QR (ចូលធនាគារ)";
+
+            const message = `🛍️ *របាយការណ៍លក់/សេវាកម្មថ្មី!*\n\n` +
+                            `👤 *បុគ្គលិកលក់:* ${currentVerifiedSeller}\n` +
+                            `📦 *ទំនិញ/សេវាកម្ម:* ${itemName}\n` +
+                            `🔢 *ចំនួន:* ${qty}\n` +
+                            `💵 *តម្លៃទទួលបាន:* ${displayPriceText}\n` +
+                            `💳 *ប្រភេទការទូទាត់:* ${paymentText}`;
+
+            await sendTelegram(message);
+
+            alert("កត់ត្រាការលក់ជោគជ័យ!");
+            
+            // Clear ទិន្នន័យ
+            document.getElementById('sellerPin').value = '';
+            document.getElementById('employeeNameStatus').innerText = '';
+            currentVerifiedSeller = "";
+            document.getElementById('phoneModelInput').value = '';
+            document.getElementById('otherItemName').value = '';
+            document.getElementById('totalPrice').value = '';
+            document.getElementById('sellQty').value = '1';
+            setTimeout(fetchData, 1500);
+
+        } catch (error) {
+            alert("មានបញ្ហាក្នុងការផ្ញើទិន្នន័យ!");
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "📤 កត់ត្រាការលក់ & ផ្ញើទៅ Telegram";
+        }
+    }
+
+    async function submitExpense() {
+        if (!currentVerifiedSeller) {
+            alert("សូមបញ្ចូលលេខសម្ងាត់បុគ្គលិកឱ្យបានត្រឹមត្រូវជាមុនសិន!");
+            return;
+        }
+
+        const reason = document.getElementById('expenseReason').value.trim();
+        const rawAmount = parseFloat(document.getElementById('expenseAmount').value);
+        const currency = document.getElementById('expenseCurrencyType').value;
+
+        if (!reason || isNaN(rawAmount) || rawAmount <= 0) {
+            alert("សូមបញ្ចូលមូលហេតុ និងចំនួនលុយដកឱ្យបានត្រឹមត្រូវ!");
+            return;
+        }
+
+        let amountInUSD = 0;
+        let displayAmountText = "";
+
+        if (currency === 'USD') {
+            amountInUSD = rawAmount;
+            let amountInKHR = rawAmount * EXCHANGE_RATE;
+            displayAmountText = `-$${rawAmount} (${amountInKHR.toLocaleString()} ៛)`;
+        } else {
+            amountInUSD = rawAmount / EXCHANGE_RATE;
+            displayAmountText = `-${rawAmount.toLocaleString()} ៛ (≈ -$${amountInUSD.toFixed(2)})`;
+        }
+
+        const btn = document.getElementById('submitExpenseBtn');
+        btn.disabled = true;
+        btn.innerText = "កំពុងរក្សាទុក...";
+
+        try {
+            await fetch(GOOGLE_SHEET_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'expense', amount: amountInUSD })
+            });
+
+            const message = `💸 *របាយការណ៍ដកលុយ/បញ្ចាំ (-លុយចេញ)!*\n\n` +
+                            `👤 *បុគ្គលិកប្រតិបត្តិការ:* ${currentVerifiedSeller}\n` +
+                            `📝 *មូលហេតុ:* ${reason}\n` +
+                            `💵 *ចំនួនលុយដក:* ${displayAmountText}`;
+
+            await sendTelegram(message);
+
+            alert("កត់ត្រាការដកសាច់ប្រាក់ជោគជ័យ!");
+            document.getElementById('sellerPin').value = '';
+            document.getElementById('employeeNameStatus').innerText = '';
+            currentVerifiedSeller = "";
+            document.getElementById('expenseReason').value = '';
+            document.getElementById('expenseAmount').value = '';
+            setTimeout(fetchData, 1500);
+
+        } catch (error) {
+            alert("មានបញ្ហាក្នុងការដកសាច់ប្រាក់!");
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "💸 កត់ត្រាការដកលុយ & ផ្ញើទៅ Telegram";
+        }
+    }
+
+    async function sendTelegram(msg) {
+        const tgUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+        await fetch(tgUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: TELEGRAM_CHAT_ID,
+                text: msg,
+                parse_mode: 'Markdown'
+            })
+        });
+    }
+
+    fetchData();
+</script>
+
+</body>
+</html>
