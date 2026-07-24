@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ប្រព័ន្ធកត់ត្រាវត្តមានបុគ្គលិក</title>
+    <style>
+        body { 
+            font-family: 'Khmer OS Battambang', Arial, sans-serif; 
+            margin: 0; padding: 20px; background-color: #f0f4f8; 
+        }
+        .container { 
+            max-width: 480px; margin: auto; background: white; 
+            padding: 25px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); 
+        }
+        h2 { color: #2c3e50; text-align: center; margin-bottom: 5px; font-size: 22px; }
+        .clock-box {
+            background: #2c3e50; color: #00ffcc; text-align: center;
+            padding: 15px; border-radius: 10px; margin: 15px 0 20px 0;
+        }
+        .clock-box .time { font-size: 32px; font-weight: bold; font-family: monospace; }
+        .clock-box .date { font-size: 14px; color: #ddd; margin-top: 5px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; color: #34495e; }
+        input { 
+            width: 100%; padding: 12px; border: 1px solid #cccccc; 
+            border-radius: 8px; box-sizing: border-box; font-size: 16px; text-align: center;
+        }
+        .employee-badge {
+            margin-top: 8px; font-weight: bold; font-size: 16px; text-align: center;
+        }
+        /* ប្រអប់បង្ហាញសង្ខេបការយឺតម៉ោងប្រចាំខែ */
+        .summary-box {
+            display: none;
+            background: #fff3cd; border: 1px solid #ffeeba; color: #856404;
+            padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: left;
+        }
+        .summary-box h4 { margin: 0 0 10px 0; font-size: 15px; color: #856404; text-align: center; border-bottom: 1px solid #ffe8a1; padding-bottom: 5px; }
+        .summary-item { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 5px; }
+        .summary-item strong { color: #d9534f; }
+        
+        button { 
+            width: 100%; padding: 14px; background-color: #007bff; 
+            color: white; border: none; border-radius: 8px; font-size: 18px; 
+            font-weight: bold; cursor: pointer; transition: 0.2s;
+        }
+        button:hover { background-color: #0056b3; }
+        .info-card {
+            background: #eef6ff; border-left: 4px solid #007bff;
+            padding: 12px; border-radius: 5px; font-size: 13px; color: #333; margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>⏰ ចុះវត្តមានបុគ្គលិក</h2>
+    
+    <div class="clock-box">
+        <div class="time" id="liveClock">00:00:00 AM</div>
+        <div class="date" id="liveDate">ថ្ងៃ... ទី...</div>
+    </div>
+
+    <div class="form-group">
+        <label for="employeePin">🔒 បញ្ចូលលេខសម្ងាត់បុគ្គលិក (PIN):</label>
+        <input type="password" id="employeePin" placeholder="បញ្ចូល PIN របស់អ្នក" oninput="verifyPin()">
+        <div id="employeeStatus" class="employee-badge"></div>
+    </div>
+
+    <!-- ប្រអប់សរុបការយឺតម៉ោងប្រចាំខែ -->
+    <div id="summaryBox" class="summary-box">
+        <h4>📊 របាយការណ៍យឺតម៉ោង (ប្រចាំខែនេះ)</h4>
+        <div class="summary-item"><span>⏱️ សរុបនាទីយឺត៖</span> <strong id="totalMinutes">0 នាទី</strong></div>
+        <div class="summary-item"><span>🕒 សរុបគិតជាម៉ោង៖</span> <strong id="totalHours">0 ម៉ោង 0 នាទី</strong></div>
+        <div class="summary-item"><span>💸 សរុបប្រាក់ត្រូវកាត់៖</span> <strong id="totalPenalty">0 ៛ ($0.00)</strong></div>
+    </div>
+
+    <button id="checkInBtn" onclick="submitAttendance()">ចុះវត្តមាន (Check-In)</button>
+
+    <div class="info-card">
+        📌 <b>លក្ខខណ្ឌម៉ោងធ្វើការ៖</b><br>
+        • ម៉ោងចូលធ្វើការ៖ <b>7:30 AM</b><br>
+        • យឺតម៉ោង៖ <b>150 ៛ / នាទី</b> (កាត់ប្រាក់ខែ)
+    </div>
+</div>
+
+<script>
+    const TELEGRAM_BOT_TOKEN = '8318133620:AAEREpUD8zo98FlEKholu9Kwgo3H_hiil8Y'; 
+    const TELEGRAM_CHAT_ID = '-5581678540'; 
+    const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbxT3MST_O5tu0hjZMwLz3yx4CkQuYLqjbL8EoUH8WteNkGNA8ZDI7C11WZ8SSsvSMR7ag/exec'; 
+
+    const EMPLOYEE_CODES = {
+        "04": "សីហា",
+        "102": "ហេង",
+        "103": "ធារ៉ា",
+        "999": "មេហាង"
+    };
+
+    const WORK_START_HOUR = 7;
+    const WORK_START_MINUTE = 30;
+    const PENALTY_PER_MINUTE = 150;
+    const EXCHANGE_RATE = 4000;
+
+    let currentEmployee = "";
+    let attendanceHistory = [];
+
+    // ទាញយកទិន្នន័យប្រវត្តិវត្តមានពី Google Sheets ពេលបើក HTML ដំបូង
+    async function fetchAttendanceData() {
+        try {
+            const response = await fetch(GOOGLE_SHEET_URL);
+            attendanceHistory = await response.json();
+        } catch (e) {
+            console.error("មិនអាចទាញទិន្នន័យបានទេ:", e);
+        }
+    }
+    fetchAttendanceData();
+
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('liveClock').innerText = now.toLocaleTimeString('en-US', { hour12: true });
+        document.getElementById('liveDate').innerText = now.toLocaleDateString('km-KH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    function verifyPin() {
+        const pin = document.getElementById('employeePin').value.trim();
+        const statusDiv = document.getElementById('employeeStatus');
+        const summaryBox = document.getElementById('summaryBox');
+
+        if (pin === "") {
+            statusDiv.innerText = "";
+            summaryBox.style.display = "none";
+            currentEmployee = "";
+            return;
+        }
+
+        if (EMPLOYEE_CODES[pin]) {
+            currentEmployee = EMPLOYEE_CODES[pin];
+            statusDiv.style.color = "#28a745";
+            statusDiv.innerText = `✅ បុគ្គលិក៖ ${currentEmployee}`;
+            
+            // គណនាសរុបការយឺតប្រចាំខែ
+            calculateMonthlySummary(currentEmployee);
+        } else {
+            currentEmployee = "";
+            statusDiv.style.color = "#dc3545";
+            statusDiv.innerText = "❌ លេខសម្ងាត់មិនត្រឹមត្រូវ!";
+            summaryBox.style.display = "none";
+        }
+    }
+
+    function calculateMonthlySummary(empName) {
+        const now = new Date();
+        const currentMonth = now.getMonth(); // ខែបច្ចុប្បន្ន (0-11)
+        const currentYear = now.getFullYear();
+
+        let totalMinutes = 0;
+        let totalPenaltyKHR = 0;
+
+        attendanceHistory.forEach(row => {
+            if (row.employee === empName && row.date) {
+                // បំបែកថ្ងៃខែពី String (DD/MM/YYYY)
+                const parts = row.date.split('/');
+                if (parts.length === 3) {
+                    const rowDate = new Date(parts[2], parts[1] - 1, parts[0]);
+                    
+                    // ពិនិត្យមើលថាតើទិន្នន័យស្ថិតក្នុងខែ និងឆ្នាំបច្ចុប្បន្នដែរឬទេ
+                    if (rowDate.getMonth() === currentMonth && rowDate.getFullYear() === currentYear) {
+                        totalMinutes += parseInt(row.lateMinutes) || 0;
+                        totalPenaltyKHR += parseInt(row.penaltyKHR) || 0;
+                    }
+                }
+            }
+        });
+
+        // គណនាជា ម៉ោង និង នាទី
+        const hours = Math.floor(totalMinutes / 60);
+        const mins = totalMinutes % 60;
+        const totalPenaltyUSD = (totalPenaltyKHR / EXCHANGE_RATE).toFixed(2);
+
+        // បង្ហាញលើអេក្រង់
+        document.getElementById('totalMinutes').innerText = `${totalMinutes.toLocaleString()} នាទី`;
+        document.getElementById('totalHours').innerText = `${hours} ម៉ោង ${mins} នាទី`;
+        document.getElementById('totalPenalty').innerText = `${totalPenaltyKHR.toLocaleString()} ៛ ($${totalPenaltyUSD})`;
+
+        document.getElementById('summaryBox').style.display = "block";
+    }
+
+    async function submitAttendance() {
+        if (!currentEmployee) {
+            alert("សូមបញ្ចូលលេខសម្ងាត់បុគ្គលិកឱ្យបានត្រឹមត្រូវជាមុនសិន!");
+            return;
+        }
+
+        const now = new Date();
+        const currentHour = now.getHours();
+        const currentMinute = now.getMinutes();
+
+        const scheduledTimeInMinutes = (WORK_START_HOUR * 60) + WORK_START_MINUTE; 
+        const actualTimeInMinutes = (currentHour * 60) + currentMinute;
+
+        let lateMinutes = 0;
+        let penaltyKHR = 0;
+        let penaltyUSD = 0;
+        let statusText = "✅ ទាន់ម៉ោង";
+
+        if (actualTimeInMinutes > scheduledTimeInMinutes) {
+            lateMinutes = actualTimeInMinutes - scheduledTimeInMinutes;
+            penaltyKHR = lateMinutes * PENALTY_PER_MINUTE;
+            penaltyUSD = penaltyKHR / EXCHANGE_RATE;
+            statusText = "⚠️ យឺតម៉ោង";
+        }
+
+        const dateString = now.toLocaleDateString('en-GB'); 
+        const timeString = now.toLocaleTimeString('en-US', { hour12: true });
+
+        const btn = document.getElementById('checkInBtn');
+        btn.disabled = true;
+        btn.innerText = "កំពុងរក្សាទុកវត្តមាន...";
+
+        try {
+            await fetch(GOOGLE_SHEET_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({
+                    action: 'attendance',
+                    employee: currentEmployee,
+                    date: dateString,
+                    time: timeString,
+                    status: statusText,
+                    lateMinutes: lateMinutes,
+                    penaltyKHR: penaltyKHR,
+                    penaltyUSD: penaltyUSD.toFixed(2)
+                })
+            });
+
+            let telegramMsg = `⏰ *របាយការណ៍វត្តមានបុគ្គលិក!*\n\n` +
+                              `👤 *បុគ្គលិក:* ${currentEmployee}\n` +
+                              `📅 *កាលបរិច្ឆេទ:* ${dateString}\n` +
+                              `🕒 *ម៉ោងចូល:* ${timeString}\n` +
+                              `📌 *ស្ថានភាព:* ${statusText}\n`;
+
+            if (lateMinutes > 0) {
+                telegramMsg += `⏱️ *យឺតពេល:* ${lateMinutes} នាទី\n` +
+                               `💸 *ប្រាក់ត្រូវកាត់:* ${penaltyKHR.toLocaleString()} ៛ (≈ $${penaltyUSD.toFixed(2)})`;
+            } else {
+                telegramMsg += `🎉 *ការសរសើរ:* មកធ្វើការបានទាន់ពេលវេលា!`;
+            }
+
+            await sendTelegram(telegramMsg);
+
+            alert(`ចុះវត្តមានជោគជ័យ!\nបុគ្គលិក៖ ${currentEmployee}\nស្ថានភាព៖ ${statusText}` + (lateMinutes > 0 ? `\nយឺត៖ ${lateMinutes} នាទី (កាត់ប្រាក់ខែ ${penaltyKHR.toLocaleString()} ៛)` : ""));
+
+            // Clear ទិន្នន័យ និង Refresh Data
+            document.getElementById('employeePin').value = '';
+            document.getElementById('employeeStatus').innerText = '';
+            document.getElementById('summaryBox').style.display = "none";
+            currentEmployee = "";
+            fetchAttendanceData();
+
+        } catch (error) {
+            alert("មានបញ្ហាក្នុងការចុះវត្តមាន! សូមព្យាយាមម្តងទៀត។");
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "ចុះវត្តមាន (Check-In)";
+        }
+    }
+
+    async function sendTelegram(msg) {
+        const tgUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+        await fetch(tgUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: TELEGRAM_CHAT_ID,
+                text: msg,
+                parse_mode: 'Markdown'
+            })
+        });
+    }
+</script>
+
+</body>
+</html>
