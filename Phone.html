@@ -184,10 +184,11 @@
 
                 <div id="pawnRedeemCalcBox" class="redeem-summary-box" style="display: none;">
                     <p>📅 <b>ថ្ងៃបញ្ចាំ៖</b> <span id="redeemStartDateText">-</span></p>
-                    <p>⏱️ <b>រយៈពេលបញ្ចាំសរុប (រហូតមកដល់ថ្ងៃនេះ)៖</b> <span id="totalPawnDaysText">0</span> ថ្ងៃ</p>
-                    <p>✅ <b>ធ្លាប់បង់ការប្រាក់បាន៖</b> <span id="alreadyPaidDaysText">0</span> ថ្ងៃ (ស្មើ <span id="alreadyPaidAmountText">$0.00</span>)</p>
+                    <p>📆 <b>ថ្ងៃនេះ (ថ្ងៃលស់)៖</b> <span id="redeemTodayDateText">-</span></p>
+                    <p>⏱️ <b>រយៈពេលបញ្ចាំជាក់ស្ដែង៖</b> <span id="totalPawnDaysText">0</span> ថ្ងៃ</p>
+                    <p>✅ <b>ធ្លាប់បង់ការប្រាក់បាន៖</b> <span id="alreadyPaidDaysText">0</span> ថ្ងៃ (ស្មើ <span id="alreadyPaidAmountText">0 ៛</span>)</p>
                     <p>⏳ <b>ចំនួនថ្ងៃត្រូវគិតការប្រាក់៖</b> <span id="chargeableDaysText">0</span> ថ្ងៃ <i id="minimumFeeNote" style="color:#d32f2f; display:none;">(បញ្ចាំក្រោម ៤ថ្ងៃ គិត ៣ថ្ងៃ)</i></p>
-                    <p>💸 <b>ការប្រាក់ដែលត្រូវបង់បន្ថែម៖</b> <b id="interestToPayText" style="color: #2e7d32;">$0.00</b></p>
+                    <p>💸 <b>ការប្រាក់ដែលត្រូវបង់សរុប៖</b> <b id="interestToPayText" style="color: #2e7d32;">$0.00</b></p>
                     <hr style="margin: 6px 0; border: 0; border-top: 1px solid #ffeeba;">
                     <div class="highlight-total">💰 ប្រាក់សរុបត្រូវប្រមូល (ដើម + ការប្រាក់): <span id="totalRedeemAmountText">$0.00</span></div>
                 </div>
@@ -299,8 +300,8 @@
             </div>
 
             <div class="form-group">
-                <label for="pawnDueDate">📆 ថ្ងៃផុតកំណត់បញ្ចាំ៖</label>
-                <input type="date" id="pawnDueDate" readonly style="background-color: #e9ecef;">
+                <label for="pawnDueDate">📆 ថ្ងៃផុតកំណត់បញ្ចាំ (DD/MM/YYYY)៖</label>
+                <input type="text" id="pawnDueDate" readonly style="background-color: #e9ecef;">
             </div>
 
             <div class="form-group">
@@ -409,7 +410,7 @@
     const TELEGRAM_CHAT_ID = '-1004473550210'; 
     
     const MAIN_SHEET_URL = 'https://script.google.com/macros/s/AKfycbzdU0lDH-tQtss-RzM1gnV_dngLHuLH9auPkZBFbVxtEia-Nq49iYYTxIrBiMmYfpvU/exec';
-    const PAWN_SHEET_URL = 'https://script.google.com/macros/s/AKfycbytBA5FwdxmJAPb5P9WuqKex3Abk-dUBimh3LmOdUUyIxMEa34p1GU5eqFwfobwHUs1zg/exec';
+    const PAWN_SHEET_URL = 'https://script.google.com/macros/s/AKfycbz4NSAjDXruSZ50gqMPdVx3PWnEXudr2F6EHhXnQc9Pt6-eA9PX4M3pOSTkiIIdzcXqOQ/exec';
 
     const EMPLOYEE_CODES = {
         "04": "សីហា",
@@ -428,6 +429,33 @@
     let calculatedRedeemInterestUSD = 0;
     let currentVerifiedSeller = "";
     let currentPendingAction = ""; 
+
+    // 🛠️ Function សម្រាប់ Format កាលបរិច្ឆេទជា DD/MM/YYYY
+    function formatDateToDMY(dateInput) {
+        if (!dateInput) return '-';
+        let dateObj = (dateInput instanceof Date) ? dateInput : new Date(dateInput);
+        if (isNaN(dateObj.getTime())) return dateInput; 
+
+        const dd = String(dateObj.getDate()).padStart(2, '0');
+        const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const yyyy = dateObj.getFullYear();
+
+        return `${dd}/${mm}/${yyyy}`;
+    }
+
+    // 🛠️ Helper សម្រាប់ Parse កាលបរិច្ឆេទ String
+    function parseDateString(dateStr) {
+        if (!dateStr) return new Date();
+        if (dateStr instanceof Date) return new Date(dateStr.getTime());
+        
+        if (typeof dateStr === 'string' && dateStr.includes('/')) {
+            const parts = dateStr.split('/');
+            if (parts.length === 3) {
+                return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+            }
+        }
+        return new Date(dateStr);
+    }
 
     function openPinModal(actionType) {
         if (actionType === 'sale' && !validateSaleInputs()) return;
@@ -493,10 +521,7 @@
         const days = parseInt(document.getElementById('pawnDaysSelect').value) || 10;
         const today = new Date();
         today.setDate(today.getDate() + days);
-        const yyyy = today.getFullYear();
-        const mm = String(today.getMonth() + 1).padStart(2, '0');
-        const dd = String(today.getDate()).padStart(2, '0');
-        document.getElementById('pawnDueDate').value = `${yyyy}-${mm}-${dd}`;
+        document.getElementById('pawnDueDate').value = formatDateToDMY(today);
     }
 
     function autoCalculateInterest() {
@@ -596,16 +621,45 @@
         const tbody = document.getElementById('pawnTable');
         tbody.innerHTML = '';
         if (pawnItems.length === 0) { tbody.innerHTML = '<tr><td colspan="6">គ្មានទិន្នន័យទូរសព្ទបញ្ចាំទេ</td></tr>'; return; }
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
         pawnItems.forEach(item => {
-            let paidInterestDisplay = item.totalInterestPaid ? `$${parseFloat(item.totalInterestPaid).toFixed(2)}` : '$0.00';
-            let lastPaidDateDisplay = item.lastPaidDate || '-';
+            let amountUSD = parseFloat(item.amount) || 0;
+            let amountKHR = amountUSD * EXCHANGE_RATE;
+            let pawnAmountDisplay = `$${amountUSD.toFixed(2)} (${amountKHR.toLocaleString()} ៛)`;
+
+            let totalPaidUSD = parseFloat(item.totalInterestPaid) || 0;
+            let paidInterestKHR = totalPaidUSD * EXCHANGE_RATE;
+            let paidInterestDisplay = `${paidInterestKHR.toLocaleString()} ៛`;
             
+            let formattedDueDate = formatDateToDMY(item.dueDate);
+            let lastPaidDateDisplay = item.lastPaidDate ? formatDateToDMY(item.lastPaidDate) : '-';
+
+            let isOverdue = false;
+            if (item.dueDate) {
+                let due = parseDateString(item.dueDate);
+                due.setHours(0, 0, 0, 0);
+
+                if (due < today) {
+                    isOverdue = true;
+                }
+            }
+
+            let dueDateStyle = isOverdue 
+                ? 'color: #dc3545; font-weight: bold; background-color: #ffe6e6;' 
+                : '';
+            let dueDateText = isOverdue 
+                ? `⚠️ ${formattedDueDate}` 
+                : formattedDueDate;
+
             tbody.innerHTML += `
                 <tr>
                     <td><b>${item.model}</b> (${item.color})</td>
                     <td><code>${item.imei}</code></td>
-                    <td style="color:#d32f2f; font-weight:bold;">$${parseFloat(item.amount).toFixed(2)}</td>
-                    <td>${item.dueDate}</td>
+                    <td style="color:#d32f2f; font-weight:bold;">${pawnAmountDisplay}</td>
+                    <td style="${dueDateStyle}">${dueDateText}</td>
                     <td style="color:#2e7d32; font-weight:bold;">${paidInterestDisplay}</td>
                     <td>${lastPaidDateDisplay}</td>
                 </tr>`;
@@ -623,14 +677,18 @@
                 selectedPawnItem = found;
                 document.getElementById('pawnModelText').innerText = found.model;
                 document.getElementById('pawnColorText').innerText = found.color;
-                document.getElementById('pawnAmountText').innerText = `$${parseFloat(found.amount).toFixed(2)}`;
+                
+                let amtUsd = parseFloat(found.amount) || 0;
+                let amtKhr = amtUsd * EXCHANGE_RATE;
+                document.getElementById('pawnAmountText').innerText = `$${amtUsd.toFixed(2)} (${amtKhr.toLocaleString()} ៛)`;
                 
                 let rateVal = parseFloat(found.interestRate) || 0;
-                let rateText = (rateVal < 10) ? `$${rateVal}` : `${rateVal.toLocaleString()} ៛`;
+                let rateCurr = found.rateCurrency || (rateVal < 10 ? 'USD' : 'KHR');
+                let rateText = (rateCurr === 'USD') ? `$${rateVal.toFixed(2)}` : `${rateVal.toLocaleString()} ៛`;
                 document.getElementById('pawnRateText').innerText = rateText;
 
-                document.getElementById('pawnStartDateText').innerText = found.date || '-';
-                document.getElementById('pawnDateText').innerText = found.dueDate;
+                document.getElementById('pawnStartDateText').innerText = formatDateToDMY(found.date);
+                document.getElementById('pawnDateText').innerText = formatDateToDMY(found.dueDate);
                 displayGroup.style.display = 'block';
 
                 if (category === 'pawn_redeem') {
@@ -649,29 +707,27 @@
         }
     }
 
+    // 🎯 មុខងារគណនាប្រាក់លស់ស្វ័យប្រវត្តិ (គណនាថ្ងៃបច្ចុប្បន្ន ដក ថ្ងៃបញ្ចាំ ជាក់ស្ដែង)
     function calculateRedeemAmount() {
         if (!selectedPawnItem) return;
 
         const redeemBox = document.getElementById('pawnRedeemCalcBox');
         document.getElementById('interestExtendInfo').style.display = 'none';
-        document.getElementById('redeemStartDateText').innerText = selectedPawnItem.date || '-';
+        
+        let startDate = parseDateString(selectedPawnItem.date);
+        const today = new Date();
+        
+        startDate.setHours(0, 0, 0, 0);
+        today.setHours(0, 0, 0, 0);
 
-        let totalDays = 0;
-        if (selectedPawnItem.date) {
-            const startDate = new Date(selectedPawnItem.date);
-            const today = new Date();
-            startDate.setHours(0, 0, 0, 0);
-            today.setHours(0, 0, 0, 0);
-
-            const diffTime = today - startDate;
-            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-            totalDays = diffDays >= 0 ? diffDays + 1 : 1;
-        } else {
-            totalDays = parseInt(selectedPawnItem.days) || 1;
-        }
+        // 🔍 គណនាចំនួនថ្ងៃជាក់ស្ដែង (ថ្ងៃបច្ចុប្បន្ន - ថ្ងៃបញ្ចាំ + ១ ថ្ងៃ)
+        const diffTime = today.getTime() - startDate.getTime();
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        let actualTotalDays = diffDays >= 0 ? diffDays + 1 : 1;
 
         let ratePerDay = parseFloat(selectedPawnItem.interestRate) || 0;
-        let rateInUSD = (ratePerDay < 10) ? ratePerDay : ratePerDay / EXCHANGE_RATE;
+        let rateCurr = selectedPawnItem.rateCurrency || (ratePerDay < 10 ? 'USD' : 'KHR');
+        let rateInUSD = (rateCurr === 'USD') ? ratePerDay : ratePerDay / EXCHANGE_RATE;
 
         let totalInterestPaidUSD = parseFloat(selectedPawnItem.totalInterestPaid) || 0;
         let alreadyPaidDays = (rateInUSD > 0) ? Math.floor(totalInterestPaidUSD / rateInUSD) : 0;
@@ -679,11 +735,12 @@
         let chargeableDays = 0;
         let showNote = false;
 
-        if (totalDays < 4) {
+        // គិតលក្ខខណ្ឌអប្បបរមា (បញ្ចាំក្រោម ៤ ថ្ងៃ គិត ៣ ថ្ងៃ)
+        if (actualTotalDays < 4) {
             chargeableDays = 3 - alreadyPaidDays;
             showNote = true;
         } else {
-            chargeableDays = totalDays - alreadyPaidDays;
+            chargeableDays = actualTotalDays - alreadyPaidDays;
             showNote = false;
         }
 
@@ -695,9 +752,13 @@
         let principalUSD = parseFloat(selectedPawnItem.amount) || 0;
         let totalRedeemUSD = principalUSD + interestToPayUSD;
 
-        document.getElementById('totalPawnDaysText').innerText = totalDays;
+        let totalPaidKHR = totalInterestPaidUSD * EXCHANGE_RATE;
+
+        document.getElementById('redeemStartDateText').innerText = formatDateToDMY(startDate);
+        document.getElementById('redeemTodayDateText').innerText = formatDateToDMY(today);
+        document.getElementById('totalPawnDaysText').innerText = actualTotalDays;
         document.getElementById('alreadyPaidDaysText').innerText = alreadyPaidDays;
-        document.getElementById('alreadyPaidAmountText').innerText = `$${totalInterestPaidUSD.toFixed(2)}`;
+        document.getElementById('alreadyPaidAmountText').innerText = `${totalPaidKHR.toLocaleString()} ៛`;
         document.getElementById('chargeableDaysText').innerText = chargeableDays;
         document.getElementById('minimumFeeNote').style.display = showNote ? 'inline' : 'none';
 
@@ -726,6 +787,7 @@
         const rawPrice = parseFloat(document.getElementById('totalPrice').value) || 0;
         const currency = document.getElementById('currencyType').value;
         let ratePerDay = parseFloat(selectedPawnItem.interestRate) || 0;
+        let rateCurr = selectedPawnItem.rateCurrency || (ratePerDay < 10 ? 'USD' : 'KHR');
 
         if (rawPrice <= 0 || ratePerDay <= 0 || !currency) {
             extendDiv.style.display = 'none';
@@ -733,20 +795,16 @@
         }
 
         let totalPaidInKHR = (currency === 'USD') ? rawPrice * EXCHANGE_RATE : rawPrice;
-        let rateInKHR = (ratePerDay < 10) ? ratePerDay * EXCHANGE_RATE : ratePerDay;
+        let rateInKHR = (rateCurr === 'USD') ? ratePerDay * EXCHANGE_RATE : ratePerDay;
 
         calculatedAddedDays = Math.floor(totalPaidInKHR / rateInKHR);
 
         if (calculatedAddedDays > 0) {
-            let currentDue = new Date(selectedPawnItem.dueDate);
+            let currentDue = parseDateString(selectedPawnItem.dueDate);
             if (isNaN(currentDue.getTime())) { currentDue = new Date(); }
             
             currentDue.setDate(currentDue.getDate() + calculatedAddedDays);
-            
-            const yyyy = currentDue.getFullYear();
-            const mm = String(currentDue.getMonth() + 1).padStart(2, '0');
-            const dd = String(currentDue.getDate()).padStart(2, '0');
-            calculatedNewDueDate = `${yyyy}-${mm}-${dd}`;
+            calculatedNewDueDate = formatDateToDMY(currentDue);
 
             document.getElementById('addedDaysText').innerText = calculatedAddedDays;
             document.getElementById('newDueDateText').innerText = calculatedNewDueDate;
@@ -846,7 +904,6 @@
 
         let priceInUSD = (currency === 'USD') ? rawPrice : rawPrice / EXCHANGE_RATE;
         
-        // 🎯 ការកែសម្រួលដោះស្រាយ៖ បង្ហាញសញ្ញារូបិយប័ណ្ណត្រឹមត្រូវតាមប្រភេទប្រាក់ (ចំណូល)
         let displayPriceText = (currency === 'USD') 
             ? `$${rawPrice.toFixed(2)} (${(rawPrice * EXCHANGE_RATE).toLocaleString()} ៛)` 
             : `${rawPrice.toLocaleString()} ៛ (≈ $${priceInUSD.toFixed(2)})`;
@@ -862,7 +919,7 @@
             });
 
             if (isInterestPay) {
-                const todayStr = new Date().toISOString().split('T')[0];
+                const todayStr = formatDateToDMY(new Date());
                 await fetch(PAWN_SHEET_URL, {
                     method: 'POST', mode: 'no-cors',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -871,7 +928,8 @@
                         imei: selectedPawnItem.imei, 
                         newDueDate: calculatedNewDueDate,
                         interestPaidAmount: priceInUSD,
-                        paidDate: todayStr
+                        paidDate: todayStr,
+                        rateCurrency: currency || "KHR"
                     })
                 });
             }
@@ -976,7 +1034,6 @@
 
         let amountInUSD = (currency === 'USD') ? rawAmount : rawAmount / EXCHANGE_RATE;
 
-        // 🎯 ការកែសម្រួលដោះស្រាយ៖ លុបសញ្ញា $ ចេញពីលុយរៀល នៅពេលផ្ញើចូល Telegram (ចំណាយ)
         let displayAmountText = (currency === 'USD') 
             ? `-$${rawAmount.toFixed(2)} (${(rawAmount * EXCHANGE_RATE).toLocaleString()} ៛)` 
             : `-${rawAmount.toLocaleString()} ៛ (≈ -$${amountInUSD.toFixed(2)})`;
