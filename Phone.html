@@ -119,13 +119,36 @@
         <div class="form-group">
             <label for="itemCategory">ប្រភេទទំនិញ/សេវាកម្ម:</label>
             <select id="itemCategory" onchange="handleCategoryChange()">
-                <option value="phone">📱 ទូរសព្ទ (ដកស្តុក)</option>
-                <option value="charger">🔌 ឆ្នាំងសាក / ខ្សែកាប</option>
-                <option value="screen">📱 អ៊ុត Screen</option>
+                <option value="phone">📱 លក់ទូរសព្ទ (ដកស្តុក)</option>
                 <option value="repair">🛠️ សេវាជួសជុលទូរសព្ទ</option>
+                <option value="charger">🔌 ដុំសាក/ខ្សែសាក</option>
                 <option value="earphone">🎧 កាស / គ្រឿងបន្លាស់</option>
                 <option value="other">📦 ផ្សេងៗ</option>
             </select>
+        </div>
+
+        <!-- 🛠️ កន្លែងជ្រើសរើសសេវាកម្មជួសជុល -->
+        <div id="repairSectionGroup" style="display: none;">
+            <div class="form-group">
+                <label for="repairType">ប្រភេទសេវាជួសជុល៖</label>
+                <select id="repairType" onchange="handleRepairTypeChange()">
+                    <option value="ផ្លាស់ប្ដូរអេក្រង់">📱 ផ្លាស់ប្ដូរអេក្រង់</option>
+                    <option value="ផ្លាស់ប្ដូរថ្ម">🔋 ផ្លាស់ប្ដូរថ្ម</option>
+                    <option value="អ៊ុតកញ្ចក់ថាច់">✨ អ៊ុតកញ្ចក់ថាច់</option>
+                    <option value="ផ្លាស់ប្ដូរសំបក">🛠️ ផ្លាស់ប្ដូរសំបក</option>
+                    <option value="other_repair">🔧 ផ្សេងៗ</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="customRepairDetailGroup" style="display: none;">
+                <label for="customRepairDetail">បញ្ជាក់សេវាជួសជុលផ្សេងៗ៖</label>
+                <input type="text" id="customRepairDetail" placeholder="ឧទាហរណ៍៖ ដូរឌុយសាក, ដូរកាមេរ៉ា...">
+            </div>
+
+            <div class="form-group">
+                <label for="repairPhoneModel">ម៉ាក/ម៉ូឌែលទូរសព្ទជួសជុល៖</label>
+                <input type="text" id="repairPhoneModel" placeholder="ឧទាហរណ៍៖ iPhone 13 Pro Max, Samsung S22 Ultra...">
+            </div>
         </div>
 
         <!-- 🔍 កន្លែង Search ម៉ូឌែលទូរសព្ទថ្មី (ដើរលើទូរសព្ទ ១០០%) -->
@@ -137,8 +160,8 @@
 
         <!-- កន្លែងបញ្ជាក់ឈ្មោះទំនិញផ្សេងៗ -->
         <div class="form-group" id="otherItemGroup" style="display: none;">
-            <label for="otherItemName">ឈ្មោះទំនិញ/ការជួសជុល:</label>
-            <input type="text" id="otherItemName" placeholder="ឧទាហរណ៍៖ ដូរអេក្រង់ iPhone 11 Pro">
+            <label for="otherItemName">ឈ្មោះទំនិញ/ការពិពណ៌នា:</label>
+            <input type="text" id="otherItemName" placeholder="បញ្ជាក់ឈ្មោះទំនិញ ឬសេវាកម្ម">
         </div>
 
         <div class="form-group">
@@ -178,9 +201,20 @@
 
     <div class="section-box">
         <h3>💸 កត់ត្រាការដកលុយ / ទទួលបញ្ចាំ (- លុយចេញ)</h3>
+        
         <div class="form-group">
-            <label for="expenseReason">មូលហេតុ (ឧទាហរណ៍៖ ទទួលបញ្ចាំ, ដកថ្លៃបាយ...):</label>
-            <input type="text" id="expenseReason" placeholder="បញ្ជាក់មូលហេតុដកលុយ">
+            <label for="expenseCategory">មូលហេតុដកលុយ៖</label>
+            <select id="expenseCategory" onchange="handleExpenseCategoryChange()">
+                <option value="ទទួលបញ្ចាំទូរសព្ទ">📱 ទទួលបញ្ចាំទូរសព្ទ</option>
+                <option value="សម្រាប់ទិញម្ហូប">🍲 សម្រាប់ទិញម្ហូប</option>
+                <option value="សម្រាប់ទិញទឹក">🥤 សម្រាប់ទិញទឹក</option>
+                <option value="other">📦 ផ្សេងៗ</option>
+            </select>
+        </div>
+
+        <div class="form-group" id="otherExpenseGroup" style="display: none;">
+            <label for="expenseReasonDetail">បញ្ជាក់មូលហេតុផ្សេងៗ៖</label>
+            <input type="text" id="expenseReasonDetail" placeholder="បញ្ចូលមូលហេតុដកលុយផ្សេងៗ...">
         </div>
 
         <div class="form-group">
@@ -256,14 +290,43 @@
     function handleCategoryChange() {
         const category = document.getElementById('itemCategory').value;
         const phoneGroup = document.getElementById('phoneModelGroup');
+        const repairSection = document.getElementById('repairSectionGroup');
         const otherGroup = document.getElementById('otherItemGroup');
 
         if (category === 'phone') {
             phoneGroup.style.display = 'block';
+            repairSection.style.display = 'none';
+            otherGroup.style.display = 'none';
+        } else if (category === 'repair') {
+            phoneGroup.style.display = 'none';
+            repairSection.style.display = 'block';
             otherGroup.style.display = 'none';
         } else {
             phoneGroup.style.display = 'none';
+            repairSection.style.display = 'none';
             otherGroup.style.display = 'block';
+        }
+    }
+
+    function handleRepairTypeChange() {
+        const repairType = document.getElementById('repairType').value;
+        const customGroup = document.getElementById('customRepairDetailGroup');
+
+        if (repairType === 'other_repair') {
+            customGroup.style.display = 'block';
+        } else {
+            customGroup.style.display = 'none';
+        }
+    }
+
+    function handleExpenseCategoryChange() {
+        const category = document.getElementById('expenseCategory').value;
+        const otherGroup = document.getElementById('otherExpenseGroup');
+
+        if (category === 'other') {
+            otherGroup.style.display = 'block';
+        } else {
+            otherGroup.style.display = 'none';
         }
     }
 
@@ -373,6 +436,27 @@
         if (category === 'phone') {
             itemName = document.getElementById('phoneSearchInput').value.trim();
             isPhone = true;
+        } else if (category === 'repair') {
+            const repairTypeVal = document.getElementById('repairType').value;
+            let repairServiceText = "";
+
+            if (repairTypeVal === 'other_repair') {
+                repairServiceText = document.getElementById('customRepairDetail').value.trim();
+                if (!repairServiceText) {
+                    alert("សូមបញ្ជាក់សេវាជួសជុលផ្សេងៗ!");
+                    return;
+                }
+            } else {
+                repairServiceText = repairTypeVal;
+            }
+
+            const modelText = document.getElementById('repairPhoneModel').value.trim();
+            if (!modelText) {
+                alert("សូមបញ្ចូលម៉ាក/ម៉ូឌែលទូរសព្ទដែលជួសជុល!");
+                return;
+            }
+
+            itemName = `🛠️ ${repairServiceText} (${modelText})`;
         } else {
             const categoryText = document.getElementById('itemCategory').options[document.getElementById('itemCategory').selectedIndex].text;
             const detail = document.getElementById('otherItemName').value.trim();
@@ -449,6 +533,8 @@
             document.getElementById('employeeNameStatus').innerText = '';
             currentVerifiedSeller = "";
             document.getElementById('phoneSearchInput').value = '';
+            document.getElementById('repairPhoneModel').value = '';
+            document.getElementById('customRepairDetail').value = '';
             document.getElementById('otherItemName').value = '';
             document.getElementById('totalPrice').value = '';
             document.getElementById('sellQty').value = '1';
@@ -468,7 +554,19 @@
             return;
         }
 
-        const reason = document.getElementById('expenseReason').value.trim();
+        const expenseCategory = document.getElementById('expenseCategory').value;
+        let reason = "";
+
+        if (expenseCategory === 'other') {
+            reason = document.getElementById('expenseReasonDetail').value.trim();
+            if (!reason) {
+                alert("សូមបញ្ចូលព័ត៌មានលម្អិតនៃមូលហេតុផ្សេងៗ!");
+                return;
+            }
+        } else {
+            reason = expenseCategory;
+        }
+
         const rawAmount = parseFloat(document.getElementById('expenseAmount').value);
         const currency = document.getElementById('expenseCurrencyType').value;
 
@@ -512,7 +610,9 @@
             document.getElementById('sellerPin').value = '';
             document.getElementById('employeeNameStatus').innerText = '';
             currentVerifiedSeller = "";
-            document.getElementById('expenseReason').value = '';
+            document.getElementById('expenseCategory').value = 'ទទួលបញ្ចាំទូរសព្ទ';
+            document.getElementById('otherExpenseGroup').style.display = 'none';
+            document.getElementById('expenseReasonDetail').value = '';
             document.getElementById('expenseAmount').value = '';
             setTimeout(fetchData, 1500);
 
