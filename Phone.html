@@ -15,7 +15,6 @@
         }
         h2, h3 { color: #2c3e50; text-align: center; margin-bottom: 15px; font-size: 20px; }
         
-        /* 💵 💳 Dashboard ផ្នែកបង្ហាញសាច់ប្រាក់ */
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -132,7 +131,6 @@
 <div class="container">
     <h2>📱 ប្រព័ន្ធគ្រប់គ្រងការលក់ និងសាច់ប្រាក់</h2>
 
-    <!-- 💵 💳 Dashboard បង្ហាញសាច់ប្រាក់ -->
     <div class="dashboard-grid">
         <div class="cash-box cash-box-hand">
             <h4>💵 សាច់ប្រាក់ក្នុងដៃ (Cash)</h4>
@@ -169,7 +167,6 @@
             </select>
         </div>
 
-        <!-- 💸/🔓 កន្លែងស្វែងរកទូរសព្ទបញ្ចាំ -->
         <div id="pawnSearchSectionGroup" style="display: none;">
             <div class="form-group">
                 <label for="pawnImeiSearch">🔍 បញ្ចូល IMEI (៤ ខ្ទង់ចុងក្រោយ):</label>
@@ -197,7 +194,6 @@
             </div>
         </div>
 
-        <!-- 🛠️ សេវាជួសជុល -->
         <div id="repairSectionGroup" style="display: none;">
             <div class="form-group">
                 <label for="repairType">ប្រភេទសេវាជួសជុល៖</label>
@@ -221,7 +217,6 @@
             </div>
         </div>
 
-        <!-- 🔍 ម៉ូឌែលទូរសព្ទលក់ -->
         <div class="form-group" id="phoneModelGroup">
             <label for="phoneSearchInput">🔍 ស្វែងរក / ជ្រើសរើសម៉ូឌែលទូរសព្ទ:</label>
             <input type="text" id="phoneSearchInput" placeholder="🔍 ចុចទីនេះដើម្បី Search..." oninput="filterPhoneModels()" onfocus="showPhoneDropdown()" autocomplete="off">
@@ -258,7 +253,7 @@
             </div>
         </div>
 
-        <button id="submitSaleBtn" onclick="openPinModal('sale')">📤 កត់ត្រាការលក់ & ផ្ញើទៅ Telegram</button>
+        <button id="submitSaleBtn" type="button" onclick="openPinModal('sale')">📤 កត់ត្រាការលក់ & ផ្ញើទៅ Telegram</button>
     </div>
 
     <!-- 📤 ផ្នែកកត់ត្រាចំណាយ (- លុយចេញ) -->
@@ -344,7 +339,7 @@
             </div>
         </div>
 
-        <button class="expense-btn" id="submitExpenseBtn" onclick="openPinModal('expense')">💸 កត់ត្រាការដកលុយ & ផ្ញើទៅ Telegram</button>
+        <button class="expense-btn" id="submitExpenseBtn" type="button" onclick="openPinModal('expense')">💸 កត់ត្រាការដកលុយ & ផ្ញើទៅ Telegram</button>
     </div>
 
     <hr style="margin: 25px 0; border: 0; border-top: 1px solid #eee;">
@@ -355,8 +350,8 @@
     </div>
 
     <div class="tab-container">
-        <button class="tab-btn active" id="tabStockBtn" onclick="switchTab('stock')">📱 ស្តុកទូរសព្ទលក់</button>
-        <button class="tab-btn" id="tabPawnBtn" onclick="switchTab('pawn')">🔒 បញ្ជីទូរសព្ទបញ្ចាំ</button>
+        <button type="button" class="tab-btn active" id="tabStockBtn" onclick="switchTab('stock')">📱 ស្តុកទូរសព្ទលក់</button>
+        <button type="button" class="tab-btn" id="tabPawnBtn" onclick="switchTab('pawn')">🔒 បញ្ជីទូរសព្ទបញ្ចាំ</button>
     </div>
 
     <div id="stockTableSection" class="table-wrapper">
@@ -394,15 +389,15 @@
     </div>
 </div>
 
-<!-- 🔒 POPUP MODAL សម្រាប់វាយ PIN បុគ្គលិក -->
+<!-- 🔒 POPUP MODAL សម្រាប់វាយ PIN បុគ្គលិក (កែប្រែប្រព័ន្ធស្ទាក់ Event) -->
 <div id="pinModal" class="pin-modal-overlay">
     <div class="pin-modal-content">
         <h3>🔒 បញ្ចូលលេខសម្ងាត់បុគ្គលិក</h3>
-        <input type="password" id="modalPinInput" placeholder="****" maxlength="6" autofocus>
+        <input type="password" id="modalPinInput" placeholder="****" maxlength="6" autofocus onkeyup="if(event.key==='Enter') confirmPinAndSubmit()">
         <div id="pinModalError" style="color: #dc3545; font-size: 13px; margin-bottom: 10px;"></div>
         <div class="modal-btn-group">
-            <button class="btn-cancel" onclick="closePinModal()">បោះបង់</button>
-            <button onclick="confirmPinAndSubmit()">បញ្ជាក់</button>
+            <button type="button" class="btn-cancel" onclick="closePinModal()">បោះបង់</button>
+            <button type="button" id="confirmPinBtn" onclick="confirmPinAndSubmit()">បញ្ជាក់</button>
         </div>
     </div>
 </div>
@@ -439,7 +434,7 @@
         document.getElementById('modalPinInput').value = '';
         document.getElementById('pinModalError').innerText = '';
         document.getElementById('pinModal').style.display = 'flex';
-        document.getElementById('modalPinInput').focus();
+        setTimeout(() => document.getElementById('modalPinInput').focus(), 100);
     }
 
     function closePinModal() {
@@ -447,17 +442,20 @@
         currentPendingAction = "";
     }
 
-    function confirmPinAndSubmit() {
+    // 🎯 អនុគមន៍គន្លឹះដែលបានកែប្រែឱ្យដំណើរការ ASYNC ច្បាស់លាស់
+    async function confirmPinAndSubmit() {
         const pinInput = document.getElementById('modalPinInput').value.trim();
         const errorDiv = document.getElementById('pinModalError');
+        const confirmBtn = document.getElementById('confirmPinBtn');
 
         if (EMPLOYEE_CODES[pinInput]) {
             currentVerifiedSeller = EMPLOYEE_CODES[pinInput];
             closePinModal();
+            
             if (currentPendingAction === 'sale') {
-                executeSaleSubmit();
+                await executeSaleSubmit();
             } else if (currentPendingAction === 'expense') {
-                executeExpenseSubmit();
+                await executeExpenseSubmit();
             }
         } else {
             errorDiv.innerText = "❌ លេខសម្ងាត់មិនត្រឹមត្រូវទេ! សូមវាយម្ដងទៀត";
@@ -649,7 +647,6 @@
         }
     }
 
-    // ⚡ មុខងារគណនាប្រាក់លស់ទូរសព្ទ (បានកែប្រែកន្លែងយកថ្ងៃបច្ចុប្បន្ន - ថ្ងៃបញ្ចាំ)
     function calculateRedeemAmount() {
         if (!selectedPawnItem) return;
 
@@ -658,20 +655,17 @@
 
         document.getElementById('redeemStartDateText').innerText = selectedPawnItem.date || '-';
 
-        // 🎯 គណនារយៈពេលបញ្ចាំសរុប = ថ្ងៃបច្ចុប្បន្ន (Today) - ថ្ងៃបញ្ចាំ (Start Date)
         let totalDays = 0;
         if (selectedPawnItem.date) {
             const startDate = new Date(selectedPawnItem.date);
             const today = new Date();
             
-            // សម្រួលម៉ោងឱ្យស្មើ 00:00:00 ដើម្បីគិតតែចំនួនថ្ងៃ
             startDate.setHours(0, 0, 0, 0);
             today.setHours(0, 0, 0, 0);
 
             const diffTime = today - startDate;
             const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
             
-            // ប្រសិនបើបញ្ចាំក្នុងថ្ងៃនេះតែម្តង គិត 1 ថ្ងៃ បើលើសពីនេះ យកចំនួនថ្ងៃជាក់ស្តែង
             totalDays = diffDays >= 0 ? diffDays + 1 : 1;
         } else {
             totalDays = parseInt(selectedPawnItem.days) || 1;
@@ -686,7 +680,6 @@
         let chargeableDays = 0;
         let showNote = false;
 
-        // គោលការណ៍៖ បើបញ្ចាំក្រោម ៤ ថ្ងៃ គិតការប្រាក់ ៣ ថ្ងៃ
         if (totalDays < 4) {
             chargeableDays = 3 - alreadyPaidDays;
             showNote = true;
