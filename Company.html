@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ប្រព័ន្ធ Login ចូលប្រើប្រាស់ Link</title>
+    <title>ប្រព័ន្ធ Login ចូលប្រើប្រាស់</title>
     <style>
         * {
             box-sizing: border-box;
@@ -11,19 +11,32 @@
             margin: 0;
             padding: 0;
         }
-        body {
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
             background-color: #f0f2f5;
+        }
+
+        /* ទម្រង់ Login */
+        .login-container {
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            width: 100vw;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            background-color: #f0f2f5;
         }
         .login-card {
             background: #ffffff;
             padding: 30px;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            width: 100%;
+            width: 90%;
             max-width: 380px;
         }
         .login-card h2 {
@@ -74,25 +87,39 @@
             margin-top: 15px;
             display: none;
         }
+
+        /* ផ្នែកបង្ហាញកម្មវិធី (App View) */
+        #appFrame {
+            width: 100%;
+            height: 100vh;
+            border: none;
+            display: none; /* លាក់ជាមុនសិន */
+        }
     </style>
 </head>
 <body>
 
-    <div class="login-card">
-        <h2>ចូលប្រើប្រាស់</h2>
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" placeholder="បញ្ចូល Username..." required>
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" placeholder="បញ្ចូល Password..." required>
-            </div>
-            <button type="submit" class="btn-submit">Login</button>
-            <div id="errorMessage" class="error-message">Username ឬ Password មិនត្រឹមត្រូវទេ!</div>
-        </form>
+    <!-- ទម្រង់ Login -->
+    <div class="login-container" id="loginScreen">
+        <div class="login-card">
+            <h2>ចូលប្រើប្រាស់</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" placeholder="បញ្ចូល Username..." required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="បញ្ចូល Password..." required>
+                </div>
+                <button type="submit" class="btn-submit">Login</button>
+                <div id="errorMessage" class="error-message">Username ឬ Password មិនត្រឹមត្រូវទេ!</div>
+            </form>
+        </div>
     </div>
+
+    <!-- ផ្នែកផ្ទុក App / Link ដែលត្រូវលាក់ -->
+    <iframe id="appFrame" src=""></iframe>
 
     <script>
         // ==============================================================
@@ -108,15 +135,9 @@
                 username: "admin",
                 password: "123",
                 redirectUrl: "https://google.com"
-            },
-            {
-                username: "user2",
-                password: "999",
-                redirectUrl: "https://facebook.com"
             }
         ];
 
-        // មុខងារផ្ទៀងផ្ទាត់ពេលចុច Login
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
@@ -124,17 +145,22 @@
             const inputPass = document.getElementById('password').value.trim();
             const errorElement = document.getElementById('errorMessage');
 
-            // ស្វែងរក Account ដែលត្រូវគ្នា
+            // ស្វែងរក Account
             const matchedUser = userDatabase.find(
                 acc => acc.username === inputUser && acc.password === inputPass
             );
 
             if (matchedUser) {
                 errorElement.style.display = 'none';
-                // ផ្ទេរទៅកាន់ Link ដែលបានកំណត់
-                window.location.href = matchedUser.redirectUrl;
+                
+                // លាក់ទម្រង់ Login 
+                document.getElementById('loginScreen').style.display = 'none';
+                
+                // បើក Link ក្នុង iframe ដោយមិនបង្ហាញ Link នៅលើ URL Bar ទេ
+                const iframe = document.getElementById('appFrame');
+                iframe.src = matchedUser.redirectUrl;
+                iframe.style.display = 'block';
             } else {
-                // បង្ហាញសារប្រាប់ថាខុស
                 errorElement.style.display = 'block';
             }
         });
