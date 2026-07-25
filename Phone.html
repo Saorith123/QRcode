@@ -187,7 +187,7 @@
 
                 <div id="pawnRedeemCalcBox" class="redeem-summary-box" style="display: none;">
                     <p>📅 <b>ថ្ងៃបញ្ចាំ៖</b> <span id="redeemStartDateText">-</span></p>
-                    <p>⏱️ <b>រយៈពេលបញ្ចាំសរុប៖</b> <span id="totalPawnDaysText">0</span> ថ្ងៃ</p>
+                    <p>⏱️ <b>រយៈពេលបញ្ចាំសរុប (រហូតមកដល់ថ្ងៃនេះ)៖</b> <span id="totalPawnDaysText">0</span> ថ្ងៃ</p>
                     <p>✅ <b>ធ្លាប់បង់ការប្រាក់បាន៖</b> <span id="alreadyPaidDaysText">0</span> ថ្ងៃ (ស្មើ <span id="alreadyPaidAmountText">$0.00</span>)</p>
                     <p>⏳ <b>ចំនួនថ្ងៃត្រូវគិតការប្រាក់៖</b> <span id="chargeableDaysText">0</span> ថ្ងៃ <i id="minimumFeeNote" style="color:#d32f2f; display:none;">(បញ្ចាំក្រោម ៤ថ្ងៃ គិត ៣ថ្ងៃ)</i></p>
                     <p>💸 <b>ការប្រាក់ដែលត្រូវបង់បន្ថែម៖</b> <b id="interestToPayText" style="color: #2e7d32;">$0.00</b></p>
@@ -429,11 +429,9 @@
     let calculatedAddedDays = 0;
     let calculatedRedeemInterestUSD = 0;
     let currentVerifiedSeller = "";
-    let currentPendingAction = ""; // 'sale' ឬ 'expense'
+    let currentPendingAction = ""; 
 
-    // 🔒 មុខងារបើក/បិទ Modal Bunjool PIN
     function openPinModal(actionType) {
-        // ពិនិត្យការបំពេញទិន្នន័យជាមុនសិន
         if (actionType === 'sale' && !validateSaleInputs()) return;
         if (actionType === 'expense' && !validateExpenseInputs()) return;
 
@@ -651,6 +649,7 @@
         }
     }
 
+    // ⚡ មុខងារគណនាប្រាក់លស់ទូរសព្ទ (បានកែប្រែកន្លែងយកថ្ងៃបច្ចុប្បន្ន - ថ្ងៃបញ្ចាំ)
     function calculateRedeemAmount() {
         if (!selectedPawnItem) return;
 
@@ -659,7 +658,24 @@
 
         document.getElementById('redeemStartDateText').innerText = selectedPawnItem.date || '-';
 
-        let totalDays = parseInt(selectedPawnItem.days) || 1;
+        // 🎯 គណនារយៈពេលបញ្ចាំសរុប = ថ្ងៃបច្ចុប្បន្ន (Today) - ថ្ងៃបញ្ចាំ (Start Date)
+        let totalDays = 0;
+        if (selectedPawnItem.date) {
+            const startDate = new Date(selectedPawnItem.date);
+            const today = new Date();
+            
+            // សម្រួលម៉ោងឱ្យស្មើ 00:00:00 ដើម្បីគិតតែចំនួនថ្ងៃ
+            startDate.setHours(0, 0, 0, 0);
+            today.setHours(0, 0, 0, 0);
+
+            const diffTime = today - startDate;
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            
+            // ប្រសិនបើបញ្ចាំក្នុងថ្ងៃនេះតែម្តង គិត 1 ថ្ងៃ បើលើសពីនេះ យកចំនួនថ្ងៃជាក់ស្តែង
+            totalDays = diffDays >= 0 ? diffDays + 1 : 1;
+        } else {
+            totalDays = parseInt(selectedPawnItem.days) || 1;
+        }
 
         let ratePerDay = parseFloat(selectedPawnItem.interestRate) || 0;
         let rateInUSD = (ratePerDay < 10) ? ratePerDay : ratePerDay / EXCHANGE_RATE;
@@ -670,6 +686,7 @@
         let chargeableDays = 0;
         let showNote = false;
 
+        // គោលការណ៍៖ បើបញ្ចាំក្រោម ៤ ថ្ងៃ គិតការប្រាក់ ៣ ថ្ងៃ
         if (totalDays < 4) {
             chargeableDays = 3 - alreadyPaidDays;
             showNote = true;
@@ -780,7 +797,6 @@
         }
     });
 
-    // 🔍 ពិនិត្យ Form លក់
     function validateSaleInputs() {
         const category = document.getElementById('itemCategory').value;
         const rawPrice = parseFloat(document.getElementById('totalPrice').value);
@@ -904,7 +920,6 @@
         finally { btn.disabled = false; btn.innerText = "📤 កត់ត្រាការលក់ & ផ្ញើទៅ Telegram"; }
     }
 
-    // 🔍 ពិនិត្យ Form ដកលុយ/បញ្ចាំ
     function validateExpenseInputs() {
         const expenseCategory = document.getElementById('expenseCategory').value;
         const paymentRadio = document.querySelector('input[name="expensePaymentType"]:checked');
