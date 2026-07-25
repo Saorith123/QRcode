@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ប្រព័ន្ធ Login ចូលប្រើប្រាស់ Link</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Kantumruy Pro', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .login-card {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 380px;
+        }
+        .login-card h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 24px;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: #555;
+            font-weight: 600;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus {
+            border-color: #007bff;
+        }
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-submit:hover {
+            background-color: #0056b3;
+        }
+        .error-message {
+            color: #dc3545;
+            font-size: 14px;
+            text-align: center;
+            margin-top: 15px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <h2>ចូលប្រើប្រាស់</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="បញ្ចូល Username..." required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="បញ្ចូល Password..." required>
+            </div>
+            <button type="submit" class="btn-submit">Login</button>
+            <div id="errorMessage" class="error-message">Username ឬ Password មិនត្រឹមត្រូវទេ!</div>
+        </form>
+    </div>
+
+    <script>
+        // ==============================================================
+        // ទីនេះជាកន្លែងបន្ថែម ឬកែប្រែ Username, Password និង Link
+        // ==============================================================
+        const userDatabase = [
+            {
+                username: "RS",
+                password: "168",
+                redirectUrl: "https://psnb.app/Phone"
+            },
+            {
+                username: "admin",
+                password: "123",
+                redirectUrl: "https://google.com"
+            },
+            {
+                username: "user2",
+                password: "999",
+                redirectUrl: "https://facebook.com"
+            }
+        ];
+
+        // មុខងារផ្ទៀងផ្ទាត់ពេលចុច Login
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const inputUser = document.getElementById('username').value.trim();
+            const inputPass = document.getElementById('password').value.trim();
+            const errorElement = document.getElementById('errorMessage');
+
+            // ស្វែងរក Account ដែលត្រូវគ្នា
+            const matchedUser = userDatabase.find(
+                acc => acc.username === inputUser && acc.password === inputPass
+            );
+
+            if (matchedUser) {
+                errorElement.style.display = 'none';
+                // ផ្ទេរទៅកាន់ Link ដែលបានកំណត់
+                window.location.href = matchedUser.redirectUrl;
+            } else {
+                // បង្ហាញសារប្រាប់ថាខុស
+                errorElement.style.display = 'block';
+            }
+        });
+    </script>
+
+</body>
+</html>
