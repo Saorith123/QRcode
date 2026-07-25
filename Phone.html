@@ -10,72 +10,60 @@
             margin: 0; padding: 15px; background-color: #f4f6f9; 
         }
         .container { 
-            max-width: 800px; margin: auto; background: white; 
+            max-width: 950px; margin: auto; background: white; 
             padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); 
         }
         h2, h3 { color: #2c3e50; text-align: center; margin-bottom: 15px; font-size: 20px; }
-        .cash-box {
-            background-color: #e8f5e9; border: 2px solid #28a745;
-            border-radius: 10px; padding: 12px; text-align: center; margin-bottom: 20px;
+        
+        /* 💵 💳 Dashboard ផ្នែកបង្ហាញសាច់ប្រាក់ */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
         }
-        .cash-box h4 { margin: 0; color: #2e7d32; font-size: 15px; }
-        .cash-box .amount-usd { font-size: 28px; font-weight: bold; color: #1b5e20; margin-top: 4px; }
-        .cash-box .amount-khr { font-size: 18px; font-weight: bold; color: #d32f2f; margin-top: 2px; }
+        .cash-box {
+            border-radius: 10px; padding: 12px; text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .cash-box-hand { background-color: #e8f5e9; border: 2px solid #28a745; }
+        .cash-box-bank { background-color: #e3f2fd; border: 2px solid #007bff; }
+        .cash-box-total { background-color: #fff3cd; border: 2px solid #ffc107; grid-column: span 1 / -1; }
+
+        .cash-box h4 { margin: 0; font-size: 14px; }
+        .cash-box-hand h4 { color: #2e7d32; }
+        .cash-box-bank h4 { color: #0d47a1; }
+        .cash-box-total h4 { color: #856404; }
+
+        .cash-box .amount-usd { font-size: 24px; font-weight: bold; margin-top: 4px; }
+        .cash-box-hand .amount-usd { color: #1b5e20; }
+        .cash-box-bank .amount-usd { color: #1565c0; }
+        .cash-box-total .amount-usd { color: #b78103; font-size: 28px; }
+
+        .cash-box .amount-khr { font-size: 16px; font-weight: bold; color: #d32f2f; margin-top: 2px; }
+
         .form-group { margin-bottom: 15px; position: relative; }
         label { display: block; margin-bottom: 6px; font-weight: bold; color: #34495e; font-size: 14px; }
         input, select { 
             width: 100%; padding: 12px; border: 1px solid #cccccc; 
             border-radius: 8px; box-sizing: border-box; font-size: 15px;
         }
-        .price-input-container {
-            display: flex; gap: 8px;
-        }
+        .price-input-container { display: flex; gap: 8px; }
         .price-input-container input { flex: 2; }
         .price-input-container select { flex: 1.2; }
-        .employee-badge {
-            margin-top: 6px; font-weight: bold; font-size: 13px; transition: all 0.3s ease;
-        }
-        .radio-group {
-            display: flex; flex-direction: column; gap: 10px; background: #eef2f5; padding: 12px; border-radius: 8px;
-        }
-        .radio-group label {
-            display: flex; align-items: center; gap: 10px; cursor: pointer; margin: 0; font-weight: normal; font-size: 14px;
-        }
+        .employee-badge { margin-top: 6px; font-weight: bold; font-size: 13px; transition: all 0.3s ease; }
+        .radio-group { display: flex; flex-direction: column; gap: 10px; background: #eef2f5; padding: 12px; border-radius: 8px; }
+        .radio-group label { display: flex; align-items: center; gap: 10px; cursor: pointer; margin: 0; font-weight: normal; font-size: 14px; }
         .radio-group input[type="radio"] { width: auto; margin: 0; }
         
-        /* 🔍 Custom Search Dropdown សម្រាប់ទូរសព្ទដៃ */
         .custom-dropdown-list {
-            position: absolute;
-            top: 100%; left: 0; right: 0;
-            max-height: 220px;
-            overflow-y: auto;
-            background: white;
-            border: 2px solid #007bff;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 9999;
-            display: none;
+            position: absolute; top: 100%; left: 0; right: 0; max-height: 220px; overflow-y: auto;
+            background: white; border: 2px solid #007bff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 9999; display: none;
         }
-        .dropdown-item {
-            padding: 12px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        .dropdown-item:active {
-            background-color: #e9ecef;
-        }
-        .stock-tag {
-            font-size: 12px;
-            background: #e8f5e9;
-            color: #2e7d32;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-weight: bold;
-        }
+        .dropdown-item { padding: 12px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 14px; }
+        .dropdown-item:active { background-color: #e9ecef; }
+        .stock-tag { font-size: 12px; background: #e8f5e9; color: #2e7d32; padding: 3px 8px; border-radius: 12px; font-weight: bold; }
 
         button { 
             width: 100%; padding: 14px; background-color: #28a745; 
@@ -85,14 +73,41 @@
         button:hover { background-color: #218838; }
         .expense-btn { background-color: #fd7e14; }
         .expense-btn:hover { background-color: #e06b0d; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
-        th, td { border: 1px solid #dee2e6; padding: 10px 6px; text-align: center; }
+        
+        .refresh-btn {
+            background-color: #17a2b8; color: white; border: none; padding: 10px 16px;
+            border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; width: auto; margin-top: 0;
+        }
+        .refresh-btn:hover { background-color: #138496; }
+
+        .table-header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .table-header-container h3 { margin: 0; }
+
+        .tab-container { display: flex; gap: 10px; margin-bottom: 15px; }
+        .tab-btn {
+            flex: 1; padding: 10px; background-color: #e9ecef; color: #495057;
+            border: 1px solid #ced4da; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 0; font-size: 14px;
+        }
+        .tab-btn.active { background-color: #007bff; color: white; border-color: #007bff; }
+
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; white-space: nowrap; }
+        th, td { border: 1px solid #dee2e6; padding: 10px 8px; text-align: center; }
         th { background-color: #007bff; color: white; }
         tr:nth-child(even) { background-color: #f8f9fa; }
-        .section-box {
-            background-color: #f8f9fa; border: 1px solid #e9ecef;
-            padding: 15px; border-radius: 10px; margin-bottom: 20px;
+        .section-box { background-color: #f8f9fa; border: 1px solid #e9ecef; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
+        
+        .pawn-info-card {
+            background-color: #e3f2fd; border: 1px solid #90caf9; padding: 12px; border-radius: 8px; margin-top: 10px;
         }
+        .pawn-info-card p { margin: 4px 0; font-size: 14px; color: #0d47a1; }
+
+        .redeem-summary-box {
+            background-color: #fff3cd; border: 1px solid #ffeeba; border-radius: 8px;
+            padding: 12px; margin-top: 10px; color: #856404; font-size: 14px;
+        }
+        .redeem-summary-box p { margin: 4px 0; }
+        .highlight-total { font-size: 18px; font-weight: bold; color: #d32f2f; margin-top: 6px; }
     </style>
 </head>
 <body>
@@ -100,16 +115,31 @@
 <div class="container">
     <h2>📱 ប្រព័ន្ធគ្រប់គ្រងការលក់ និងសាច់ប្រាក់</h2>
 
-    <div class="cash-box">
-        <h4>💵 សាច់ប្រាក់ស្រស់ក្នុងដៃ (Cash Balance)</h4>
-        <div class="amount-usd" id="cashBalanceDisplay">$0.00</div>
-        <div class="amount-khr" id="cashBalanceKHRDisplay">≈ 0 ៛</div>
+    <!-- 💵 💳 Dashboard បង្ហាញសាច់ប្រាក់ក្នុងដៃ, ក្នុងកុង និងសរុប -->
+    <div class="dashboard-grid">
+        <div class="cash-box cash-box-hand">
+            <h4>💵 សាច់ប្រាក់ក្នុងដៃ (Cash)</h4>
+            <div class="amount-usd" id="cashBalanceDisplay">$0.00</div>
+            <div class="amount-khr" id="cashBalanceKHRDisplay">≈ 0 ៛</div>
+        </div>
+
+        <div class="cash-box cash-box-bank">
+            <h4>💳 សាច់ប្រាក់ក្នុងកុង (Bank/QR)</h4>
+            <div class="amount-usd" id="bankBalanceDisplay">$0.00</div>
+            <div class="amount-khr" id="bankBalanceKHRDisplay">≈ 0 ៛</div>
+        </div>
+
+        <div class="cash-box cash-box-total">
+            <h4>💰 សាច់ប្រាក់សរុបរួម (Total Balance)</h4>
+            <div class="amount-usd" id="totalBalanceDisplay">$0.00</div>
+            <div class="amount-khr" id="totalBalanceKHRDisplay">≈ 0 ៛</div>
+        </div>
     </div>
 
+    <!-- 📥 ផ្នែកកត់ត្រាចំណូល (+ លុយចូល) -->
     <div class="section-box">
-        <h3>🛒 កត់ត្រាការលក់ & សេវាកម្ម</h3>
+        <h3>🛒 កត់ត្រាការលក់ & សេវាកម្ម (+ លុយចូល)</h3>
         
-        <!-- កន្លែងបញ្ចូលលេខកូដសម្ងាត់បុគ្គលិក -->
         <div class="form-group">
             <label for="sellerPin">🔒 លេខសម្ងាត់បុគ្គលិក (PIN/ID):</label>
             <input type="password" id="sellerPin" placeholder="បញ្ចូលលេខសម្ងាត់បុគ្គលិក" oninput="verifyEmployeePin()">
@@ -120,14 +150,44 @@
             <label for="itemCategory">ប្រភេទទំនិញ/សេវាកម្ម:</label>
             <select id="itemCategory" onchange="handleCategoryChange()">
                 <option value="phone">📱 លក់ទូរសព្ទ (ដកស្តុក)</option>
+                <option value="interest">💸 បង់ការប្រាក់ទូរសព្ទបញ្ចាំ</option>
+                <option value="pawn_redeem">🔓 លស់ទូរសព្ទបញ្ចាំ</option>
                 <option value="repair">🛠️ សេវាជួសជុលទូរសព្ទ</option>
                 <option value="charger">🔌 ដុំសាក/ខ្សែសាក</option>
-                <option value="earphone">🎧 កាស / គ្រឿងបន្លាស់</option>
                 <option value="other">📦 ផ្សេងៗ</option>
             </select>
         </div>
 
-        <!-- 🛠️ កន្លែងជ្រើសរើសសេវាកម្មជួសជុល -->
+        <!-- 💸/🔓 កន្លែងស្វែងរកទូរសព្ទបញ្ចាំ -->
+        <div id="pawnSearchSectionGroup" style="display: none;">
+            <div class="form-group">
+                <label for="pawnImeiSearch">🔍 បញ្ចូល IMEI (៤ ខ្ទង់ចុងក្រោយ):</label>
+                <input type="text" id="pawnImeiSearch" maxlength="4" placeholder="ឧទាហរណ៍៖ 1234" oninput="searchPawnByImei()">
+            </div>
+            
+            <div class="pawn-info-card" id="pawnDetailDisplayGroup" style="display: none;">
+                <p>📱 <b>ម៉ូឌែល៖</b> <span id="pawnModelText">-</span> (ពណ៌៖ <span id="pawnColorText">-</span>)</p>
+                <p>💵 <b>ប្រាក់ដើមបញ្ចាំ៖</b> <span id="pawnAmountText">-</span> | <b>ការប្រាក់/ថ្ងៃ៖</b> <span id="pawnRateText">-</span></p>
+                <p>📅 <b>ថ្ងៃបញ្ចាំ៖</b> <span id="pawnStartDateText">-</span> | <b>ថ្ងៃផុតកំណត់៖</b> <span id="pawnDateText">-</span></p>
+                
+                <!-- 💸 ព័ត៌មានពន្យារពេលបង់ការប្រាក់ -->
+                <div id="interestExtendInfo" style="display: none; margin-top: 8px; padding-top: 8px; border-top: 1px dashed #90caf9; color: #2e7d32; font-weight: bold;">
+                    ➕ ទទួលបានថែម៖ <span id="addedDaysText">0</span> ថ្ងៃ ➔ <b>ថ្ងៃផុតកំណត់ថ្មី៖</b> <span id="newDueDateText">-</span>
+                </div>
+
+                <!-- 🔓 ព័ត៌មានលម្អិតសម្រាប់លស់ទូរសព្ទ -->
+                <div id="pawnRedeemCalcBox" class="redeem-summary-box" style="display: none;">
+                    <p>⏱️ <b>រយៈពេលបញ្ចាំសរុប៖</b> <span id="totalPawnDaysText">0</span> ថ្ងៃ</p>
+                    <p>✅ <b>ធ្លាប់បង់ការប្រាក់បាន៖</b> <span id="alreadyPaidDaysText">0</span> ថ្ងៃ (ស្មើ <span id="alreadyPaidAmountText">$0.00</span>)</p>
+                    <p>⏳ <b>ចំនួនថ្ងៃត្រូវគិតការប្រាក់៖</b> <span id="chargeableDaysText">0</span> ថ្ងៃ <i id="minimumFeeNote" style="color:#d32f2f; display:none;">(បញ្ចាំក្រោម ៤ថ្ងៃ គិត ៣ថ្ងៃ)</i></p>
+                    <p>💸 <b>ការប្រាក់ដែលត្រូវបង់បន្ថែម៖</b> <b id="interestToPayText" style="color: #2e7d32;">$0.00</b></p>
+                    <hr style="margin: 6px 0; border: 0; border-top: 1px solid #ffeeba;">
+                    <div class="highlight-total">💰 ប្រាក់សរុបត្រូវប្រមូល (ដើម + ការប្រាក់): <span id="totalRedeemAmountText">$0.00</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🛠️ សេវាជួសជុល -->
         <div id="repairSectionGroup" style="display: none;">
             <div class="form-group">
                 <label for="repairType">ប្រភេទសេវាជួសជុល៖</label>
@@ -142,74 +202,126 @@
 
             <div class="form-group" id="customRepairDetailGroup" style="display: none;">
                 <label for="customRepairDetail">បញ្ជាក់សេវាជួសជុលផ្សេងៗ៖</label>
-                <input type="text" id="customRepairDetail" placeholder="ឧទាហរណ៍៖ ដូរឌុយសាក, ដូរកាមេរ៉ា...">
+                <input type="text" id="customRepairDetail" placeholder="ឧទាហរណ៍៖ ដូរកាមេរ៉ា, ជួសជុលម៉ាស៊ីន...">
             </div>
 
             <div class="form-group">
                 <label for="repairPhoneModel">ម៉ាក/ម៉ូឌែលទូរសព្ទជួសជុល៖</label>
-                <input type="text" id="repairPhoneModel" placeholder="ឧទាហរណ៍៖ iPhone 13 Pro Max, Samsung S22 Ultra...">
+                <input type="text" id="repairPhoneModel" placeholder="ឧទាហរណ៍៖ iPhone 13 Pro Max...">
             </div>
         </div>
 
-        <!-- 🔍 កន្លែង Search ម៉ូឌែលទូរសព្ទថ្មី (ដើរលើទូរសព្ទ ១០០%) -->
+        <!-- 🔍 ម៉ូឌែលទូរសព្ទលក់ -->
         <div class="form-group" id="phoneModelGroup">
             <label for="phoneSearchInput">🔍 ស្វែងរក / ជ្រើសរើសម៉ូឌែលទូរសព្ទ:</label>
             <input type="text" id="phoneSearchInput" placeholder="🔍 ចុចទីនេះដើម្បី Search..." oninput="filterPhoneModels()" onfocus="showPhoneDropdown()" autocomplete="off">
             <div id="phoneDropdownList" class="custom-dropdown-list"></div>
         </div>
 
-        <!-- កន្លែងបញ្ជាក់ឈ្មោះទំនិញផ្សេងៗ -->
         <div class="form-group" id="otherItemGroup" style="display: none;">
             <label for="otherItemName">ឈ្មោះទំនិញ/ការពិពណ៌នា:</label>
             <input type="text" id="otherItemName" placeholder="បញ្ជាក់ឈ្មោះទំនិញ ឬសេវាកម្ម">
         </div>
 
-        <div class="form-group">
+        <div class="form-group" id="qtyGroup">
             <label for="sellQty">ចំនួន (គ្រឿង/ដង):</label>
             <input type="number" id="sellQty" min="1" value="1">
         </div>
 
-        <!-- កន្លែងបញ្ចូលតម្លៃ និងជ្រើសរើសរូបិយប័ណ្ណ ($ ឬ ៛) -->
         <div class="form-group">
             <label for="totalPrice">តម្លៃសរុប និង រូបិយប័ណ្ណទទួល៖</label>
             <div class="price-input-container">
-                <input type="number" id="totalPrice" placeholder="បញ្ចូលចំនួនទឹកប្រាក់">
-                <select id="currencyType">
-                    <option value="USD">💵 ដុល្លារ ($)</option>
+                <input type="number" id="totalPrice" placeholder="បញ្ចូលចំនួនទឹកប្រាក់" oninput="calculateInterestExtension()">
+                <!-- 🎯 តម្រូវឱ្យជ្រើសរើសរូបិយប័ណ្ណ -->
+                <select id="currencyType" onchange="calculateInterestExtension()">
+                    <option value="">-- ជ្រើសរើសរូបិយប័ណ្ណ --</option>
                     <option value="KHR">៛ រៀល (៛)</option>
+                    <option value="USD">💵 ដុល្លារ ($)</option>
                 </select>
             </div>
         </div>
 
-        <!-- ប្រភេទសាច់ប្រាក់ -->
         <div class="form-group">
             <label>💳 ប្រភេទសាច់ប្រាក់ទទួល៖</label>
+            <!-- 🎯 តម្រូវឱ្យជ្រើសរើសប្រភេទសាច់ប្រាក់ (គ្មាន default) -->
             <div class="radio-group">
-                <label>
-                    <input type="radio" name="paymentType" value="cash" checked> 
-                    💵 លុយស្រស់ (បូកចូលប្រាក់ក្នុងដៃ)
-                </label>
-                <label>
-                    <input type="radio" name="paymentType" value="bank"> 
-                    💳 លុយកុង/QR (មិនបូកចូលប្រាក់ក្នុងដៃ)
-                </label>
+                <label><input type="radio" name="paymentType" value="cash"> 💵 លុយស្រស់ (ចូលប្រាក់ក្នុងដៃ)</label>
+                <label><input type="radio" name="paymentType" value="bank"> 💳 លុយកុង/QR (ចូលប្រាក់ក្នុងកុង)</label>
             </div>
         </div>
 
         <button id="submitSaleBtn" onclick="submitSale()">📤 កត់ត្រាការលក់ & ផ្ញើទៅ Telegram</button>
     </div>
 
+    <!-- 📤 ផ្នែកកត់ត្រាចំណាយ (- លុយចេញ) -->
     <div class="section-box">
         <h3>💸 កត់ត្រាការដកលុយ / ទទួលបញ្ចាំ (- លុយចេញ)</h3>
         
         <div class="form-group">
             <label for="expenseCategory">មូលហេតុដកលុយ៖</label>
             <select id="expenseCategory" onchange="handleExpenseCategoryChange()">
-                <option value="ទទួលបញ្ចាំទូរសព្ទ">📱 ទទួលបញ្ចាំទូរសព្ទ</option>
+                <option value="pawn_in">📱 ទទួលបញ្ចាំទូរសព្ទ</option>
                 <option value="សម្រាប់ទិញម្ហូប">🍲 សម្រាប់ទិញម្ហូប</option>
                 <option value="សម្រាប់ទិញទឹក">🥤 សម្រាប់ទិញទឹក</option>
                 <option value="other">📦 ផ្សេងៗ</option>
             </select>
+        </div>
+
+        <div id="pawnDetailInputsGroup">
+            <div class="form-group">
+                <label for="pawnPhoneModel">📱 ម៉ាក/ម៉ូឌែលទូរសព្ទបញ្ចាំ៖</label>
+                <input type="text" id="pawnPhoneModel" placeholder="ឧទាហរណ៍៖ iPhone 12 Pro Max">
+            </div>
+
+            <div class="form-group">
+                <label for="pawnColor">🎨 ពណ៌ទូរសព្ទ៖</label>
+                <input type="text" id="pawnColor" placeholder="ឧទាហរណ៍៖ ពណ៌ខ្មៅ / Gold">
+            </div>
+
+            <div class="form-group">
+                <label for="pawnImei">🔢 លេខ IMEI (៤ ខ្ទង់ចុងក្រោយ):</label>
+                <input type="text" id="pawnImei" maxlength="4" placeholder="ឧទាហរណ៍៖ 8899">
+            </div>
+
+            <div class="form-group">
+                <label for="pawnDaysSelect">📅 រយៈពេលបញ្ចាំ (ថ្ងៃ)៖</label>
+                <select id="pawnDaysSelect" onchange="calculatePawnDueDate()">
+                    <option value="2">2 ថ្ងៃ</option>
+                    <option value="5">5 ថ្ងៃ</option>
+                    <option value="10" selected>10 ថ្ងៃ (ទូទៅ)</option>
+                    <option value="15">15 ថ្ងៃ</option>
+                    <option value="30">30 ថ្ងៃ (1 ខែ)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="pawnDueDate">📆 ថ្ងៃផុតកំណត់បញ្ចាំ៖</label>
+                <input type="date" id="pawnDueDate" readonly style="background-color: #e9ecef;">
+            </div>
+
+            <div class="form-group">
+                <label for="expenseAmount">💵 ប្រាក់ដើមបញ្ចាំ / ចំនួនលុយដកចេញ៖</label>
+                <div class="price-input-container">
+                    <input type="number" id="expenseAmount" placeholder="បញ្ចូលប្រាក់ដើមបញ្ចាំ" oninput="autoCalculateInterest()">
+                    <!-- 🎯 តម្រូវឱ្យជ្រើសរើសរូបិយប័ណ្ណសម្រាប់ដក -->
+                    <select id="expenseCurrencyType" onchange="autoCalculateInterest()">
+                        <option value="">-- ជ្រើសរើសរូបិយប័ណ្ណ --</option>
+                        <option value="KHR">៛ រៀល (៛)</option>
+                        <option value="USD">💵 ដុល្លារ ($)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="pawnInterestRate">💸 ការប្រាក់ក្នុង ១ ថ្ងៃ (គណនាស្វ័យប្រវត្តិ/អាចកែបាន)៖</label>
+                <div class="price-input-container">
+                    <input type="number" id="pawnInterestRate" step="100" placeholder="បញ្ចូល ឬកែការប្រាក់">
+                    <select id="pawnRateCurrency">
+                        <option value="KHR">៛ រៀល</option>
+                        <option value="USD">💵 ដុល្លារ</option>
+                    </select>
+                </div>
+            </div>
         </div>
 
         <div class="form-group" id="otherExpenseGroup" style="display: none;">
@@ -217,14 +329,13 @@
             <input type="text" id="expenseReasonDetail" placeholder="បញ្ចូលមូលហេតុដកលុយផ្សេងៗ...">
         </div>
 
+        <!-- ➕ បន្ថែមជម្រើស ប្រភេទសាច់ប្រាក់សម្រាប់ដក/បញ្ចាំ -->
         <div class="form-group">
-            <label for="expenseAmount">ចំនួនលុយដកចេញពីប្រាក់ក្នុងដៃ៖</label>
-            <div class="price-input-container">
-                <input type="number" id="expenseAmount" placeholder="បញ្ចូលចំនួនទឹកប្រាក់">
-                <select id="expenseCurrencyType">
-                    <option value="USD">💵 ដុល្លារ ($)</option>
-                    <option value="KHR">៛ រៀល (៛)</option>
-                </select>
+            <label>💳 ប្រភេទសាច់ប្រាក់ដកចេញ៖</label>
+            <!-- 🎯 តម្រូវឱ្យជ្រើសរើសប្រភេទសាច់ប្រាក់ដក (គ្មាន default) -->
+            <div class="radio-group">
+                <label><input type="radio" name="expensePaymentType" value="cash"> 💵 លុយស្រស់ (ដកចេញពីប្រាក់ក្នុងដៃ)</label>
+                <label><input type="radio" name="expensePaymentType" value="bank"> 💳 លុយកុង/QR (ដកចេញពីប្រាក់ក្នុងកុង)</label>
             </div>
         </div>
 
@@ -233,28 +344,58 @@
 
     <hr style="margin: 25px 0; border: 0; border-top: 1px solid #eee;">
 
-    <h3>📊 របាយការណ៍ស្តុកទូរសព្ទ</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>ម៉ូឌែលទូរសព្ទ</th>
-                <th>ស្តុកដើម</th>
-                <th>លក់បាន</th>
-                <th>នៅសល់</th>
-            </tr>
-        </thead>
-        <tbody id="stockTable">
-            <tr><td colspan="4">កំពុងទាញយកទិន្នន័យ...</td></tr>
-        </tbody>
-    </table>
+    <div class="table-header-container">
+        <h3>📊 របាយការណ៍ទិន្នន័យ</h3>
+        <button type="button" class="refresh-btn" id="refreshBtn" onclick="fetchData()">🔄 ពិនិត្យម្ដងទៀត</button>
+    </div>
+
+    <div class="tab-container">
+        <button class="tab-btn active" id="tabStockBtn" onclick="switchTab('stock')">📱 ស្តុកទូរសព្ទលក់</button>
+        <button class="tab-btn" id="tabPawnBtn" onclick="switchTab('pawn')">🔒 បញ្ជីទូរសព្ទបញ្ចាំ</button>
+    </div>
+
+    <div id="stockTableSection" class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>ម៉ូឌែលទូរសព្ទ</th>
+                    <th>ស្តុកដើម</th>
+                    <th>លក់បាន</th>
+                    <th>នៅសល់</th>
+                </tr>
+            </thead>
+            <tbody id="stockTable">
+                <tr><td colspan="4">កំពុងទាញយកទិន្នន័យ...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="pawnTableSection" class="table-wrapper" style="display: none;">
+        <table>
+            <thead>
+                <tr>
+                    <th>ម៉ូឌែល / ពណ៌</th>
+                    <th>IMEI (4ខ្ទង់)</th>
+                    <th>ប្រាក់បញ្ចាំ</th>
+                    <th>ថ្ងៃផុតកំណត់</th>
+                    <th>បានបង់ការប្រាក់</th>
+                    <th>កាលបរិច្ឆេទបង់ការប្រាក់</th>
+                </tr>
+            </thead>
+            <tbody id="pawnTable">
+                <tr><td colspan="6">គ្មានទិន្នន័យទូរសព្ទបញ្ចាំទេ</td></tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <script>
     const TELEGRAM_BOT_TOKEN = '8875601366:AAHrCpV6w2FijHcJqQ9WBskEJYf6-ReD7CU'; 
     const TELEGRAM_CHAT_ID = '-1004473550210'; 
-    const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbzYy7tamlJaWK0TyOquRH6Fi3gvzfw73KJ38ymi2QcYev_3dODd_Q7O6KAeWdScPPVU/exec'; 
+    
+    const MAIN_SHEET_URL = 'https://script.google.com/macros/s/AKfycbzdU0lDH-tQtss-RzM1gnV_dngLHuLH9auPkZBFbVxtEia-Nq49iYYTxIrBiMmYfpvU/exec';
+    const PAWN_SHEET_URL = 'https://script.google.com/macros/s/AKfycbzvPoUUUoIYMZ10VMYkSuajdRUIFGnsDJOscHEgzYjLiX4-Y4j7dH9anktzzZpqRu2d2g/exec';
 
-    // 🔑 បញ្ជីលេខសម្ងាត់បុគ្គលិក
     const EMPLOYEE_CODES = {
         "04": "សីហា",
         "102": "វិចិត្រ",
@@ -262,19 +403,19 @@
         "999": "មេហាង"
     };
 
-    const EXCHANGE_RATE = 4000; // 1 USD = 4000 KHR
+    const EXCHANGE_RATE = 4000;
     let inventory = [];
+    let pawnItems = [];
+    let selectedPawnItem = null;
+    let calculatedNewDueDate = "";
+    let calculatedAddedDays = 0;
     let currentVerifiedSeller = "";
 
     function verifyEmployeePin() {
         const pinInput = document.getElementById('sellerPin').value.trim();
         const statusDiv = document.getElementById('employeeNameStatus');
 
-        if (pinInput === "") {
-            statusDiv.innerText = "";
-            currentVerifiedSeller = "";
-            return;
-        }
+        if (pinInput === "") { statusDiv.innerText = ""; currentVerifiedSeller = ""; return; }
 
         if (EMPLOYEE_CODES[pinInput]) {
             currentVerifiedSeller = EMPLOYEE_CODES[pinInput];
@@ -289,80 +430,124 @@
 
     function handleCategoryChange() {
         const category = document.getElementById('itemCategory').value;
-        const phoneGroup = document.getElementById('phoneModelGroup');
-        const repairSection = document.getElementById('repairSectionGroup');
-        const otherGroup = document.getElementById('otherItemGroup');
-
-        if (category === 'phone') {
-            phoneGroup.style.display = 'block';
-            repairSection.style.display = 'none';
-            otherGroup.style.display = 'none';
-        } else if (category === 'repair') {
-            phoneGroup.style.display = 'none';
-            repairSection.style.display = 'block';
-            otherGroup.style.display = 'none';
-        } else {
-            phoneGroup.style.display = 'none';
-            repairSection.style.display = 'none';
-            otherGroup.style.display = 'block';
-        }
+        document.getElementById('phoneModelGroup').style.display = (category === 'phone') ? 'block' : 'none';
+        document.getElementById('pawnSearchSectionGroup').style.display = (category === 'pawn_redeem' || category === 'interest') ? 'block' : 'none';
+        document.getElementById('repairSectionGroup').style.display = (category === 'repair') ? 'block' : 'none';
+        document.getElementById('otherItemGroup').style.display = (['charger', 'other'].includes(category)) ? 'block' : 'none';
+        
+        document.getElementById('pawnImeiSearch').value = '';
+        document.getElementById('pawnDetailDisplayGroup').style.display = 'none';
+        document.getElementById('interestExtendInfo').style.display = 'none';
+        document.getElementById('pawnRedeemCalcBox').style.display = 'none';
+        selectedPawnItem = null;
     }
 
     function handleRepairTypeChange() {
         const repairType = document.getElementById('repairType').value;
-        const customGroup = document.getElementById('customRepairDetailGroup');
-
-        if (repairType === 'other_repair') {
-            customGroup.style.display = 'block';
-        } else {
-            customGroup.style.display = 'none';
-        }
+        document.getElementById('customRepairDetailGroup').style.display = (repairType === 'other_repair') ? 'block' : 'none';
     }
 
     function handleExpenseCategoryChange() {
         const category = document.getElementById('expenseCategory').value;
-        const otherGroup = document.getElementById('otherExpenseGroup');
+        document.getElementById('pawnDetailInputsGroup').style.display = (category === 'pawn_in') ? 'block' : 'none';
+        document.getElementById('otherExpenseGroup').style.display = (category === 'other') ? 'block' : 'none';
+    }
 
-        if (category === 'other') {
-            otherGroup.style.display = 'block';
-        } else {
-            otherGroup.style.display = 'none';
+    function calculatePawnDueDate() {
+        const days = parseInt(document.getElementById('pawnDaysSelect').value) || 10;
+        const today = new Date();
+        today.setDate(today.getDate() + days);
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        document.getElementById('pawnDueDate').value = `${yyyy}-${mm}-${dd}`;
+    }
+
+    function autoCalculateInterest() {
+        const category = document.getElementById('expenseCategory').value;
+        if (category !== 'pawn_in') return;
+
+        const rawAmount = parseFloat(document.getElementById('expenseAmount').value) || 0;
+        const currency = document.getElementById('expenseCurrencyType').value;
+        
+        if (rawAmount <= 0) {
+            document.getElementById('pawnInterestRate').value = '';
+            return;
         }
+
+        let amountKHR = (currency === 'USD') ? rawAmount * EXCHANGE_RATE : rawAmount;
+        let interestPerDayKHR = 0;
+
+        if (amountKHR >= 10000 && amountKHR <= 30000) {
+            interestPerDayKHR = 1000;
+        } else if (amountKHR >= 40000 && amountKHR <= 100000) { 
+            interestPerDayKHR = 1500;
+        } else if (amountKHR >= 110000 && amountKHR <= 200000) { 
+            interestPerDayKHR = 2000;
+        } else if (amountKHR > 200000) { 
+            interestPerDayKHR = amountKHR * 0.01; 
+        } else {
+            interestPerDayKHR = 1000; 
+        }
+
+        document.getElementById('pawnInterestRate').value = interestPerDayKHR;
+        document.getElementById('pawnRateCurrency').value = 'KHR';
+    }
+
+    function switchTab(tab) {
+        document.getElementById('tabStockBtn').classList.toggle('active', tab === 'stock');
+        document.getElementById('tabPawnBtn').classList.toggle('active', tab === 'pawn');
+        document.getElementById('stockTableSection').style.display = (tab === 'stock') ? 'block' : 'none';
+        document.getElementById('pawnTableSection').style.display = (tab === 'pawn') ? 'block' : 'none';
     }
 
     async function fetchData() {
+        const refreshBtn = document.getElementById('refreshBtn');
+        if (refreshBtn) { refreshBtn.disabled = true; refreshBtn.innerText = "⏳ កំពុងពិនិត្យ..."; }
+
         try {
-            const res = await fetch(GOOGLE_SHEET_URL);
-            const data = await res.json();
-            
-            if (data.error) {
-                alert("មានបញ្ហាចេញពី Google Sheet: " + data.error);
-                return;
+            const mainRes = await fetch(MAIN_SHEET_URL);
+            const mainData = await mainRes.json();
+            if (mainData) {
+                if (mainData.inventory) inventory = mainData.inventory;
+                
+                // 💵 💳 គណនាសមតុល្យសាច់ប្រាក់ក្នុងដៃ, ក្នុងកុង និងសរុប
+                let cashUsd = mainData.cashBalance || mainData.balance || 0;
+                let bankUsd = mainData.bankBalance || 0;
+                let totalUsd = cashUsd + bankUsd;
+
+                // បង្ហាញសាច់ប្រាក់ក្នុងដៃ
+                document.getElementById('cashBalanceDisplay').innerText = `$${cashUsd.toFixed(2)}`;
+                document.getElementById('cashBalanceKHRDisplay').innerText = `≈ ${(cashUsd * EXCHANGE_RATE).toLocaleString()} ៛`;
+
+                // បង្ហាញសាច់ប្រាក់ក្នុងកុង
+                document.getElementById('bankBalanceDisplay').innerText = `$${bankUsd.toFixed(2)}`;
+                document.getElementById('bankBalanceKHRDisplay').innerText = `≈ ${(bankUsd * EXCHANGE_RATE).toLocaleString()} ៛`;
+
+                // បង្ហាញសាច់ប្រាក់សរុបរួម
+                document.getElementById('totalBalanceDisplay').innerText = `$${totalUsd.toFixed(2)}`;
+                document.getElementById('totalBalanceKHRDisplay').innerText = `≈ ${(totalUsd * EXCHANGE_RATE).toLocaleString()} ៛`;
             }
 
-            if (data && data.inventory) {
-                inventory = data.inventory;
-                let balanceUsd = data.balance || 0;
-                let balanceKhr = balanceUsd * EXCHANGE_RATE;
-
-                document.getElementById('cashBalanceDisplay').innerText = `$${balanceUsd.toFixed(2)}`;
-                document.getElementById('cashBalanceKHRDisplay').innerText = `≈ ${balanceKhr.toLocaleString()} ៛`;
+            const pawnRes = await fetch(PAWN_SHEET_URL);
+            const pawnData = await pawnRes.json();
+            if (pawnData && pawnData.pawnItems) {
+                pawnItems = pawnData.pawnItems;
             }
             
             renderStock();
+            renderPawnTable();
         } catch (error) {
             console.error("Error fetching data:", error);
-            document.getElementById('stockTable').innerHTML = '<tr><td colspan="4" style="color:red;">មិនអាចទាញយកទិន្នន័យបានទេ។</td></tr>';
+        } finally {
+            if (refreshBtn) { refreshBtn.disabled = false; refreshBtn.innerText = "🔄 ពិនិត្យម្ដងទៀត"; }
         }
     }
 
     function renderStock() {
         const tbody = document.getElementById('stockTable');
         tbody.innerHTML = '';
-        if (inventory.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4">គ្មានទិន្នន័យស្តុកទេ</td></tr>';
-            return;
-        }
+        if (inventory.length === 0) { tbody.innerHTML = '<tr><td colspan="4">គ្មានទិន្នន័យស្តុកទេ</td></tr>'; return; }
         inventory.forEach(item => {
             let remaining = item.initial - item.sold;
             tbody.innerHTML += `
@@ -371,19 +556,172 @@
                     <td>${item.initial}</td>
                     <td style="color: #dc3545; font-weight: bold;">${item.sold}</td>
                     <td style="color: #28a745; font-weight: bold;">${remaining}</td>
-                </tr>
-            `;
+                </tr>`;
         });
     }
 
-    // 🔍 មុខងារ Search ម៉ូឌែលទូរសព្ទ និង បង្ហាញ Dropdown លើទូរសព្ទដៃ
+    function renderPawnTable() {
+        const tbody = document.getElementById('pawnTable');
+        tbody.innerHTML = '';
+        if (pawnItems.length === 0) { tbody.innerHTML = '<tr><td colspan="6">គ្មានទិន្នន័យទូរសព្ទបញ្ចាំទេ</td></tr>'; return; }
+        pawnItems.forEach(item => {
+            let paidInterestDisplay = item.totalInterestPaid ? `$${parseFloat(item.totalInterestPaid).toFixed(2)}` : '$0.00';
+            let lastPaidDateDisplay = item.lastPaidDate || '-';
+            
+            tbody.innerHTML += `
+                <tr>
+                    <td><b>${item.model}</b> (${item.color})</td>
+                    <td><code>${item.imei}</code></td>
+                    <td style="color:#d32f2f; font-weight:bold;">$${parseFloat(item.amount).toFixed(2)}</td>
+                    <td>${item.dueDate}</td>
+                    <td style="color:#2e7d32; font-weight:bold;">${paidInterestDisplay}</td>
+                    <td>${lastPaidDateDisplay}</td>
+                </tr>`;
+        });
+    }
+
+    function searchPawnByImei() {
+        const imeiQuery = document.getElementById('pawnImeiSearch').value.trim();
+        const displayGroup = document.getElementById('pawnDetailDisplayGroup');
+        const category = document.getElementById('itemCategory').value;
+
+        if (imeiQuery.length === 4) {
+            const found = pawnItems.find(p => String(p.imei).padStart(4, '0') === imeiQuery);
+            if (found) {
+                selectedPawnItem = found;
+                document.getElementById('pawnModelText').innerText = found.model;
+                document.getElementById('pawnColorText').innerText = found.color;
+                document.getElementById('pawnAmountText').innerText = `$${parseFloat(found.amount).toFixed(2)}`;
+                
+                let rateVal = parseFloat(found.interestRate) || 0;
+                let rateText = (rateVal < 10) ? `$${rateVal}` : `${rateVal.toLocaleString()} ៛`;
+                document.getElementById('pawnRateText').innerText = rateText;
+
+                document.getElementById('pawnStartDateText').innerText = found.date || '-';
+                document.getElementById('pawnDateText').innerText = found.dueDate;
+                displayGroup.style.display = 'block';
+
+                if (category === 'pawn_redeem') {
+                    calculateRedeemAmount();
+                } else {
+                    calculateInterestExtension();
+                }
+            } else {
+                selectedPawnItem = null;
+                alert("មិនរកឃើញទូរសព្ទបញ្ចាំដែលមាន IMEI នេះទេ!");
+                displayGroup.style.display = 'none';
+            }
+        } else {
+            displayGroup.style.display = 'none';
+            selectedPawnItem = null;
+        }
+    }
+
+    function calculateRedeemAmount() {
+        if (!selectedPawnItem) return;
+
+        const redeemBox = document.getElementById('pawnRedeemCalcBox');
+        document.getElementById('interestExtendInfo').style.display = 'none';
+
+        let startDate = new Date(selectedPawnItem.date);
+        let today = new Date();
+        
+        if (isNaN(startDate.getTime())) { startDate = new Date(); }
+
+        let diffTime = Math.abs(today - startDate);
+        let totalDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        if (totalDays === 0) totalDays = 1; 
+
+        let ratePerDay = parseFloat(selectedPawnItem.interestRate) || 0;
+        let rateInUSD = (ratePerDay < 10) ? ratePerDay : ratePerDay / EXCHANGE_RATE;
+
+        let totalInterestPaidUSD = parseFloat(selectedPawnItem.totalInterestPaid) || 0;
+        let alreadyPaidDays = (rateInUSD > 0) ? Math.floor(totalInterestPaidUSD / rateInUSD) : 0;
+
+        let chargeableDays = 0;
+        let showNote = false;
+
+        if (totalDays < 4) {
+            chargeableDays = 3 - alreadyPaidDays;
+            showNote = true;
+        } else {
+            chargeableDays = totalDays - alreadyPaidDays;
+            showNote = false;
+        }
+
+        if (chargeableDays < 0) chargeableDays = 0;
+
+        let interestToPayUSD = chargeableDays * rateInUSD;
+        let principalUSD = parseFloat(selectedPawnItem.amount) || 0;
+        let totalRedeemUSD = principalUSD + interestToPayUSD;
+
+        document.getElementById('totalPawnDaysText').innerText = totalDays;
+        document.getElementById('alreadyPaidDaysText').innerText = alreadyPaidDays;
+        document.getElementById('alreadyPaidAmountText').innerText = `$${totalInterestPaidUSD.toFixed(2)}`;
+        document.getElementById('chargeableDaysText').innerText = chargeableDays;
+        document.getElementById('minimumFeeNote').style.display = showNote ? 'inline' : 'none';
+
+        let interestKHR = interestToPayUSD * EXCHANGE_RATE;
+        document.getElementById('interestToPayText').innerText = `$${interestToPayUSD.toFixed(2)} (${interestKHR.toLocaleString()} ៛)`;
+
+        let totalKHR = totalRedeemUSD * EXCHANGE_RATE;
+        document.getElementById('totalRedeemAmountText').innerText = `$${totalRedeemUSD.toFixed(2)} (${totalKHR.toLocaleString()} ៛)`;
+
+        document.getElementById('totalPrice').value = totalRedeemUSD.toFixed(2);
+        document.getElementById('currencyType').value = 'USD';
+
+        redeemBox.style.display = 'block';
+    }
+
+    function calculateInterestExtension() {
+        const category = document.getElementById('itemCategory').value;
+        const extendDiv = document.getElementById('interestExtendInfo');
+        document.getElementById('pawnRedeemCalcBox').style.display = 'none';
+
+        if (category !== 'interest' || !selectedPawnItem) {
+            extendDiv.style.display = 'none';
+            return;
+        }
+
+        const rawPrice = parseFloat(document.getElementById('totalPrice').value) || 0;
+        const currency = document.getElementById('currencyType').value;
+        let ratePerDay = parseFloat(selectedPawnItem.interestRate) || 0;
+
+        if (rawPrice <= 0 || ratePerDay <= 0 || !currency) {
+            extendDiv.style.display = 'none';
+            return;
+        }
+
+        let totalPaidInKHR = (currency === 'USD') ? rawPrice * EXCHANGE_RATE : rawPrice;
+        let rateInKHR = (ratePerDay < 10) ? ratePerDay * EXCHANGE_RATE : ratePerDay;
+
+        calculatedAddedDays = Math.floor(totalPaidInKHR / rateInKHR);
+
+        if (calculatedAddedDays > 0) {
+            let currentDue = new Date(selectedPawnItem.dueDate);
+            if (isNaN(currentDue.getTime())) { currentDue = new Date(); }
+            
+            currentDue.setDate(currentDue.getDate() + calculatedAddedDays);
+            
+            const yyyy = currentDue.getFullYear();
+            const mm = String(currentDue.getMonth() + 1).padStart(2, '0');
+            const dd = String(currentDue.getDate()).padStart(2, '0');
+            calculatedNewDueDate = `${yyyy}-${mm}-${dd}`;
+
+            document.getElementById('addedDaysText').innerText = calculatedAddedDays;
+            document.getElementById('newDueDateText').innerText = calculatedNewDueDate;
+            extendDiv.style.display = 'block';
+        } else {
+            extendDiv.style.display = 'none';
+        }
+    }
+
     function filterPhoneModels() {
         const query = document.getElementById('phoneSearchInput').value.toLowerCase().trim();
         const dropdown = document.getElementById('phoneDropdownList');
         dropdown.innerHTML = '';
 
         const filtered = inventory.filter(item => item.model.toLowerCase().includes(query));
-
         if (filtered.length === 0) {
             dropdown.innerHTML = '<div style="padding:12px; text-align:center; color:#888;">មិនរកឃើញម៉ូឌែលនេះទេ</div>';
         } else {
@@ -393,7 +731,8 @@
                 div.className = 'dropdown-item';
                 div.innerHTML = `<span><b>${item.model}</b></span> <span class="stock-tag">នៅសល់ ${remaining} គ្រឿង</span>`;
                 div.onclick = function() {
-                    selectPhoneModel(item.model);
+                    document.getElementById('phoneSearchInput').value = item.model;
+                    dropdown.style.display = 'none';
                 };
                 dropdown.appendChild(div);
             });
@@ -401,16 +740,8 @@
         dropdown.style.display = 'block';
     }
 
-    function showPhoneDropdown() {
-        filterPhoneModels();
-    }
+    function showPhoneDropdown() { filterPhoneModels(); }
 
-    function selectPhoneModel(modelName) {
-        document.getElementById('phoneSearchInput').value = modelName;
-        document.getElementById('phoneDropdownList').style.display = 'none';
-    }
-
-    // បិទ Dropdown ពេលចុចកន្លែងផ្សេង
     document.addEventListener('click', function(e) {
         const container = document.getElementById('phoneModelGroup');
         if (container && !container.contains(e.target)) {
@@ -419,224 +750,221 @@
     });
 
     async function submitSale() {
-        if (!currentVerifiedSeller) {
-            alert("សូមបញ្ចូលលេខសម្ងាត់បុគ្គលិកឱ្យបានត្រឹមត្រូវជាមុនសិន!");
-            return;
-        }
+        if (!currentVerifiedSeller) { alert("សូមបញ្ចូលលេខសម្ងាត់បុគ្គលិកឱ្យបានត្រឹមត្រូវ!"); return; }
 
         const category = document.getElementById('itemCategory').value;
         const qty = parseInt(document.getElementById('sellQty').value);
         const rawPrice = parseFloat(document.getElementById('totalPrice').value);
         const currency = document.getElementById('currencyType').value;
-        const paymentType = document.querySelector('input[name="paymentType"]:checked').value;
+        const paymentRadio = document.querySelector('input[name="paymentType"]:checked');
+
+        // ⚠️ ពិនិត្យមើលថាតើបានជ្រើសរើសរូបិយប័ណ្ណ និងប្រភេទសាច់ប្រាក់ហើយឬនៅ
+        if (!currency) {
+            alert("⚠️ សូមជ្រើសរើសរូបិយប័ណ្ណទទួល (រៀល ឬ ដុល្លារ)!");
+            return;
+        }
+        if (!paymentRadio) {
+            alert("⚠️ សូមជ្រើសរើសប្រភេទសាច់ប្រាក់ទទួល (លុយស្រស់ ឬ លុយកុង/QR)!");
+            return;
+        }
+
+        const paymentType = paymentRadio.value;
 
         let itemName = "";
         let isPhone = false;
+        let isPawnRedeem = false;
+        let isInterestPay = false;
 
         if (category === 'phone') {
             itemName = document.getElementById('phoneSearchInput').value.trim();
             isPhone = true;
+        } else if (category === 'interest') {
+            if (!selectedPawnItem) { alert("សូមជ្រើសរើសទូរសព្ទបញ្ចាំដែលត្រូវបង់ការប្រាក់!"); return; }
+            itemName = `💸 បង់ការប្រាក់បញ្ចាំ: ${selectedPawnItem.model} (${selectedPawnItem.imei})`;
+            isInterestPay = true;
+        } else if (category === 'pawn_redeem') {
+            if (!selectedPawnItem) { alert("សូមជ្រើសរើសទូរសព្ទបញ្ចាំដែលត្រូវលស់!"); return; }
+            itemName = `🔓 លស់ទូរសព្ទបញ្ចាំ: ${selectedPawnItem.model} (${selectedPawnItem.imei})`;
+            isPawnRedeem = true;
         } else if (category === 'repair') {
             const repairTypeVal = document.getElementById('repairType').value;
-            let repairServiceText = "";
-
-            if (repairTypeVal === 'other_repair') {
-                repairServiceText = document.getElementById('customRepairDetail').value.trim();
-                if (!repairServiceText) {
-                    alert("សូមបញ្ជាក់សេវាជួសជុលផ្សេងៗ!");
-                    return;
-                }
-            } else {
-                repairServiceText = repairTypeVal;
-            }
-
+            let repairText = (repairTypeVal === 'other_repair') ? document.getElementById('customRepairDetail').value.trim() : repairTypeVal;
             const modelText = document.getElementById('repairPhoneModel').value.trim();
-            if (!modelText) {
-                alert("សូមបញ្ចូលម៉ាក/ម៉ូឌែលទូរសព្ទដែលជួសជុល!");
-                return;
-            }
-
-            itemName = `🛠️ ${repairServiceText} (${modelText})`;
+            if (!repairText || !modelText) { alert("សូមបញ្ចូលព័ត៌មានជួសជុលឱ្យគ្រប់!"); return; }
+            itemName = `🛠️ ${repairText} (${modelText})`;
         } else {
             const categoryText = document.getElementById('itemCategory').options[document.getElementById('itemCategory').selectedIndex].text;
             const detail = document.getElementById('otherItemName').value.trim();
             itemName = detail ? `${categoryText} (${detail})` : categoryText;
         }
 
-        if (!itemName || isNaN(qty) || qty <= 0 || isNaN(rawPrice) || rawPrice <= 0) {
-            alert("សូមបំពេញព័ត៌មានទំនិញ/តម្លៃឱ្យបានគ្រប់គ្រាន់!");
-            return;
-        }
+        if (!itemName || isNaN(rawPrice) || rawPrice <= 0) { alert("សូមបំពេញព័ត៌មានឱ្យបានគ្រប់គ្រាន់!"); return; }
 
-        if (isPhone) {
-            let item = inventory.find(i => i.model.toLowerCase() === itemName.toLowerCase());
-            
-            if (!item) {
-                alert("ម៉ូឌែលទូរសព្ទនេះមិនមានក្នុងស្តុកទេ! សូមចុចជ្រើសរើសចេញពីបញ្ជី Dropdown។");
-                return;
-            }
-
-            let remaining = item.initial - item.sold;
-            if (qty > remaining) {
-                alert(`ស្តុកមិនគ្រប់គ្រាន់ទេ! នៅសល់ត្រឹមតែ ${remaining} គ្រឿងប៉ុណ្ណោះ។`);
-                return;
-            }
-            itemName = item.model; 
-        }
-
-        // គណនាតម្លៃជា USD និង KHR
-        let priceInUSD = 0;
-        let displayPriceText = "";
-
-        if (currency === 'USD') {
-            priceInUSD = rawPrice;
-            let priceInKHR = rawPrice * EXCHANGE_RATE;
-            displayPriceText = `$${rawPrice} (${priceInKHR.toLocaleString()} ៛)`;
-        } else {
-            priceInUSD = rawPrice / EXCHANGE_RATE;
-            displayPriceText = `${rawPrice.toLocaleString()} ៛ (≈ $${priceInUSD.toFixed(2)})`;
-        }
+        let priceInUSD = (currency === 'USD') ? rawPrice : rawPrice / EXCHANGE_RATE;
+        let displayPriceText = (currency === 'USD') ? `$${rawPrice.toFixed(2)} (${(rawPrice * EXCHANGE_RATE).toLocaleString()} ៛)` : `${rawPrice.toLocaleString()} ៛ (≈ $${priceInUSD.toFixed(2)})`;
 
         const btn = document.getElementById('submitSaleBtn');
-        btn.disabled = true;
-        btn.innerText = "កំពុងរក្សាទុក...";
+        btn.disabled = true; btn.innerText = "កំពុងរក្សាទុក...";
 
         try {
-            await fetch(GOOGLE_SHEET_URL, {
-                method: 'POST',
-                mode: 'no-cors',
+            await fetch(MAIN_SHEET_URL, {
+                method: 'POST', mode: 'no-cors',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ 
-                    action: 'sell', 
-                    model: isPhone ? itemName : '', 
-                    qty: qty, 
-                    price: priceInUSD,
-                    paymentType: paymentType 
-                })
+                body: JSON.stringify({ action: 'sell', model: isPhone ? itemName : '', qty: qty, price: priceInUSD, paymentType: paymentType })
             });
 
-            let paymentText = (paymentType === 'cash') ? "💵 លុយស្រស់ (ចូលប្រាក់ក្នុងដៃ)" : "💳 លុយកុង/QR (ចូលធនាគារ)";
+            if (isInterestPay) {
+                const todayStr = new Date().toISOString().split('T')[0];
+                await fetch(PAWN_SHEET_URL, {
+                    method: 'POST', mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ 
+                        action: 'update_interest', 
+                        imei: selectedPawnItem.imei, 
+                        newDueDate: calculatedNewDueDate,
+                        interestPaidAmount: priceInUSD,
+                        paidDate: todayStr
+                    })
+                });
+            }
 
-            const message = `🛍️ *របាយការណ៍លក់/សេវាកម្មថ្មី!*\n\n` +
-                            `👤 *បុគ្គលិកលក់:* ${currentVerifiedSeller}\n` +
-                            `📦 *ទំនិញ/សេវាកម្ម:* ${itemName}\n` +
-                            `🔢 *ចំនួន:* ${qty}\n` +
-                            `💵 *តម្លៃទទួលបាន:* ${displayPriceText}\n` +
-                            `💳 *ប្រភេទការទូទាត់:* ${paymentText}`;
+            if (isPawnRedeem) {
+                await fetch(PAWN_SHEET_URL, {
+                    method: 'POST', mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'pawn_redeem', imei: selectedPawnItem.imei })
+                });
+            }
+
+            let paymentText = (paymentType === 'cash') ? "💵 លុយស្រស់ (ចូលប្រាក់ក្នុងដៃ)" : "💳 លុយកុង/QR (ចូលប្រាក់ក្នុងកុង)";
+            let extraMsg = isInterestPay ? `\n📅 *ពន្យារពេល:* +${calculatedAddedDays} ថ្ងៃ (ថ្ងៃផុតកំណត់ថ្មី៖ ${calculatedNewDueDate})` : '';
+
+            const message = `🛍️ *របាយការណ៍ប្រតិបត្តិការថ្មី (ចំណូល)!*\n\n` +
+                            `👤 *បុគ្គលិក:* ${currentVerifiedSeller}\n` +
+                            `📦 *ប្រភេទ:* ${itemName}\n` +
+                            `💵 *ទទួលបាន:* ${displayPriceText}${extraMsg}\n` +
+                            `💳 *ការទូទាត់:* ${paymentText}`;
 
             await sendTelegram(message);
+            alert("កត់ត្រាប្រតិបត្តិការជោគជ័យ!");
 
-            alert("កត់ត្រាការលក់ជោគជ័យ!");
-            
-            // Clear ទិន្នន័យ
             document.getElementById('sellerPin').value = '';
             document.getElementById('employeeNameStatus').innerText = '';
             currentVerifiedSeller = "";
-            document.getElementById('phoneSearchInput').value = '';
-            document.getElementById('repairPhoneModel').value = '';
-            document.getElementById('customRepairDetail').value = '';
-            document.getElementById('otherItemName').value = '';
             document.getElementById('totalPrice').value = '';
-            document.getElementById('sellQty').value = '1';
+            document.getElementById('currencyType').value = '';
+            if (paymentRadio) paymentRadio.checked = false;
+            document.getElementById('pawnImeiSearch').value = '';
+            document.getElementById('pawnDetailDisplayGroup').style.display = 'none';
             setTimeout(fetchData, 1500);
 
-        } catch (error) {
-            alert("មានបញ្ហាក្នុងការផ្ញើទិន្នន័យ!");
-        } finally {
-            btn.disabled = false;
-            btn.innerText = "📤 កត់ត្រាការលក់ & ផ្ញើទៅ Telegram";
-        }
+        } catch (error) { alert("មានបញ្ហាក្នុងការផ្ញើទិន្នន័យ!"); }
+        finally { btn.disabled = false; btn.innerText = "📤 កត់ត្រាការលក់ & ផ្ញើទៅ Telegram"; }
     }
 
     async function submitExpense() {
-        if (!currentVerifiedSeller) {
-            alert("សូមបញ្ចូលលេខសម្ងាត់បុគ្គលិកឱ្យបានត្រឹមត្រូវជាមុនសិន!");
+        if (!currentVerifiedSeller) { alert("សូមបញ្ចូលលេខសម្ងាត់បុគ្គលិកឱ្យបានត្រឹមត្រូវ!"); return; }
+
+        const expenseCategory = document.getElementById('expenseCategory').value;
+        const paymentRadio = document.querySelector('input[name="expensePaymentType"]:checked');
+        const currency = document.getElementById('expenseCurrencyType').value;
+
+        // ⚠️ ពិនិត្យមើលថាតើបានជ្រើសរើសរូបិយប័ណ្ណ និងប្រភេទសាច់ប្រាក់ដកហើយឬនៅ
+        if (!currency) {
+            alert("⚠️ សូមជ្រើសរើសរូបិយប័ណ្ណដក (រៀល ឬ ដុល្លារ)!");
+            return;
+        }
+        if (!paymentRadio) {
+            alert("⚠️ សូមជ្រើសរើសប្រភេទសាច់ប្រាក់ដកចេញ (ដកពីប្រាក់ក្នុងដៃ ឬ ក្នុងកុង)!");
             return;
         }
 
-        const expenseCategory = document.getElementById('expenseCategory').value;
+        const paymentType = paymentRadio.value;
         let reason = "";
+        let pawnData = null;
 
-        if (expenseCategory === 'other') {
+        if (expenseCategory === 'pawn_in') {
+            const model = document.getElementById('pawnPhoneModel').value.trim();
+            const color = document.getElementById('pawnColor').value.trim();
+            const imei = document.getElementById('pawnImei').value.trim();
+            const days = document.getElementById('pawnDaysSelect').value;
+            const dueDate = document.getElementById('pawnDueDate').value;
+            
+            let interestRate = document.getElementById('pawnInterestRate').value;
+            let rateCurr = document.getElementById('pawnRateCurrency').value;
+
+            if (!model || !color || imei.length !== 4) { alert("សូមបញ្ចូលព័ត៌មានបញ្ចាំ និង IMEI ៤ខ្ទង់ ឱ្យបានត្រឹមត្រូវ!"); return; }
+
+            reason = `📱 ទទួលបញ្ចាំ: ${model} (${color}) - IMEI: ${imei}`;
+            pawnData = { model, color, imei, days, dueDate, interestRate, rateCurrency: rateCurr };
+        } else if (expenseCategory === 'other') {
             reason = document.getElementById('expenseReasonDetail').value.trim();
-            if (!reason) {
-                alert("សូមបញ្ចូលព័ត៌មានលម្អិតនៃមូលហេតុផ្សេងៗ!");
-                return;
-            }
+            if (!reason) { alert("សូមបញ្ចូលមូលហេតុដកលុយ!"); return; }
         } else {
             reason = expenseCategory;
         }
 
         const rawAmount = parseFloat(document.getElementById('expenseAmount').value);
-        const currency = document.getElementById('expenseCurrencyType').value;
+        if (!reason || isNaN(rawAmount) || rawAmount <= 0) { alert("សូមបញ្ចូលចំនួនលុយដកឱ្យបានត្រឹមត្រូវ!"); return; }
 
-        if (!reason || isNaN(rawAmount) || rawAmount <= 0) {
-            alert("សូមបញ្ចូលមូលហេតុ និងចំនួនលុយដកឱ្យបានត្រឹមត្រូវ!");
-            return;
-        }
-
-        let amountInUSD = 0;
-        let displayAmountText = "";
-
-        if (currency === 'USD') {
-            amountInUSD = rawAmount;
-            let amountInKHR = rawAmount * EXCHANGE_RATE;
-            displayAmountText = `-$${rawAmount} (${amountInKHR.toLocaleString()} ៛)`;
-        } else {
-            amountInUSD = rawAmount / EXCHANGE_RATE;
-            displayAmountText = `-${rawAmount.toLocaleString()} ៛ (≈ -$${amountInUSD.toFixed(2)})`;
-        }
+        let amountInUSD = (currency === 'USD') ? rawAmount : rawAmount / EXCHANGE_RATE;
+        let displayAmountText = (currency === 'USD') ? `-$${rawAmount.toFixed(2)} (${(rawAmount * EXCHANGE_RATE).toLocaleString()} ៛)` : `-$${rawAmount.toLocaleString()} ៛ (≈ -$${amountInUSD.toFixed(2)})`;
 
         const btn = document.getElementById('submitExpenseBtn');
-        btn.disabled = true;
-        btn.innerText = "កំពុងរក្សាទុក...";
+        btn.disabled = true; btn.innerText = "កំពុងរក្សាទុក...";
 
         try {
-            await fetch(GOOGLE_SHEET_URL, {
-                method: 'POST',
-                mode: 'no-cors',
+            await fetch(MAIN_SHEET_URL, {
+                method: 'POST', mode: 'no-cors',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: 'expense', amount: amountInUSD })
+                body: JSON.stringify({ action: 'expense', amount: amountInUSD, paymentType: paymentType })
             });
 
-            const message = `💸 *របាយការណ៍ដកលុយ/បញ្ចាំ (-លុយចេញ)!*\n\n` +
+            if (expenseCategory === 'pawn_in') {
+                pawnData.amount = amountInUSD;
+                await fetch(PAWN_SHEET_URL, {
+                    method: 'POST', mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'pawn_in', pawnDetails: pawnData })
+                });
+            }
+
+            let paymentText = (paymentType === 'cash') ? "💵 លុយស្រស់ (ដកចេញពីប្រាក់ក្នុងដៃ)" : "💳 លុយកុង/QR (ដកចេញពីប្រាក់ក្នុងកុង)";
+
+            const message = `💸 *របាយការណ៍ដកលុយ/បញ្ចាំ (- លុយចេញ)!*\n\n` +
                             `👤 *បុគ្គលិកប្រតិបត្តិការ:* ${currentVerifiedSeller}\n` +
                             `📝 *មូលហេតុ:* ${reason}\n` +
-                            `💵 *ចំនួនលុយដក:* ${displayAmountText}`;
+                            `💵 *ចំនួនលុយដក:* ${displayAmountText}\n` +
+                            `💳 *ប្រភពសាច់ប្រាក់:* ${paymentText}`;
 
             await sendTelegram(message);
-
             alert("កត់ត្រាការដកសាច់ប្រាក់ជោគជ័យ!");
+
             document.getElementById('sellerPin').value = '';
             document.getElementById('employeeNameStatus').innerText = '';
             currentVerifiedSeller = "";
-            document.getElementById('expenseCategory').value = 'ទទួលបញ្ចាំទូរសព្ទ';
-            document.getElementById('otherExpenseGroup').style.display = 'none';
-            document.getElementById('expenseReasonDetail').value = '';
             document.getElementById('expenseAmount').value = '';
+            document.getElementById('expenseCurrencyType').value = '';
+            if (paymentRadio) paymentRadio.checked = false;
+            document.getElementById('pawnPhoneModel').value = '';
+            document.getElementById('pawnColor').value = '';
+            document.getElementById('pawnImei').value = '';
+            document.getElementById('pawnInterestRate').value = '';
             setTimeout(fetchData, 1500);
 
-        } catch (error) {
-            alert("មានបញ្ហាក្នុងការដកសាច់ប្រាក់!");
-        } finally {
-            btn.disabled = false;
-            btn.innerText = "💸 កត់ត្រាការដកលុយ & ផ្ញើទៅ Telegram";
-        }
+        } catch (error) { alert("មានបញ្ហាក្នុងការដកសាច់ប្រាក់!"); }
+        finally { btn.disabled = false; btn.innerText = "💸 កត់ត្រាការដកលុយ & ផ្ញើទៅ Telegram"; }
     }
 
     async function sendTelegram(msg) {
-        const tgUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-        await fetch(tgUrl, {
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: TELEGRAM_CHAT_ID,
-                text: msg,
-                parse_mode: 'Markdown'
-            })
+            body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: msg, parse_mode: 'Markdown' })
         });
     }
 
+    calculatePawnDueDate();
     fetchData();
 </script>
 
