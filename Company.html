@@ -93,7 +93,58 @@
             width: 100%;
             height: 100vh;
             border: none;
-            display: none; /* លាក់ជាមុនសិន */
+            display: none;
+        }
+
+        /* ផ្ទាំង Popup សួរបញ្ជាក់ (Custom Confirm Dialog) */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-box {
+            background: #fff;
+            padding: 20px 25px;
+            border-radius: 12px;
+            text-align: center;
+            width: 85%;
+            max-width: 320px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        .modal-box p {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .modal-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-yes {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-no {
+            background-color: #6c757d;
+            color: white;
         }
     </style>
 </head>
@@ -121,6 +172,17 @@
     <!-- ផ្នែកផ្ទុក App / Link ដែលត្រូវលាក់ -->
     <iframe id="appFrame" src=""></iframe>
 
+    <!-- Popup សួរបញ្ជាក់ពេលចុច Back -->
+    <div class="modal-overlay" id="exitModal">
+        <div class="modal-box">
+            <p>តើអ្នកចង់ចាកចេញពីកម្មវិធីនេះមែនទេ?</p>
+            <div class="modal-buttons">
+                <button class="modal-btn btn-yes" id="btnYes">បាទ / ចាស</button>
+                <button class="modal-btn btn-no" id="btnNo">ទេ</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ==============================================================
         // ទីនេះជាកន្លែងបន្ថែម ឬកែប្រែ Username, Password និង Link
@@ -138,6 +200,8 @@
             }
         ];
 
+        let isLoggedIn = false;
+
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
@@ -145,24 +209,56 @@
             const inputPass = document.getElementById('password').value.trim();
             const errorElement = document.getElementById('errorMessage');
 
-            // ស្វែងរក Account
             const matchedUser = userDatabase.find(
                 acc => acc.username === inputUser && acc.password === inputPass
             );
 
             if (matchedUser) {
                 errorElement.style.display = 'none';
+                isLoggedIn = true;
                 
                 // លាក់ទម្រង់ Login 
                 document.getElementById('loginScreen').style.display = 'none';
                 
-                // បើក Link ក្នុង iframe ដោយមិនបង្ហាញ Link នៅលើ URL Bar ទេ
+                // បើក App ក្នុង iframe
                 const iframe = document.getElementById('appFrame');
                 iframe.src = matchedUser.redirectUrl;
                 iframe.style.display = 'block';
+
+                // បន្ថែម State ទៅក្នុង History ដើម្បីស្ទាក់ប៊ូតុង Back
+                history.pushState({ page: 'app' }, '', '');
             } else {
                 errorElement.style.display = 'block';
             }
+        });
+
+        // ស្ទាក់ព្រឹត្តិការណ៍ចុចប៊ូតុង Back លើទូរស័ព្ទ
+        window.addEventListener('popstate', function(event) {
+            if (isLoggedIn) {
+                // បង្ហាញ Popup សួរបញ្ជាក់
+                document.getElementById('exitModal').style.style ? document.getElementById('exitModal').style.display = 'flex' : document.getElementById('exitModal').setAttribute('style', 'display: flex;');
+                
+                // រក្សា State ដដែលដើម្បីកុំឱ្យវាថយក្រោយភ្លាមៗ
+                history.pushState({ page: 'app' }, '', '');
+            }
+        });
+
+        // ប្រសិនបើចុច "បាទ / ចាស" -> ចាកចេញ (ត្រឡប់ទៅ Login វិញ)
+        document.getElementById('btnYes').addEventListener('click', function() {
+            isLoggedIn = false;
+            document.getElementById('exitModal').style.display = 'none';
+                
+            // បិទ App ហើយបង្ហាញ Login វិញ
+            document.getElementById('appFrame').style.display = 'none';
+            document.getElementById('appFrame').src = '';
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        });
+
+        // ប្រសិនបើចុច "ទេ" -> បិទ Popup ហើយនៅទីនេះដដែល
+        document.getElementById('btnNo').addEventListener('click', function() {
+            document.getElementById('exitModal').style.display = 'none';
         });
     </script>
 
