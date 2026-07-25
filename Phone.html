@@ -107,7 +107,7 @@
         .redeem-summary-box p { margin: 4px 0; }
         .highlight-total { font-size: 18px; font-weight: bold; color: #d32f2f; margin-top: 6px; }
 
-        /* 🔒 Style សម្រាប់ Modal/Popup វាយកូដបុគ្គលិក */
+        /* Modal PIN */
         .pin-modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.6); display: none;
@@ -270,6 +270,7 @@
             </select>
         </div>
 
+        <!-- ផ្នែកព័ត៌មានទូរសព្ទបញ្ចាំ -->
         <div id="pawnDetailInputsGroup">
             <div class="form-group">
                 <label for="pawnPhoneModel">📱 ម៉ាក/ម៉ូឌែលទូរសព្ទបញ្ចាំ៖</label>
@@ -287,7 +288,7 @@
             </div>
 
             <div class="form-group">
-                <label for="pawnDaysSelect">📅 រយៈពេលបញ្ចាំ (ថ្ងៃ)៖</label>
+                <label for="pawnDaysSelect" onchange="calculatePawnDueDate()">📅 រយៈពេលបញ្ចាំ (ថ្ងៃ)៖</label>
                 <select id="pawnDaysSelect" onchange="calculatePawnDueDate()">
                     <option value="2">2 ថ្ងៃ</option>
                     <option value="5">5 ថ្ងៃ</option>
@@ -303,24 +304,12 @@
             </div>
 
             <div class="form-group">
-                <label for="expenseAmount">💵 ប្រាក់ដើមបញ្ចាំ / ចំនួនលុយដកចេញ៖</label>
-                <div class="price-input-container">
-                    <input type="number" id="expenseAmount" placeholder="បញ្ចូលប្រាក់ដើមបញ្ចាំ" oninput="autoCalculateInterest()">
-                    <select id="expenseCurrencyType" onchange="autoCalculateInterest()">
-                        <option value="">-- ជ្រើសរើសរូបិយប័ណ្ណ --</option>
-                        <option value="KHR">៛ រៀល (៛)</option>
-                        <option value="USD">💵 ដុល្លារ ($)</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-group">
                 <label for="pawnInterestRate">💸 ការប្រាក់ក្នុង ១ ថ្ងៃ (គណនាស្វ័យប្រវត្តិ/អាចកែបាន)៖</label>
                 <div class="price-input-container">
                     <input type="number" id="pawnInterestRate" step="100" placeholder="បញ្ចូល ឬកែការប្រាក់">
                     <select id="pawnRateCurrency">
                         <option value="KHR">៛ រៀល</option>
-                        <option value="USD">💵 ដុល្លារ</option>
+                        <option value="USD">💵 ដុល្លារ ($)</option>
                     </select>
                 </div>
             </div>
@@ -329,6 +318,19 @@
         <div class="form-group" id="otherExpenseGroup" style="display: none;">
             <label for="expenseReasonDetail">បញ្ជាក់មូលហេតុផ្សេងៗ៖</label>
             <input type="text" id="expenseReasonDetail" placeholder="បញ្ចូលមូលហេតុដកលុយផ្សេងៗ...">
+        </div>
+
+        <!-- ប្រអប់បញ្ចូលចំនួនលុយដក -->
+        <div class="form-group">
+            <label for="expenseAmount">💵 ចំនួនលុយដកចេញ / ប្រាក់ដើមបញ្ចាំ៖</label>
+            <div class="price-input-container">
+                <input type="number" id="expenseAmount" placeholder="បញ្ចូលចំនួនទឹកប្រាក់" oninput="autoCalculateInterest()">
+                <select id="expenseCurrencyType" onchange="autoCalculateInterest()">
+                    <option value="">-- ជ្រើសរើសរូបិយប័ណ្ណ --</option>
+                    <option value="KHR">៛ រៀល (៛)</option>
+                    <option value="USD">💵 ដុល្លារ ($)</option>
+                </select>
+            </div>
         </div>
 
         <div class="form-group">
@@ -389,7 +391,7 @@
     </div>
 </div>
 
-<!-- 🔒 POPUP MODAL សម្រាប់វាយ PIN បុគ្គលិក (កែប្រែប្រព័ន្ធស្ទាក់ Event) -->
+<!-- POPUP MODAL PIN -->
 <div id="pinModal" class="pin-modal-overlay">
     <div class="pin-modal-content">
         <h3>🔒 បញ្ចូលលេខសម្ងាត់បុគ្គលិក</h3>
@@ -411,6 +413,7 @@
 
     const EMPLOYEE_CODES = {
         "04": "សីហា",
+        "4": "សីហា",
         "102": "វិចិត្រ",
         "103": "ធារ៉ា",
         "999": "មេហាង"
@@ -442,23 +445,22 @@
         currentPendingAction = "";
     }
 
-    // 🎯 អនុគមន៍គន្លឹះដែលបានកែប្រែឱ្យដំណើរការ ASYNC ច្បាស់លាស់
     async function confirmPinAndSubmit() {
-        const pinInput = document.getElementById('modalPinInput').value.trim();
+        const rawPin = document.getElementById('modalPinInput').value.trim();
         const errorDiv = document.getElementById('pinModalError');
-        const confirmBtn = document.getElementById('confirmPinBtn');
 
-        if (EMPLOYEE_CODES[pinInput]) {
-            currentVerifiedSeller = EMPLOYEE_CODES[pinInput];
+        if (EMPLOYEE_CODES[rawPin]) {
+            currentVerifiedSeller = EMPLOYEE_CODES[rawPin];
+            const actionToRun = currentPendingAction;
             closePinModal();
             
-            if (currentPendingAction === 'sale') {
+            if (actionToRun === 'sale') {
                 await executeSaleSubmit();
-            } else if (currentPendingAction === 'expense') {
+            } else if (actionToRun === 'expense') {
                 await executeExpenseSubmit();
             }
         } else {
-            errorDiv.innerText = "❌ លេខសម្ងាត់មិនត្រឹមត្រូវទេ! សូមវាយម្ដងទៀត";
+            errorDiv.innerText = "❌ លេខសម្ងាត់មិនត្រឹមត្រូវទេ!";
         }
     }
 
@@ -652,20 +654,17 @@
 
         const redeemBox = document.getElementById('pawnRedeemCalcBox');
         document.getElementById('interestExtendInfo').style.display = 'none';
-
         document.getElementById('redeemStartDateText').innerText = selectedPawnItem.date || '-';
 
         let totalDays = 0;
         if (selectedPawnItem.date) {
             const startDate = new Date(selectedPawnItem.date);
             const today = new Date();
-            
             startDate.setHours(0, 0, 0, 0);
             today.setHours(0, 0, 0, 0);
 
             const diffTime = today - startDate;
             const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-            
             totalDays = diffDays >= 0 ? diffDays + 1 : 1;
         } else {
             totalDays = parseInt(selectedPawnItem.days) || 1;
@@ -846,10 +845,14 @@
         }
 
         let priceInUSD = (currency === 'USD') ? rawPrice : rawPrice / EXCHANGE_RATE;
-        let displayPriceText = (currency === 'USD') ? `$${rawPrice.toFixed(2)} (${(rawPrice * EXCHANGE_RATE).toLocaleString()} ៛)` : `${rawPrice.toLocaleString()} ៛ (≈ $${priceInUSD.toFixed(2)})`;
+        
+        // 🎯 ការកែសម្រួលដោះស្រាយ៖ បង្ហាញសញ្ញារូបិយប័ណ្ណត្រឹមត្រូវតាមប្រភេទប្រាក់ (ចំណូល)
+        let displayPriceText = (currency === 'USD') 
+            ? `$${rawPrice.toFixed(2)} (${(rawPrice * EXCHANGE_RATE).toLocaleString()} ៛)` 
+            : `${rawPrice.toLocaleString()} ៛ (≈ $${priceInUSD.toFixed(2)})`;
 
         const btn = document.getElementById('submitSaleBtn');
-        btn.disabled = true; btn.innerText = "កំពុងរក្សាទុក...";
+        btn.disabled = true; btn.innerText = "⏳ កំពុងរក្សាទុក...";
 
         try {
             await fetch(MAIN_SHEET_URL, {
@@ -898,7 +901,7 @@
                             `💳 *ការទូទាត់:* ${paymentText}`;
 
             await sendTelegram(message);
-            alert("កត់ត្រាប្រតិបត្តិការជោគជ័យ!");
+            alert("✅ កត់ត្រាប្រតិបត្តិការជោគជ័យ និងផ្ញើទៅ Telegram រួចរាល់!");
 
             currentVerifiedSeller = "";
             document.getElementById('totalPrice').value = '';
@@ -907,10 +910,13 @@
             if (paymentRadio) paymentRadio.checked = false;
             document.getElementById('pawnImeiSearch').value = '';
             document.getElementById('pawnDetailDisplayGroup').style.display = 'none';
-            setTimeout(fetchData, 1500);
+            setTimeout(fetchData, 1200);
 
-        } catch (error) { alert("មានបញ្ហាក្នុងការផ្ញើទិន្នន័យ!"); }
-        finally { btn.disabled = false; btn.innerText = "📤 កត់ត្រាការលក់ & ផ្ញើទៅ Telegram"; }
+        } catch (error) { 
+            alert("❌ មានបញ្ហាក្នុងការផ្ញើទិន្នន័យ៖ " + error.message); 
+        } finally { 
+            btn.disabled = false; btn.innerText = "📤 កត់ត្រាការលក់ & ផ្ញើទៅ Telegram"; 
+        }
     }
 
     function validateExpenseInputs() {
@@ -969,10 +975,14 @@
         }
 
         let amountInUSD = (currency === 'USD') ? rawAmount : rawAmount / EXCHANGE_RATE;
-        let displayAmountText = (currency === 'USD') ? `-$${rawAmount.toFixed(2)} (${(rawAmount * EXCHANGE_RATE).toLocaleString()} ៛)` : `-$${rawAmount.toLocaleString()} ៛ (≈ -$${amountInUSD.toFixed(2)})`;
+
+        // 🎯 ការកែសម្រួលដោះស្រាយ៖ លុបសញ្ញា $ ចេញពីលុយរៀល នៅពេលផ្ញើចូល Telegram (ចំណាយ)
+        let displayAmountText = (currency === 'USD') 
+            ? `-$${rawAmount.toFixed(2)} (${(rawAmount * EXCHANGE_RATE).toLocaleString()} ៛)` 
+            : `-${rawAmount.toLocaleString()} ៛ (≈ -$${amountInUSD.toFixed(2)})`;
 
         const btn = document.getElementById('submitExpenseBtn');
-        btn.disabled = true; btn.innerText = "កំពុងរក្សាទុក...";
+        btn.disabled = true; btn.innerText = "⏳ កំពុងរក្សាទុក...";
 
         try {
             await fetch(MAIN_SHEET_URL, {
@@ -999,7 +1009,7 @@
                             `💳 *ប្រភពសាច់ប្រាក់:* ${paymentText}`;
 
             await sendTelegram(message);
-            alert("កត់ត្រាការដកសាច់ប្រាក់ជោគជ័យ!");
+            alert("✅ កត់ត្រាការដកសាច់ប្រាក់ជោគជ័យ និងផ្ញើទៅ Telegram រួចរាល់!");
 
             currentVerifiedSeller = "";
             document.getElementById('expenseAmount').value = '';
@@ -1010,18 +1020,25 @@
             document.getElementById('pawnColor').value = '';
             document.getElementById('pawnImei').value = '';
             document.getElementById('pawnInterestRate').value = '';
-            setTimeout(fetchData, 1500);
+            setTimeout(fetchData, 1200);
 
-        } catch (error) { alert("មានបញ្ហាក្នុងការដកសាច់ប្រាក់!"); }
-        finally { btn.disabled = false; btn.innerText = "💸 កត់ត្រាការដកលុយ & ផ្ញើទៅ Telegram"; }
+        } catch (error) { 
+            alert("❌ មានបញ្ហាក្នុងការដកសាច់ប្រាក់៖ " + error.message); 
+        } finally { 
+            btn.disabled = false; btn.innerText = "💸 កត់ត្រាការដកលុយ & ផ្ញើទៅ Telegram"; 
+        }
     }
 
     async function sendTelegram(msg) {
-        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: msg, parse_mode: 'Markdown' })
-        });
+        try {
+            await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: msg, parse_mode: 'Markdown' })
+            });
+        } catch(e) {
+            console.error("Telegram Send Error:", e);
+        }
     }
 
     calculatePawnDueDate();
