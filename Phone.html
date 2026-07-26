@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ប្រព័ន្ធគ្រប់គ្រងការលក់ និងសាច់ប្រាក់</title>
-    <!-- [រក្សាទុក CSS ដដែល] -->
     <style>
         body { font-family: 'Khmer OS Battambang', Arial, sans-serif; margin: 0; padding: 15px; background-color: #f4f6f9; }
         .container { max-width: 950px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
@@ -357,7 +356,7 @@
     const TELEGRAM_BOT_TOKEN = '8875601366:AAHrCpV6w2FijHcJqQ9WBskEJYf6-ReD7CU'; 
     const TELEGRAM_CHAT_ID = '-1004473550210'; 
     const MAIN_SHEET_URL = 'https://script.google.com/macros/s/AKfycbzdU0lDH-tQtss-RzM1gnV_dngLHuLH9auPkZBFbVxtEia-Nq49iYYTxIrBiMmYfpvU/exec';
-    const PAWN_SHEET_URL = 'https://script.google.com/macros/s/AKfycbyXhg4MdPZmORJEXyw8lyBWvXa9Mc2Dz_tdHyPmet_Hnv3uyUK7oNuZNfvstgES4uyWdQ/exec';
+    const PAWN_SHEET_URL = 'https://script.google.com/macros/s/AKfycby8Pgd60vzmCw7gUa5bl541rZj6xT4MNj_0bXveGqDxGq9aeE1-nbwEFcQn6ys_gbhs5w/exec';
 
     const EMPLOYEE_CODES = { "04": "សីហា", "4": "សីហា", "102": "វិចិត្រ", "103": "ធារ៉ា", "999": "មេហាង" };
     const EXCHANGE_RATE = 4000;
@@ -371,15 +370,9 @@
     let calculatedNewDueDate = "";
     let calculatedRedeemInterestUSD = 0;
 
-    // កំណត់ថ្ងៃចាប់ផ្ដើម Default ឱ្យលោតថ្ងៃនេះជាស្វ័យប្រវត្តិ
+    // កំណត់ថ្ងៃចាប់ផ្ដើម Default ឱ្យលោតថ្ងៃនេះ
     document.addEventListener('DOMContentLoaded', () => {
-        const today = new Date();
-        const yyyy = today.getFullYear();
-        const mm = String(today.getMonth() + 1).padStart(2, '0');
-        const dd = String(today.getDate()).padStart(2, '0');
-        
-        // កំណត់ Format ទៅជា YYYY-MM-DD សម្រាប់ HTML input date
-        document.getElementById('pawnStartDateInput').value = `${yyyy}-${mm}-${dd}`;
+        document.getElementById('pawnStartDateInput').valueAsDate = new Date();
         calculatePawnDueDate();
     });
 
@@ -388,14 +381,7 @@
         const days = parseInt(document.getElementById('pawnDaysSelect').value) || 10;
         const startDateVal = document.getElementById('pawnStartDateInput').value;
         
-        let startDate;
-        if (startDateVal) {
-            let parts = startDateVal.split('-');
-            startDate = new Date(parts[0], parts[1] - 1, parts[2]);
-        } else {
-            startDate = new Date();
-        }
-        
+        let startDate = startDateVal ? new Date(startDateVal) : new Date();
         let dueDate = new Date(startDate);
         dueDate.setDate(dueDate.getDate() + days);
         
@@ -404,14 +390,29 @@
 
     function formatDateToDMY(dateInput) {
         if (!dateInput) return '-';
-        let dateObj = (dateInput instanceof Date) ? dateInput : parseDateString(dateInput);
-        if (isNaN(dateObj.getTime())) return dateInput; 
-        const dd = String(dateObj.getDate()).padStart(2, '0');
-        const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
-        const yyyy = dateObj.getFullYear();
-        return `${dd}/${mm}/${yyyy}`;
+        if (dateInput instanceof Date) {
+            const dd = String(dateInput.getDate()).padStart(2, '0');
+            const mm = String(dateInput.getMonth() + 1).padStart(2, '0');
+            const yyyy = dateInput.getFullYear();
+            return `${dd}/${mm}/${yyyy}`;
+        }
+        let cleanStr = dateInput.toString().replace("'", "").trim();
+        if (cleanStr.includes('-') || cleanStr.includes('/')) {
+            let parts = cleanStr.split(/[\/\-T\s]/);
+            if (parts.length >= 3) {
+                let p1 = parts[0];
+                let p2 = parts[1];
+                let p3 = parts[2];
+                if (p1.length === 4) {
+                    return `${p3.padStart(2, '0')}/${p2.padStart(2, '0')}/${p1}`;
+                }
+                return `${p1.padStart(2, '0')}/${p2.padStart(2, '0')}/${p3}`;
+            }
+        }
+        return cleanStr;
     }
 
+    // អនុគមន៍បកប្រែកាលបរិច្ឆេទឱ្យត្រូវតាម DD/MM/YYYY ដោយមិនភាន់ច្រឡំ MM/DD/YYYY
     function parseDateString(dateStr) {
         if (!dateStr) return new Date();
         if (dateStr instanceof Date) return new Date(dateStr.getTime());
@@ -423,8 +424,15 @@
                 let p2 = parseInt(parts[1], 10);
                 let p3 = parseInt(parts[2], 10);
                 let day, month, year;
-                if (p3 > 1000) { year = p3; if (p2 > 12) { day = p2; month = p1 - 1; } else { day = p1; month = p2 - 1; } } 
-                else if (p1 > 1000) { year = p1; month = p2 - 1; day = p3; } else { day = p1; month = p2 - 1; year = p3; }
+                
+                // ប្រសិនបើ YYYY-MM-DD
+                if (p1 > 1000) { 
+                    year = p1; month = p2 - 1; day = p3; 
+                } 
+                // ប្រសិនបើ DD/MM/YYYY (ឬ DD-MM-YYYY)
+                else { 
+                    day = p1; month = p2 - 1; year = p3; 
+                }
                 return new Date(year, month, day);
             }
         }
@@ -532,11 +540,51 @@
         inventory.forEach(item => { let remaining = item.initial - item.sold; tbody.innerHTML += `<tr><td><b>${item.model}</b></td><td>${item.initial}</td><td style="color: #dc3545; font-weight: bold;">${item.sold}</td><td style="color: #28a745; font-weight: bold;">${remaining}</td></tr>`; });
     }
 
+    // មុខងារ Render Pawn Table - កែសម្រួលការប្រៀបធៀបថ្ងៃខែឱ្យត្រឹមត្រូវ ១០០%
     function renderPawnTable() {
-        const tbody = document.getElementById('pawnTable'); tbody.innerHTML = '';
-        if (pawnItems.length === 0) { tbody.innerHTML = '<tr><td colspan="6">គ្មានទិន្នន័យទូរសព្ទបញ្ចាំទេ</td></tr>'; return; }
-        const today = new Date(); today.setHours(0, 0, 0, 0);
-        pawnItems.forEach(item => { let amountUSD = parseFloat(item.amount) || 0; let amountKHR = amountUSD * EXCHANGE_RATE; let pawnAmountDisplay = `$${amountUSD.toFixed(2)} (${amountKHR.toLocaleString()} ៛)`; let totalPaidUSD = parseFloat(item.totalInterestPaid) || 0; let paidInterestKHR = totalPaidUSD * EXCHANGE_RATE; let paidInterestDisplay = `${paidInterestKHR.toLocaleString()} ៛`; let formattedDueDate = formatDateToDMY(item.dueDate); let lastPaidDateDisplay = item.lastPaidDate ? formatDateToDMY(item.lastPaidDate) : '-'; let isOverdue = false; if (item.dueDate) { let due = parseDateString(item.dueDate); due.setHours(0, 0, 0, 0); if (due < today) { isOverdue = true; } } let dueDateStyle = isOverdue ? 'color: #dc3545; font-weight: bold; background-color: #ffe6e6;' : ''; let dueDateText = isOverdue ? `⚠️ ${formattedDueDate}` : formattedDueDate; tbody.innerHTML += `<tr><td><b>${item.model}</b> (${item.color})</td><td><code>${item.imei}</code></td><td style="color:#d32f2f; font-weight:bold;">${pawnAmountDisplay}</td><td style="${dueDateStyle}">${dueDateText}</td><td style="color:#2e7d32; font-weight:bold;">${paidInterestDisplay}</td><td>${lastPaidDateDisplay}</td></tr>`; });
+        const tbody = document.getElementById('pawnTable'); 
+        tbody.innerHTML = '';
+        if (pawnItems.length === 0) { 
+            tbody.innerHTML = '<tr><td colspan="6">គ្មានទិន្នន័យទូរសព្ទបញ្ចាំទេ</td></tr>'; 
+            return; 
+        }
+        
+        const today = new Date(); 
+        today.setHours(0, 0, 0, 0);
+
+        pawnItems.forEach(item => { 
+            let amountUSD = parseFloat(item.amount) || 0; 
+            let amountKHR = amountUSD * EXCHANGE_RATE; 
+            let pawnAmountDisplay = `$${amountUSD.toFixed(2)} (${amountKHR.toLocaleString()} ៛)`; 
+            let totalPaidUSD = parseFloat(item.totalInterestPaid) || 0; 
+            let paidInterestKHR = totalPaidUSD * EXCHANGE_RATE; 
+            let paidInterestDisplay = `${paidInterestKHR.toLocaleString()} ៛`; 
+            
+            let formattedDueDate = item.dueDate ? item.dueDate.toString().replace("'", "").trim() : '-'; 
+            let lastPaidDateDisplay = item.lastPaidDate ? item.lastPaidDate.toString().replace("'", "").trim() : '-'; 
+            
+            let isOverdue = false; 
+            if (item.dueDate) { 
+                let due = parseDateString(item.dueDate); 
+                due.setHours(0, 0, 0, 0); 
+                // ពិនិត្យមើលថាតើផុតកំណត់មែនឬអត់
+                if (due < today) { 
+                    isOverdue = true; 
+                } 
+            } 
+            
+            let dueDateStyle = isOverdue ? 'color: #dc3545; font-weight: bold; background-color: #ffe6e6;' : ''; 
+            let dueDateText = isOverdue ? `⚠️ ${formattedDueDate}` : formattedDueDate; 
+            
+            tbody.innerHTML += `<tr>
+                <td><b>${item.model}</b> (${item.color})</td>
+                <td><code>${item.imei}</code></td>
+                <td style="color:#d32f2f; font-weight:bold;">${pawnAmountDisplay}</td>
+                <td style="${dueDateStyle}">${dueDateText}</td>
+                <td style="color:#2e7d32; font-weight:bold;">${paidInterestDisplay}</td>
+                <td>${lastPaidDateDisplay}</td>
+            </tr>`; 
+        });
     }
 
     function searchPawnByImei() {
@@ -726,15 +774,7 @@
             const color = document.getElementById('pawnColor').value.trim();
             const imei = document.getElementById('pawnImei').value.trim();
             const startDateVal = document.getElementById('pawnStartDateInput').value;
-            
-            let startDateFormatted = "";
-            if (startDateVal) {
-                let parts = startDateVal.split('-');
-                startDateFormatted = `${parts[2]}/${parts[1]}/${parts[0]}`;
-            } else {
-                startDateFormatted = formatDateToDMY(new Date());
-            }
-
+            const startDateFormatted = startDateVal ? formatDateToDMY(new Date(startDateVal)) : formatDateToDMY(new Date());
             const days = document.getElementById('pawnDaysSelect').value;
             const dueDate = document.getElementById('pawnDueDate').value;
             let interestRate = parseFloat(document.getElementById('pawnInterestRate').value) || 0;
