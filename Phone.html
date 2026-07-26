@@ -199,70 +199,78 @@
 
     <!-- 📤 ផ្នែកកត់ត្រាចំណាយ (- លុយចេញ) -->
     <div class="section-box">
-        <h3>💸 កត់ត្រាការដកលុយ / ទទួលបញ្ចាំ (- លុយចេញ)</h3>
+        <h3>💸 កត់ត្រាការដកលុយ / ទទួលបញ្ចាំ / ទិញចូល (- លុយចេញ)</h3>
         
         <div class="form-group">
-            <label for="expenseCategory">មូលហេតុដកលុយ៖</label>
+            <label for="expenseCategory">មូលហេតុដកលុយ/ទិញចូល៖</label>
             <select id="expenseCategory" onchange="handleExpenseCategoryChange()">
                 <option value="pawn_in">📱 ទទួលបញ្ចាំទូរសព្ទ</option>
+                <option value="buy_phone">📥 ទិញទូរសព្ទចូល (ថែមស្តុកស្វ័យប្រវត្តិ)</option>
                 <option value="សម្រាប់ទិញម្ហូប">🍲 សម្រាប់ទិញម្ហូប</option>
                 <option value="សម្រាប់ទិញទឹក">🥤 សម្រាប់ទិញទឹក</option>
                 <option value="other">📦 ផ្សេងៗ</option>
             </select>
         </div>
 
-        <!-- ផ្នែកព័ត៌មានទូរសព្ទបញ្ចាំ -->
+        <!-- ផ្នែកព័ត៌មានទូរសព្ទបញ្ចាំ និងទិញចូល -->
         <div id="pawnDetailInputsGroup">
             <div class="form-group">
-                <label for="pawnPhoneModel">📱 ម៉ាក/ម៉ូឌែលទូរសព្ទបញ្ចាំ៖</label>
+                <label for="pawnPhoneModel" id="pawnPhoneModelLabel">📱 ម៉ាក/ម៉ូឌែលទូរសព្ទ៖</label>
                 <input type="text" id="pawnPhoneModel" placeholder="ឧទាហរណ៍៖ iPhone 12 Pro Max">
             </div>
 
-            <div class="form-group">
-                <label for="pawnColor">🎨 ពណ៌ទូរសព្ទ៖</label>
-                <input type="text" id="pawnColor" placeholder="ឧទាហរណ៍៖ ពណ៌ខ្មៅ / Gold">
-            </div>
+            <div id="pawnOnlyFields">
+                <div class="form-group">
+                    <label for="pawnColor">🎨 ពណ៌ទូរសព្ទ៖</label>
+                    <input type="text" id="pawnColor" placeholder="ឧទាហរណ៍៖ ពណ៌ខ្មៅ / Gold">
+                </div>
 
-            <div class="form-group">
-                <label for="pawnImei">🔢 លេខ IMEI (៤ ខ្ទង់ចុងក្រោយ):</label>
-                <input type="text" id="pawnImei" maxlength="4" placeholder="ឧទាហរណ៍៖ 8899">
-            </div>
+                <div class="form-group">
+                    <label for="pawnImei">🔢 លេខ IMEI (៤ ខ្ទង់ចុងក្រោយ):</label>
+                    <input type="text" id="pawnImei" maxlength="4" placeholder="ឧទាហរណ៍៖ 8899">
+                </div>
 
-            <!-- ជ្រើសរើសថ្ងៃចាប់ផ្ដើមបញ្ចាំ -->
-            <div class="form-group">
-                <label for="pawnStartDateInput">📅 ថ្ងៃចាប់ផ្ដើមបញ្ចាំ៖</label>
-                <input type="date" id="pawnStartDateInput" onchange="calculatePawnDueDate()">
-            </div>
+                <!-- ជ្រើសរើសថ្ងៃចាប់ផ្ដើមបញ្ចាំ -->
+                <div class="form-group">
+                    <label for="pawnStartDateInput">📅 ថ្ងៃចាប់ផ្ដើមបញ្ចាំ៖</label>
+                    <input type="date" id="pawnStartDateInput" onchange="calculatePawnDueDate()">
+                </div>
 
-            <div class="form-group">
-                <label for="pawnDaysSelect">📅 រយៈពេលបញ្ចាំ (ថ្ងៃ)៖</label>
-                <select id="pawnDaysSelect" onchange="autoCalculateInterest(); calculatePawnDueDate();">
-                    <option value="2">2 ថ្ងៃ</option>
-                    <option value="5">5 ថ្ងៃ</option>
-                    <option value="10" selected>10 ថ្ងៃ</option>
-                    <option value="15">15 ថ្ងៃ</option>
-                    <option value="30">30 ថ្ងៃ (1 ខែ)</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="pawnDueDate">📆 ថ្ងៃផុតកំណត់បញ្ចាំ (DD/MM/YYYY)៖</label>
-                <input type="text" id="pawnDueDate" readonly style="background-color: #e9ecef;">
-            </div>
-
-            <div class="form-group">
-                <label for="pawnInterestRate">💸 ការប្រាក់ក្នុង ១ ថ្ងៃ (គណនាស្វ័យប្រវត្តិ/អាចកែបាន)៖</label>
-                <div class="price-input-container">
-                    <input type="number" id="pawnInterestRate" step="100" placeholder="បញ្ចូល ឬកែការប្រាក់/ថ្ងៃ" oninput="updatePawnTotalInterestDisplay()">
-                    <select id="pawnRateCurrency">
-                        <option value="KHR">៛ រៀល</option>
-                        <option value="USD">💵 ដុល្លារ ($)</option>
+                <div class="form-group">
+                    <label for="pawnDaysSelect">📅 រយៈពេលបញ្ចាំ (ថ្ងៃ)៖</label>
+                    <select id="pawnDaysSelect" onchange="autoCalculateInterest(); calculatePawnDueDate();">
+                        <option value="2">2 ថ្ងៃ</option>
+                        <option value="5">5 ថ្ងៃ</option>
+                        <option value="10" selected>10 ថ្ងៃ</option>
+                        <option value="15">15 ថ្ងៃ</option>
+                        <option value="30">30 ថ្ងៃ (1 ខែ)</option>
                     </select>
                 </div>
-                <div id="pawnTotalInterestBox" style="margin-top: 6px; font-weight: bold; color: #2e7d32; font-size: 13px; display: none;">
-                    💰 ការប្រាក់សរុបតាមចំនួនថ្ងៃ៖ <span id="pawnTotalInterestText">0 ៛</span>
+
+                <div class="form-group">
+                    <label for="pawnDueDate">📆 ថ្ងៃផុតកំណត់បញ្ចាំ (DD/MM/YYYY)៖</label>
+                    <input type="text" id="pawnDueDate" readonly style="background-color: #e9ecef;">
+                </div>
+
+                <div class="form-group">
+                    <label for="pawnInterestRate">💸 ការប្រាក់ក្នុង ១ ថ្ងៃ (គណនាស្វ័យប្រវត្តិ/អាចកែបាន)៖</label>
+                    <div class="price-input-container">
+                        <input type="number" id="pawnInterestRate" step="100" placeholder="បញ្ចូល ឬកែការប្រាក់/ថ្ងៃ" oninput="updatePawnTotalInterestDisplay()">
+                        <select id="pawnRateCurrency">
+                            <option value="KHR">៛ រៀល</option>
+                            <option value="USD">💵 ដុល្លារ ($)</option>
+                        </select>
+                    </div>
+                    <div id="pawnTotalInterestBox" style="margin-top: 6px; font-weight: bold; color: #2e7d32; font-size: 13px; display: none;">
+                        💰 ការប្រាក់សរុបតាមចំនួនថ្ងៃ៖ <span id="pawnTotalInterestText">0 ៛</span>
+                    </div>
                 </div>
             </div>
+        </div>
+
+        <div class="form-group" id="buyQtyGroup" style="display: none;">
+            <label for="buyQtyInput">📦 ចំនួនគ្រឿងទិញចូល (គ្រឿង)៖</label>
+            <input type="number" id="buyQtyInput" min="1" value="1">
         </div>
 
         <div class="form-group" id="otherExpenseGroup" style="display: none;">
@@ -271,7 +279,7 @@
         </div>
 
         <div class="form-group">
-            <label for="expenseAmount">💵 ចំនួនលុយដកចេញ / ប្រាក់ដើមបញ្ចាំ៖</label>
+            <label for="expenseAmount" id="expenseAmountLabel">💵 ចំនួនលុយដកចេញ / ប្រាក់ដើមបញ្ចាំ / តម្លៃទិញចូលសរុប៖</label>
             <div class="price-input-container">
                 <input type="number" id="expenseAmount" placeholder="បញ្ចូលចំនួនទឹកប្រាក់" oninput="autoCalculateInterest()">
                 <select id="expenseCurrencyType" onchange="autoCalculateInterest()">
@@ -290,7 +298,7 @@
             </div>
         </div>
 
-        <button class="expense-btn" id="submitExpenseBtn" type="button" onclick="openPinModal('expense')">💸 កត់ត្រាការដកលុយ & ផ្ញើទៅ Telegram</button>
+        <button class="expense-btn" id="submitExpenseBtn" type="button" onclick="openPinModal('expense')">💸 កត់ត្រាការដកលុយ/ទិញចូល & ផ្ញើទៅ Telegram</button>
     </div>
 
     <hr style="margin: 25px 0; border: 0; border-top: 1px solid #eee;">
@@ -355,7 +363,7 @@
 <script>
     const TELEGRAM_BOT_TOKEN = '8875601366:AAHrCpV6w2FijHcJqQ9WBskEJYf6-ReD7CU'; 
     const TELEGRAM_CHAT_ID = '-1004473550210'; 
-    const MAIN_SHEET_URL = 'https://script.google.com/macros/s/AKfycbzdU0lDH-tQtss-RzM1gnV_dngLHuLH9auPkZBFbVxtEia-Nq49iYYTxIrBiMmYfpvU/exec';
+    const MAIN_SHEET_URL = 'https://script.google.com/macros/s/AKfycbzgiLid3u-dI2QtfWESRHNcVC_ys_d1dBdasQZdTUztjdetqoM165UxfBTmM-fMiBwN/exec';
     const PAWN_SHEET_URL = 'https://script.google.com/macros/s/AKfycbylOC9wIdJ0PP59Zh4DjKhYMCeXDYiARJQbA1LE2eKhBwcPAQibvixiiJYJhgylewPcnQ/exec';
 
     const EMPLOYEE_CODES = { "04": "សីហា", "4": "សីហា", "102": "វិចិត្រ", "103": "ធារ៉ា", "999": "មេហាង" };
@@ -412,7 +420,6 @@
         return cleanStr;
     }
 
-    // អនុគមន៍បកប្រែកាលបរិច្ឆេទឱ្យត្រូវតាម DD/MM/YYYY ដោយមិនភាន់ច្រឡំ MM/DD/YYYY
     function parseDateString(dateStr) {
         if (!dateStr) return new Date();
         if (dateStr instanceof Date) return new Date(dateStr.getTime());
@@ -424,13 +431,9 @@
                 let p2 = parseInt(parts[1], 10);
                 let p3 = parseInt(parts[2], 10);
                 let day, month, year;
-                
-                // ប្រសិនបើ YYYY-MM-DD
                 if (p1 > 1000) { 
                     year = p1; month = p2 - 1; day = p3; 
-                } 
-                // ប្រសិនបើ DD/MM/YYYY (ឬ DD-MM-YYYY)
-                else { 
+                } else { 
                     day = p1; month = p2 - 1; year = p3; 
                 }
                 return new Date(year, month, day);
@@ -487,8 +490,33 @@
 
     function handleExpenseCategoryChange() {
         const category = document.getElementById('expenseCategory').value;
-        document.getElementById('pawnDetailInputsGroup').style.display = (category === 'pawn_in') ? 'block' : 'none';
-        document.getElementById('otherExpenseGroup').style.display = (category === 'other') ? 'block' : 'none';
+        const pawnInputsGroup = document.getElementById('pawnDetailInputsGroup');
+        const pawnOnlyFields = document.getElementById('pawnOnlyFields');
+        const buyQtyGroup = document.getElementById('buyQtyGroup');
+        const otherExpenseGroup = document.getElementById('otherExpenseGroup');
+        const pawnPhoneModelLabel = document.getElementById('pawnPhoneModelLabel');
+
+        if (category === 'pawn_in') {
+            pawnInputsGroup.style.display = 'block';
+            pawnOnlyFields.style.display = 'block';
+            buyQtyGroup.style.display = 'none';
+            otherExpenseGroup.style.display = 'none';
+            pawnPhoneModelLabel.innerText = '📱 ម៉ាក/ម៉ូឌែលទូរសព្ទបញ្ចាំ៖';
+        } else if (category === 'buy_phone') {
+            pawnInputsGroup.style.display = 'block';
+            pawnOnlyFields.style.display = 'none';
+            buyQtyGroup.style.display = 'block';
+            otherExpenseGroup.style.display = 'none';
+            pawnPhoneModelLabel.innerText = '📥 ម៉ាក/ម៉ូឌែលទូរសព្ទទិញចូល (ថែមស្តុក)៖';
+        } else if (category === 'other') {
+            pawnInputsGroup.style.display = 'none';
+            buyQtyGroup.style.display = 'none';
+            otherExpenseGroup.style.display = 'block';
+        } else {
+            pawnInputsGroup.style.display = 'none';
+            buyQtyGroup.style.display = 'none';
+            otherExpenseGroup.style.display = 'none';
+        }
     }
 
     function autoCalculateInterest() {
@@ -540,7 +568,6 @@
         inventory.forEach(item => { let remaining = item.initial - item.sold; tbody.innerHTML += `<tr><td><b>${item.model}</b></td><td>${item.initial}</td><td style="color: #dc3545; font-weight: bold;">${item.sold}</td><td style="color: #28a745; font-weight: bold;">${remaining}</td></tr>`; });
     }
 
-    // មុខងារ Render Pawn Table - កែសម្រួលការប្រៀបធៀបថ្ងៃខែឱ្យត្រឹមត្រូវ ១០០%
     function renderPawnTable() {
         const tbody = document.getElementById('pawnTable'); 
         tbody.innerHTML = '';
@@ -567,7 +594,6 @@
             if (item.dueDate) { 
                 let due = parseDateString(item.dueDate); 
                 due.setHours(0, 0, 0, 0); 
-                // ពិនិត្យមើលថាតើផុតកំណត់មែនឬអត់
                 if (due < today) { 
                     isOverdue = true; 
                 } 
@@ -757,8 +783,19 @@
         const rawAmount = parseFloat(document.getElementById('expenseAmount').value);
         if (!currency) { alert("⚠️ សូមជ្រើសរើសរូបិយប័ណ្ណដក (រៀល ឬ ដុល្លារ)!"); return false; }
         if (!paymentRadio) { alert("⚠️ សូមជ្រើសរើសប្រភេទសាច់ប្រាក់ដកចេញ!"); return false; }
-        if (expenseCategory === 'pawn_in') { const model = document.getElementById('pawnPhoneModel').value.trim(); const color = document.getElementById('pawnColor').value.trim(); const imei = document.getElementById('pawnImei').value.trim(); if (!model || !color || imei.length !== 4) { alert("សូមបញ្ចូលព័ត៌មានបញ្ចាំ និង IMEI ៤ខ្ទង់ ឱ្យបានត្រឹមត្រូវ!"); return false; } } 
-        else if (expenseCategory === 'other') { const reason = document.getElementById('expenseReasonDetail').value.trim(); if (!reason) { alert("សូមបញ្ចូលមូលហេតុដកលុយ!"); return false; } }
+        if (expenseCategory === 'pawn_in') { 
+            const model = document.getElementById('pawnPhoneModel').value.trim(); 
+            const color = document.getElementById('pawnColor').value.trim(); 
+            const imei = document.getElementById('pawnImei').value.trim(); 
+            if (!model || !color || imei.length !== 4) { alert("សូមបញ្ចូលព័ត៌មានបញ្ចាំ និង IMEI ៤ខ្ទង់ ឱ្យបានត្រឹមត្រូវ!"); return false; } 
+        } else if (expenseCategory === 'buy_phone') {
+            const model = document.getElementById('pawnPhoneModel').value.trim();
+            const buyQty = parseInt(document.getElementById('buyQtyInput').value);
+            if (!model || isNaN(buyQty) || buyQty <= 0) { alert("សូមបញ្ចូលម៉ាក/ម៉ូឌែល និងចំនួនគ្រឿងទិញចូលឱ្យបានត្រឹមត្រូវ!"); return false; }
+        } else if (expenseCategory === 'other') { 
+            const reason = document.getElementById('expenseReasonDetail').value.trim(); 
+            if (!reason) { alert("សូមបញ្ចូលមូលហេតុដកលុយ!"); return false; } 
+        }
         if (isNaN(rawAmount) || rawAmount <= 0) { alert("សូមបញ្ចូលចំនួនលុយដកឱ្យបានត្រឹមត្រូវ!"); return false; }
         return true;
     }
@@ -769,6 +806,8 @@
         const currency = document.getElementById('expenseCurrencyType').value;
         const rawAmount = parseFloat(document.getElementById('expenseAmount').value);
         let reason = ""; let pawnData = null; let interestMsgExtra = "";
+        let isBuyPhone = (expenseCategory === 'buy_phone');
+
         if (expenseCategory === 'pawn_in') {
             const model = document.getElementById('pawnPhoneModel').value.trim();
             const color = document.getElementById('pawnColor').value.trim();
@@ -784,18 +823,72 @@
             let totalInterestKHR = parseInt(days) * interestRate;
             let formattedRateText = (rateCurr === 'USD') ? `$${interestRate.toFixed(2)}/ថ្ងៃ` : `${interestRate.toLocaleString()} ៛/ថ្ងៃ`;
             interestMsgExtra = `\n📅 *ថ្ងៃចាប់ផ្ដើម:* ${startDateFormatted}\n💸 *ការប្រាក់:* ${formattedRateText}` + `\n⏱️ *រយៈពេល:* ${days} ថ្ងៃ (ផុតកំណត់៖ ${dueDate})` + `\n💰 *ការប្រាក់សរុប:* ${totalInterestKHR.toLocaleString()} ៛`;
-        } else if (expenseCategory === 'other') { reason = document.getElementById('expenseReasonDetail').value.trim(); } 
-        else { reason = expenseCategory; }
+        } else if (isBuyPhone) {
+            const modelName = document.getElementById('pawnPhoneModel').value.trim();
+            const buyQty = parseInt(document.getElementById('buyQtyInput').value) || 1;
+            reason = `📥 ទិញទូរសព្ទចូលស្តុក: ${modelName} (${buyQty} គ្រឿង)`;
+        } else if (expenseCategory === 'other') { 
+            reason = document.getElementById('expenseReasonDetail').value.trim(); 
+        } else { 
+            reason = expenseCategory; 
+        }
+
         let amountInUSD = (currency === 'USD') ? rawAmount : rawAmount / EXCHANGE_RATE;
         let displayAmountText = (currency === 'USD') ? `-$${rawAmount.toFixed(2)} (${(rawAmount * EXCHANGE_RATE).toLocaleString()} ៛)` : `-${rawAmount.toLocaleString()} ៛ (≈ -$${amountInUSD.toFixed(2)})`;
         const btn = document.getElementById('submitExpenseBtn'); btn.disabled = true; btn.innerText = "⏳ កំពុងរក្សាទុក...";
+
         try {
-            await fetch(MAIN_SHEET_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'expense', amount: amountInUSD, paymentType: paymentType }) });
-            if (expenseCategory === 'pawn_in') { pawnData.amount = amountInUSD; await fetch(PAWN_SHEET_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'pawn_in', pawnDetails: pawnData }) }); }
+            if (isBuyPhone) {
+                const modelName = document.getElementById('pawnPhoneModel').value.trim();
+                const buyQty = parseInt(document.getElementById('buyQtyInput').value) || 1;
+                await fetch(MAIN_SHEET_URL, { 
+                    method: 'POST', 
+                    mode: 'no-cors', 
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+                    body: JSON.stringify({ 
+                        action: 'buy', 
+                        model: modelName, 
+                        qty: buyQty, 
+                        price: amountInUSD, 
+                        paymentType: paymentType 
+                    }) 
+                });
+            } else {
+                await fetch(MAIN_SHEET_URL, { 
+                    method: 'POST', 
+                    mode: 'no-cors', 
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+                    body: JSON.stringify({ action: 'expense', amount: amountInUSD, paymentType: paymentType }) 
+                });
+            }
+
+            if (expenseCategory === 'pawn_in') { 
+                pawnData.amount = amountInUSD; 
+                await fetch(PAWN_SHEET_URL, { 
+                    method: 'POST', 
+                    mode: 'no-cors', 
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+                    body: JSON.stringify({ action: 'pawn_in', pawnDetails: pawnData }) 
+                }); 
+            }
+
             let paymentText = (paymentType === 'cash') ? "💵 លុយស្រស់ (ដកចេញពីប្រាក់ក្នុងដៃ)" : "💳 លុយកុង/QR (ដកចេញពីប្រាក់ក្នុងកុង)";
-            const message = `💸 *របាយការណ៍ដកលុយ/បញ្ចាំ (- លុយចេញ)!*\n\n` + `👤 *បុគ្គលិកប្រតិបត្តិការ:* ${currentVerifiedSeller}\n` + `📝 *មូលហេតុ:* ${reason}\n` + `💵 *ប្រាក់ដើមដកចេញ:* ${displayAmountText}${interestMsgExtra}\n` + `💳 *ប្រភពសាច់ប្រាក់:* ${paymentText}`;
-            await sendTelegram(message); alert("✅ កត់ត្រាការដកសាច់ប្រាក់ជោគជ័យ និងផ្ញើទៅ Telegram រួចរាល់!");
-            currentVerifiedSeller = ""; document.getElementById('expenseAmount').value = ''; document.getElementById('expenseCurrencyType').value = ''; const paymentRadio = document.querySelector('input[name="expensePaymentType"]:checked'); if (paymentRadio) paymentRadio.checked = false; document.getElementById('pawnPhoneModel').value = ''; document.getElementById('pawnColor').value = ''; document.getElementById('pawnImei').value = ''; document.getElementById('pawnInterestRate').value = ''; document.getElementById('pawnTotalInterestBox').style.display = 'none'; setTimeout(fetchData, 1200);
+            const message = `💸 *របាយការណ៍ដកលុយ/ទិញចូល (- លុយចេញ)!*\n\n` + `👤 *បុគ្គលិកប្រតិបត្តិការ:* ${currentVerifiedSeller}\n` + `📝 *មូលហេតុ:* ${reason}\n` + `💵 *ប្រាក់ដើមដកចេញ:* ${displayAmountText}${interestMsgExtra}\n` + `💳 *ប្រភពសាច់ប្រាក់:* ${paymentText}`;
+            await sendTelegram(message); alert("✅ កត់ត្រាការដកសាច់ប្រាក់/ទិញចូលជោគជ័យ និងផ្ញើទៅ Telegram រួចរាល់!");
+            
+            currentVerifiedSeller = ""; 
+            document.getElementById('expenseAmount').value = ''; 
+            document.getElementById('expenseCurrencyType').value = ''; 
+            const paymentRadio = document.querySelector('input[name="expensePaymentType"]:checked'); 
+            if (paymentRadio) paymentRadio.checked = false; 
+            document.getElementById('pawnPhoneModel').value = ''; 
+            document.getElementById('pawnColor').value = ''; 
+            document.getElementById('pawnImei').value = ''; 
+            document.getElementById('pawnInterestRate').value = ''; 
+            document.getElementById('pawnTotalInterestBox').style.display = 'none'; 
+            document.getElementById('buyQtyInput').value = 1;
+
+            setTimeout(fetchData, 1200);
         } catch (error) { alert("❌ មានបញ្ហាក្នុងការដកសាច់ប្រាក់៖ " + error.message); } finally { btn.disabled = false; btn.innerText = "💸 កត់ត្រាការដកលុយ & ផ្ញើទៅ Telegram"; }
     }
 
