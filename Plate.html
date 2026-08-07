@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>បញ្ជីស្លាកលេខ (សម្រាប់ភ្ញៀវមើល)</title>
+  <style>
+    body { font-family: sans-serif; background-color: #f0f2f5; margin: 0; padding: 10px; padding-bottom: 50px; }
+    h1 { text-align: center; color: #1a365d; font-size: 20px; margin-bottom: 20px; }
+    .grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; max-width: 600px; margin: 0 auto; }
+    .card { background: white; border-radius: 10px; padding: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-align: center; position: relative; display: flex; flex-direction: column; justify-content: space-between; }
+    .card img { width: 100%; height: 120px; object-fit: cover; border-radius: 6px; cursor: pointer; }
+    .status-booked { color: #e53e3e; font-weight: 900; font-size: 13px; margin: 6px 0; background: #fff5f5; padding: 8px; border-radius: 4px; border: 1px solid #e53e3e; text-align: left; }
+    .status-available { color: #38a169; font-weight: bold; font-size: 13px; margin: 6px 0; background: #f0fff4; padding: 6px; border-radius: 4px; border: 1px solid #38a169; }
+    
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+  </style>
+</head>
+<body>
+
+  <h1>បញ្ជីស្ថានភាពស្លាកលេខ (សម្រាប់ភ្ញៀវ)</h1>
+
+  <div class="grid-container" id="platesContainer"></div>
+
+  <!-- Zoom Modal -->
+  <div class="modal" id="imageModal" onclick="this.style.display='none'">
+    <img id="modalImage" style="max-width:90%; max-height:90%; border-radius:8px;">
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbw7k_G9wWGM5p0R6hfbfUfP91A0A_jS9jOLie5F3NVUqYCNGi9Ty-apNgQY3PIHtmZ4/exec";
+    let windowData = [], timerInterval = null;
+
+    function render(data) {
+      const container = document.getElementById('platesContainer');
+      container.innerHTML = "";
+
+      if (timerInterval) clearInterval(timerInterval);
+
+      data.forEach(item => {
+        const isBooked = item.status === "Booked";
+        const bookedBy = item.bookedBy ? item.bookedBy.trim() : "";
+
+        let statusHtml = '';
+        if (isBooked) {
+          statusHtml = `
+            <div class="status-booked">
+              🔴 កក់ដោយ៖ ${bookedBy}
+              <div style="font-size: 11px; color: #742a2a; margin-top: 4px; font-weight: normal;">ការកក់នេះនឹងផុតសុពលភាព៖</div>
+              <div class="countdown" data-time="${item.bookedTime || new Date().getTime()}" style="font-size: 11px; color: #9b2c2c; font-weight: bold; margin-top: 2px;">កំពុងគណនា...</div>
+            </div>`;
+        } else {
+          statusHtml = `<div class="status-available">🟢 នៅទំនេរ (Available)</div>`;
+        }
+
+        container.innerHTML += `
+          <div class="card">
+            <img src="${item.image}" onclick="zoom('${item.image}')" onerror="this.src='https://via.placeholder.com/300x180?text=No+Image'">
+            <div style="font-weight:bold; margin:6px 0; font-size:16px;">${item.plate}</div>
+            ${statusHtml}
+          </div>`;
+      });
+
+      startCountdown();
+    }
+
+    function startCountdown() {
+      timerInterval = setInterval(() => {
+        const timers = document.querySelectorAll('.countdown');
+        const THREE_DAYS = 3 * 24 * 60 * 60 * 1000;
+        const now = new Date().getTime();
+
+        timers.forEach(el => {
+          const bookedTime = parseInt(el.getAttribute('data-time'));
+          const expiryTime = bookedTime + THREE_DAYS;
+          const timeLeft = expiryTime - now;
+
+          if (timeLeft <= 0) {
+            el.innerText = "ផុតកំណត់សុពលភាព!";
+            load();
+          } else {
+            const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+            el.innerText = `⏳ នៅសល់៖ ${days}ថ្ងៃ ${hours}ម៉ោង ${minutes}នាទី ${seconds}វិនាទី`;
+          }
+        });
+      }, 1000);
+    }
+
+    function zoom(img) { 
+      document.getElementById('imageModal').style.display = 'flex'; 
+      document.getElementById('modalImage').src = img; 
+    }
+
+    function load() { 
+      const old = document.getElementById('jsonpScript');
+      if(old) old.remove();
+      const s = document.createElement('script'); 
+      s.id = 'jsonpScript';
+      s.src = API_URL + '?callback=handleData&t=' + new Date().getTime(); 
+      document.body.appendChild(s); 
+    }
+    
+    function handleData(d) { 
+      windowData = d || []; 
+      render(windowData); 
+    }
+    
+    // โหลดទិន្នន័យស្វ័យប្រវត្តិ និង Refresh ៀងរាល់ ១០ វិនាទី
+    load();
+    setInterval(load, 10000);
+  </script>
+</body>
+</html>
