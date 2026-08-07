@@ -43,7 +43,6 @@
     </div>
   </div>
 
-  <!-- Modal លក់ -->
   <div class="modal" id="sellModal">
     <div class="modal-content">
       <h3 style="margin-top:0;">ព័ត៌មានការលក់</h3>
@@ -55,14 +54,13 @@
     </div>
   </div>
 
-  <!-- Zoom Modal -->
   <div class="modal" id="imageModal" onclick="this.style.display='none'">
     <img id="modalImage" style="max-width:90%; max-height:90%; border-radius:8px;">
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbw7k_G9wWGM5p0R6hfbfUfP91A0A_jS9jOLie5F3NVUqYCNGi9Ty-apNgQY3PIHtmZ4/exec";
-    const USER_MAP = { "1168":"Dom", "887766":"Tola", "3334":"Phos", "1002":"SP", "00168":"មេ", "5556":"Chhun Ty", "6784":"Lyly" };
+    const API_URL = "https://script.google.com/macros/s/AKfycbz85h11924sGvhVyGOU7KHBYctzUoDX8B4ZnOJOPTzSnQKCgjrgBo0hVtw6pbM_TJP5/exec";
+    const USER_MAP = { "2168":"Dom", "2225":"Tola", "3335":"Phos", "1002":"SP", "00168":"មេ", "5556":"Chhun Ty", "6667":"Lyly" };
     let loggedInStaff = null, selected = [], windowData = [], timerInterval = null;
 
     function checkPin() {
@@ -244,7 +242,7 @@
         })
         .then(res => res.json())
         .then(() => { 
-          alert("កក់ได้ជោគជ័យ! សុពលភាពមានរយៈពេល ៣ ថ្ងៃ។"); 
+          alert("កក់បានជោគជ័យ! សុពលភាពមានរយៈពេល ៣ ថ្ងៃ។"); 
           load(); 
         })
         .catch(() => {
@@ -257,18 +255,15 @@
       }
     }
 
+    // ប្រើ fetch API ជំនួស JSONP ដើម្បីកុំឱ្យติดปัญหาលើ Android
     function load() { 
-      const old = document.getElementById('jsonpScript');
-      if(old) old.remove();
-      const s = document.createElement('script'); 
-      s.id = 'jsonpScript';
-      s.src = API_URL + '?callback=handleData&t=' + new Date().getTime(); 
-      document.body.appendChild(s); 
-    }
-    
-    function handleData(d) { 
-      windowData = d || []; 
-      render(windowData); 
+      fetch(API_URL)
+        .then(res => res.json())
+        .then(d => {
+          windowData = d || [];
+          render(windowData);
+        })
+        .catch(err => console.error("Error loading data:", err));
     }
     
     load();

@@ -12,7 +12,6 @@
     .card img { width: 100%; height: 120px; object-fit: cover; border-radius: 6px; cursor: pointer; }
     .status-booked { color: #e53e3e; font-weight: 900; font-size: 13px; margin: 6px 0; background: #fff5f5; padding: 8px; border-radius: 4px; border: 1px solid #e53e3e; text-align: left; }
     .status-available { color: #38a169; font-weight: bold; font-size: 13px; margin: 6px 0; background: #f0fff4; padding: 6px; border-radius: 4px; border: 1px solid #38a169; }
-    
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
   </style>
 </head>
@@ -22,13 +21,12 @@
 
   <div class="grid-container" id="platesContainer"></div>
 
-  <!-- Zoom Modal -->
   <div class="modal" id="imageModal" onclick="this.style.display='none'">
     <img id="modalImage" style="max-width:90%; max-height:90%; border-radius:8px;">
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbw7k_G9wWGM5p0R6hfbfUfP91A0A_jS9jOLie5F3NVUqYCNGi9Ty-apNgQY3PIHtmZ4/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbz85h11924sGvhVyGOU7KHBYctzUoDX8B4ZnOJOPTzSnQKCgjrgBo0hVtw6pbM_TJP5/exec";
     let windowData = [], timerInterval = null;
 
     function render(data) {
@@ -95,20 +93,15 @@
     }
 
     function load() { 
-      const old = document.getElementById('jsonpScript');
-      if(old) old.remove();
-      const s = document.createElement('script'); 
-      s.id = 'jsonpScript';
-      s.src = API_URL + '?callback=handleData&t=' + new Date().getTime(); 
-      document.body.appendChild(s); 
+      fetch(API_URL)
+        .then(res => res.json())
+        .then(d => {
+          windowData = d || [];
+          render(windowData);
+        })
+        .catch(err => console.error("Error loading data:", err));
     }
     
-    function handleData(d) { 
-      windowData = d || []; 
-      render(windowData); 
-    }
-    
-    // โหลดទិន្នន័យស្វ័យប្រវត្តិ និង Refresh ៀងរាល់ ១០ វិនាទី
     load();
     setInterval(load, 10000);
   </script>
