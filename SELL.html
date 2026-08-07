@@ -166,7 +166,7 @@
           </div>
           <div class="btn-group">
             <button class="btn" onclick="bookSinglePlate('${item.plate}')" ${isBooked ? 'disabled' : ''}>កក់ទុក</button>
-            <button class="btn btn-sell" onclick="openSellModalSingle('${item.plate}')">ទិញ/លក់</button>
+            <button class="btn btn-sell" onclick="openSellModalSingle('${item.plate}')" ${isBooked ? 'disabled' : ''}>ទិញ/លក់</button>
           </div>
         `;
         container.appendChild(card);
