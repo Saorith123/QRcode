@@ -5,348 +5,236 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ប្រព័ន្ធគ្រប់គ្រង និងលក់ស្លាកលេខ</title>
   <style>
-    body { font-family: 'Kantumruy Pro', 'Segoe UI', sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; padding-bottom: 100px; }
-    h1 { text-align: center; color: #1a365d; margin-bottom: 20px; }
+    body { font-family: sans-serif; background-color: #f0f2f5; margin: 0; padding: 10px; padding-bottom: 100px; }
+    h1 { text-align: center; color: #1a365d; font-size: 20px; }
+    .auth-box { max-width: 420px; margin: 0 auto 15px; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center; }
+    .grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; max-width: 600px; margin: 0 auto; }
+    .card { background: white; border-radius: 10px; padding: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-align: center; position: relative; display: flex; flex-direction: column; justify-content: space-between; }
+    .card img { width: 100%; height: 120px; object-fit: cover; border-radius: 6px; cursor: pointer; }
+    .status-booked { color: #e53e3e; font-weight: 900; font-size: 14px; margin: 8px 0; background: #fff5f5; padding: 6px; border-radius: 4px; border: 1px solid #e53e3e; }
     
-    .auth-box { max-width: 420px; margin: 0 auto 20px; background: white; padding: 20px 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; }
-    .auth-box h3 { margin-top: 0; color: #2d3748; }
-    
-    .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
-    
-    .card { background: white; border-radius: 12px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
-    .card.selected { border: 2px solid #3182ce; background-color: #ebf8ff; }
-    .card img { width: 100%; height: 180px; object-fit: cover; border-radius: 8px; background-color: #e2e8f0; cursor: pointer; }
-    
-    .select-checkbox { position: absolute; top: 25px; left: 25px; width: 22px; height: 22px; cursor: pointer; accent-color: #3182ce; z-index: 10; }
-    
-    .plate-number { font-size: 24px; font-weight: bold; margin: 12px 0 5px; color: #1a202c; letter-spacing: 1px; }
-    .status-booked { color: #e53e3e; font-weight: bold; margin-bottom: 10px; font-size: 15px; background: #fff5f5; padding: 5px; border-radius: 6px; }
-    
-    .btn-group { display: flex; gap: 8px; margin-top: 10px; }
-    .btn { flex: 1; background: #3182ce; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; }
+    .btn-group { display: flex; justify-content: space-between; margin-top: 10px; gap: 5px; }
+    .btn { border: none; padding: 8px; border-radius: 6px; cursor: pointer; color: white; font-size: 12px; font-weight: bold; flex: 1; }
+    .btn:disabled { background: #cbd5e0 !important; cursor: not-allowed; opacity: 0.6; }
+    .btn-book { background: #3182ce; }
     .btn-sell { background: #38a169; }
-    .btn:disabled { background: #cbd5e0; cursor: not-allowed; }
     
-    .action-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1a365d; color: white; padding: 15px 20px; display: none; justify-content: space-between; align-items: center; box-shadow: 0 -4px 10px rgba(0,0,0,0.15); z-index: 999; }
-    .action-bar-info { font-size: 16px; font-weight: bold; }
-    .action-bar-btns { display: flex; gap: 10px; }
-
-    label { font-weight: 500; color: #4a5568; font-size: 14px; display: block; text-align: left; }
-    input, textarea { width: 100%; padding: 10px; margin: 6px 0 16px; box-sizing: border-box; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 14px; }
-    
-    .welcome-text { display: none; color: #2b6cb0; font-weight: bold; font-size: 16px; background: #ebf8ff; padding: 10px; border-radius: 6px; margin-top: 10px; }
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1000; }
-    .modal-content { background: white; padding: 25px; border-radius: 12px; width: 90%; max-width: 450px; max-height: 90vh; overflow-y: auto; }
-    
-    /* CSS សម្រាប់ Modal Zoom រូបភាព */
-    .image-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 2000; cursor: pointer; }
-    .image-modal img { max-width: 90%; max-height: 90%; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
-
-    .card-option-item { background: #f7fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-    .card-option-item span { font-weight: bold; color: #2b6cb0; font-size: 16px; }
-
-    .loading-spinner { text-align: center; grid-column: 1 / -1; font-size: 18px; color: #4a5568; padding: 40px; }
+    .action-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1a365d; color: white; padding: 15px; display: none; justify-content: space-between; align-items: center; z-index: 999; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+    .modal-content { background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 400px; max-height: 90vh; overflow-y: auto; box-sizing: border-box; }
+    .radio-group { margin: 10px 0; padding: 10px; background: #f7fafc; border-radius: 6px; text-align: left; }
   </style>
 </head>
 <body>
 
-  <h1>ប្រព័ន្ធគ្រប់គ្រង និងលក់ស្លាកលេខឡាន</h1>
-
+  <h1>ប្រព័ន្ធគ្រប់គ្រង និងលក់ស្លាកលេខ</h1>
   <div class="auth-box">
-    <h3>🔑 ផ្ទៀងផ្ទាត់អត្តសញ្ញាណ</h3>
-    <label>បញ្ចូលលេខសម្ងាត់ (PIN) ដើម្បីចូលប្រើ៖</label>
-    <input type="password" id="staffPin" placeholder="បញ្ចូលលេខសម្ងាត់..." oninput="checkPin()">
-    <div id="welcomeBox" class="welcome-text"></div>
+    <input type="password" id="staffPin" placeholder="បញ្ចូលលេខសម្ងាត់ PIN..." oninput="checkPin()" style="width:100%; padding:10px; box-sizing:border-box; border:1px solid #ccc; border-radius:6px;">
+    <div id="welcomeBox" style="display:none; color:#2b6cb0; font-weight:bold; margin-top:8px;"></div>
   </div>
 
-  <div class="grid-container" id="platesContainer">
-    <div class="loading-spinner" id="loadingText">កំពុងទាញយកទិន្នន័យ...</div>
-  </div>
+  <div class="grid-container" id="platesContainer"></div>
 
   <div class="action-bar" id="actionBar">
-    <div class="action-bar-info" id="selectedCountText">បានជ្រើសរើស 0 ស្លាកលេខ</div>
-    <div class="action-bar-btns">
-      <button class="btn" onclick="bookSelectedPlates()" style="background:#3182ce;">កក់ទុកទាំងអស់</button>
-      <button class="btn btn-sell" onclick="openSellModalForSelected()">ទិញ/លក់ទាំងអស់</button>
+    <div id="selectedCountText">បានជ្រើសរើស 0</div>
+    <div>
+      <button class="btn btn-book" id="btnBookAction" onclick="bookSelectedPlates()">កក់</button>
+      <button class="btn btn-sell" id="btnSellAction" onclick="openSellModalForSelected()">លក់</button>
     </div>
   </div>
 
   <!-- Modal លក់ -->
   <div class="modal" id="sellModal">
     <div class="modal-content">
-      <h3 style="margin-top:0;">📝 បែបបទនៃការលក់</h3>
-      
-      <label style="font-weight:bold; color:#2d3748; margin-bottom:8px;">កំណត់កាតគ្រីតាមស្លាកលេខនីមួយៗ៖</label>
-      <div id="cardOptionsContainer" style="margin-bottom: 15px;"></div>
-      
-      <label>លេខទូរស័ព្ទភ្ញៀវ៖</label>
-      <input type="tel" id="custPhone" placeholder="ឧ. 012 345 678">
-      
-      <label>ទីតាំងត្រូវផ្ញើទៅឲ្យភ្ញៀវ៖</label>
-      <textarea id="custLocation" rows="3" placeholder="បញ្ជាក់អាសយដ្ឋាន ឬទីតាំងលម្អិត..."></textarea>
-      
-      <div class="btn-group">
-        <button class="btn btn-sell" id="btnConfirmSell" onclick="confirmSell()">រក្សាទុក និងផ្ញើ</button>
-        <button class="btn" style="background:#e53e3e;" onclick="closeModal()">បោះបង់</button>
-      </div>
+      <h3 style="margin-top:0;">ព័ត៌មានការលក់</h3>
+      <div id="modalItems"></div>
+      <input type="tel" id="custPhone" placeholder="លេខទូរស័ព្ទភ្ញៀវ" style="width:100%; padding:10px; margin:10px 0; box-sizing:border-box; border:1px solid #ccc; border-radius:6px;">
+      <textarea id="custLocation" placeholder="ទីតាំង..." rows="3" style="width:100%; padding:10px; margin-bottom:10px; box-sizing:border-box; border:1px solid #ccc; border-radius:6px;"></textarea>
+      <button class="btn btn-sell" id="btnConfirmSell" style="width:100%; padding:10px;" onclick="confirmSell()">បញ្ជាក់ការលក់</button>
+      <button class="btn" style="width:100%; margin-top:10px; background:#e53e3e; padding:10px;" onclick="closeModal()">បោះបង់</button>
     </div>
   </div>
 
-  <!-- Modal សម្រាប់ Zoom រូបភាព -->
-  <div class="image-modal" id="imageModal" onclick="closeImageModal()">
-    <img id="modalImageSrc" src="" alt="Zoomed Image">
+  <!-- Zoom Modal -->
+  <div class="modal" id="imageModal" onclick="this.style.display='none'">
+    <img id="modalImage" style="max-width:90%; max-height:90%; border-radius:8px;">
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbwpI6TVfTY1ClwU1KHgHas1SAyOvRfF-PDcgdB0_4VsOHRtk83VaERmnVnkI1tHr6ym/exec";
-    
-    const USER_MAP = { 
-      "1111": "Dom", 
-      "2222": "Tola", 
-      "3333": "Phos", 
-      "4444": "SP", 
-      "0000": "មេ", 
-      "5555": "Chhun Ty", 
-      "6666": "Lyly" 
-    };
-
-    let loggedInStaff = null;
-    let selectedPlatesArray = [];
+    const API_URL = "https://script.google.com/macros/s/AKfycbwmVMcesQVKWycRxtqhDgv0hdJnPeLFwBruS3QU8pU8l7di3st1wOofBclJncpB13cQ/exec";
+    const USER_MAP = { "1111":"Dom", "2222":"Tola", "3333":"Phos", "4444":"SP", "0000":"មេ", "5555":"Chhun Ty", "6666":"Lyly" };
+    let loggedInStaff = null, selected = [], windowData = [];
 
     function checkPin() {
       const pin = document.getElementById('staffPin').value.trim();
-      const welcomeBox = document.getElementById('welcomeBox');
-
       if (USER_MAP[pin]) {
         loggedInStaff = USER_MAP[pin];
-        welcomeBox.innerText = "👋 ស្វាគមន៍៖ " + loggedInStaff;
-        welcomeBox.style.display = "block";
-      } else {
-        loggedInStaff = null;
-        welcomeBox.style.display = "none";
+        document.getElementById('welcomeBox').innerText = "ស្វាគមន៍៖ " + loggedInStaff;
+        document.getElementById('welcomeBox').style.display = "block";
+      } else { 
+        loggedInStaff = null; 
+        document.getElementById('welcomeBox').style.display = "none"; 
       }
+      if (windowData.length > 0) render(windowData);
     }
 
-    function loadPlates() {
-      const oldScript = document.getElementById('jsonpScript');
-      if (oldScript) oldScript.remove();
-
-      const script = document.createElement('script');
-      script.id = 'jsonpScript';
-      script.src = API_URL + '?callback=renderPlates&t=' + new Date().getTime();
-      script.onerror = function() {
-        document.getElementById('platesContainer').innerHTML = `<div class="loading-spinner" style="color:red;">❌ មិនអាចទាញយកទិន្នន័យបានទេ! សូមពិនិត្យ Web App URL ឬបញ្ហា Network</div>`;
-      };
-      document.body.appendChild(script);
-    }
-
-    function renderPlates(data) {
+    function render(data) {
       const container = document.getElementById('platesContainer');
       container.innerHTML = "";
-      selectedPlatesArray = [];
-      updateActionBar();
-
-      if (!data || data.length === 0) {
-        container.innerHTML = `<div class="loading-spinner">គ្មានស្លាកលេខសម្រាប់បង្ហាញទេ</div>`;
-        return;
-      }
+      selected = [];
+      document.getElementById('actionBar').style.display = 'none';
 
       data.forEach(item => {
         const isBooked = item.status === "Booked";
-        const card = document.createElement('div');
-        card.className = "card";
-        card.id = `card-${item.plate}`;
+        const bookedBy = item.bookedBy ? item.bookedBy.trim() : "";
         
-        card.innerHTML = `
-          ${!isBooked ? `<input type="checkbox" class="select-checkbox" id="chk-${item.plate}" onchange="toggleSelectPlate('${item.plate}')">` : ''}
-          <div>
-            <img src="${item.image}" alt="Plate Image" onclick="zoomImage('${item.image}')" onerror="this.src='https://via.placeholder.com/300x180?text=No+Image'">
-            <div class="plate-number">${item.plate}</div>
-            ${isBooked ? `<div class="status-booked">🔴 គេកក់ហើយដោយ៖ ${item.bookedBy}</div>` : ''}
-          </div>
-          <div class="btn-group">
-            <button class="btn" onclick="bookSinglePlate('${item.plate}')" ${isBooked ? 'disabled' : ''}>កក់ទុក</button>
-            <button class="btn btn-sell" onclick="openSellModalSingle('${item.plate}')" ${isBooked ? 'disabled' : ''}>ទិញ/លក់</button>
-          </div>
-        `;
-        container.appendChild(card);
+        // សិទ្ធិ៖ បើមិនទាន់វាយ PIN ទេ គឺបិទទាំងអស់។ បើវាយ PIN แล้ว ឆែកមើលសិទ្ធិកក់/លក់
+        const hasPin = loggedInStaff !== null;
+        const canAction = hasPin && (!isBooked || loggedInStaff === "មេ" || loggedInStaff === bookedBy);
+
+        container.innerHTML += `
+          <div class="card">
+            ${!isBooked ? `<input type="checkbox" onchange="toggle('${item.plate}')" style="position:absolute; top:10px; left:10px; width:20px; height:20px; cursor:pointer; z-index:10;">` : ''}
+            <img src="${item.image}" onclick="zoom('${item.image}')" onerror="this.src='https://via.placeholder.com/300x180?text=No+Image'">
+            <div style="font-weight:bold; margin:8px 0; font-size:16px;">${item.plate}</div>
+            ${isBooked ? `<div class="status-booked">🔴 កក់ដោយ៖ ${bookedBy}</div>` : ''}
+            <div class="btn-group">
+              <button class="btn btn-book" ${!canAction ? 'disabled' : ''} onclick="bookSingle('${item.plate}')">កក់</button>
+              <button class="btn btn-sell" ${!canAction ? 'disabled' : ''} onclick="openSellModalSingle('${item.plate}')">លក់</button>
+            </div>
+          </div>`;
       });
     }
 
-    function zoomImage(imgUrl) {
-      const modal = document.getElementById('imageModal');
-      const modalImg = document.getElementById('modalImageSrc');
-      modalImg.src = imgUrl;
-      modal.style.display = 'flex';
+    function toggle(plate) {
+      const idx = selected.indexOf(plate);
+      idx > -1 ? selected.splice(idx, 1) : selected.push(plate);
+      document.getElementById('actionBar').style.display = selected.length > 0 ? 'flex' : 'none';
+      document.getElementById('selectedCountText').innerText = "បានជ្រើសរើស " + selected.length;
     }
 
-    function closeImageModal() {
-      const modal = document.getElementById('imageModal');
-      modal.style.display = 'none';
+    function zoom(img) { 
+      document.getElementById('imageModal').style.display = 'flex'; 
+      document.getElementById('modalImage').src = img; 
     }
-
-    function toggleSelectPlate(plate) {
-      const index = selectedPlatesArray.indexOf(plate);
-      const card = document.getElementById(`card-${plate}`);
-      const chk = document.getElementById(`chk-${plate}`);
-      
-      if (index > -1) {
-        selectedPlatesArray.splice(index, 1);
-        if(card) card.classList.remove('selected');
-        if(chk) chk.checked = false;
-      } else {
-        selectedPlatesArray.push(plate);
-        if(card) card.classList.add('selected');
-        if(chk) chk.checked = true;
-      }
-      
-      updateActionBar();
-    }
-
-    function updateActionBar() {
-      const bar = document.getElementById('actionBar');
-      const text = document.getElementById('selectedCountText');
-      
-      if (selectedPlatesArray.length > 0) {
-        text.innerText = `បានជ្រើសរើស ${selectedPlatesArray.length} ស្លាកលេខ (${selectedPlatesArray.join(', ')})`;
-        bar.style.display = 'flex';
-      } else {
-        bar.style.display = 'none';
-      }
-    }
-
-    function requireAuth() {
-      if (!loggedInStaff) {
-        alert("សូមបញ្ចូលលេខសម្ងាត់ (PIN) ឲ្យបានត្រឹមត្រូវជាមុនសិន!");
-        return false;
-      }
-      return true;
-    }
-
-    function bookSinglePlate(plate) {
-      selectedPlatesArray = [plate];
+    
+    function bookSingle(plate) {
+      selected = [plate];
       bookSelectedPlates();
     }
 
-    function bookSelectedPlates() {
-      if (!requireAuth()) return;
-      if (selectedPlatesArray.length === 0) return;
-
-      if (confirm(`តើអ្នក (${loggedInStaff}) ប្រាកដជាចង់កក់ស្លាកលេខ [${selectedPlatesArray.join(', ')}] ដែរឬទេ?`)) {
-        const items = selectedPlatesArray.map(p => ({ plate: p }));
-        
-        fetch(API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({ action: "book", items: items, staffName: loggedInStaff })
-        })
-        .then(res => res.json())
-        .then(data => {
-          if(data.status === "success") {
-            alert("បានបញ្ជូនសំណើកក់ និងផ្ញើទៅ Telegram រួចរាល់!");
-            loadPlates();
-          } else {
-            alert("មានបញ្ហា៖ " + data.message);
-          }
-        })
-        .catch(err => {
-          console.error("Booking Error:", err);
-          alert("បានបញ្ជូនសំណើកក់រួចរាល់!");
-          setTimeout(loadPlates, 1500);
-        });
-      }
-    }
-
     function openSellModalSingle(plate) {
-      selectedPlatesArray = [plate];
+      selected = [plate];
       openSellModalForSelected();
     }
 
     function openSellModalForSelected() {
-      if (!requireAuth()) return;
-      if (selectedPlatesArray.length === 0) return;
+      if(!loggedInStaff) return alert("សូមបញ្ចូល PIN ជាមុនសិន!");
+      if(selected.length === 0) return;
 
-      const container = document.getElementById('cardOptionsContainer');
-      container.innerHTML = "";
-
-      selectedPlatesArray.forEach(plate => {
-        const cleanPlateId = plate.replace(/[^a-zA-Z0-9]/g, '');
-        const div = document.createElement('div');
-        div.className = 'card-option-item';
-        div.innerHTML = `
-          <span>${plate}</span>
-          <label style="display:flex; align-items:center; gap:8px; margin:0; cursor:pointer; font-weight:bold;">
-            <input type="checkbox" id="cardCheck-${cleanPlateId}" style="width:18px; height:18px; margin:0;" checked> មានកាតគ្រី
-          </label>
-        `;
-        container.appendChild(div);
+      let html = "";
+      selected.forEach(plate => {
+        html += `<div style="margin-bottom:10px;"><strong>${plate}</strong>
+          <div class="radio-group">
+            <label style="cursor:pointer;"><input type="radio" name="card_${plate}" value="yes"> មានកាតគ្រី</label><br>
+            <label style="cursor:pointer; margin-top:6px; display:inline-block;"><input type="radio" name="card_${plate}" value="no"> គ្មានកាតគ្រី</label>
+          </div></div>`;
       });
-
+      document.getElementById('modalItems').innerHTML = html;
       document.getElementById('sellModal').style.display = "flex";
     }
 
-    function closeModal() {
-      document.getElementById('sellModal').style.display = "none";
+    function closeModal() { 
+      document.getElementById('sellModal').style.display = "none"; 
       document.getElementById('custPhone').value = "";
       document.getElementById('custLocation').value = "";
     }
 
-    function confirmSell() {
-      if (!requireAuth()) return;
+    function disableAllButtons(disabled) {
+      document.querySelectorAll('button').forEach(btn => btn.disabled = disabled);
+    }
 
+    function confirmSell() {
+      if(!loggedInStaff) return alert("សូមបញ្ចូល PIN!");
+      let items = [], valid = true;
+      selected.forEach(plate => {
+        const val = document.querySelector(`input[name="card_${plate}"]:checked`);
+        if(!val) valid = false;
+        else items.push({ plate, hasCard: val.value === "yes" });
+      });
+      if(!valid) return alert("សូមជ្រើសរើស កាតគ្រី (មាន ឬ គ្មាន) សម្រាប់ស្លាកលេខនីមួយៗ!");
+      
       const phone = document.getElementById('custPhone').value.trim();
       const location = document.getElementById('custLocation').value.trim();
-
-      if (!phone || !location) {
-        alert("សូមបញ្ចូលលេខទូរស័ព្ទ និងទីតាំងរបស់ភ្ញៀវឲ្យបានគ្រប់គ្រាន់!");
-        return;
-      }
-
-      const items = selectedPlatesArray.map(plate => {
-        const cleanPlateId = plate.replace(/[^a-zA-Z0-9]/g, '');
-        const checkElem = document.getElementById(`cardCheck-${cleanPlateId}`);
-        const hasCard = checkElem ? checkElem.checked : false;
-        return { plate: plate, hasCard: hasCard };
-      });
+      if(!phone || !location) return alert("សូមបំពេញលេខទូរស័ព្ទ និងទីតាំង!");
 
       const btn = document.getElementById('btnConfirmSell');
-      btn.disabled = true;
-      btn.innerText = "កំពុងផ្ញើ...";
+      btn.innerText = "កំពុងដំណើរការ...";
+      disableAllButtons(true);
 
-      fetch(API_URL, {
-        method: "POST",
+      fetch(API_URL, { 
+        method: "POST", 
         headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({
-          action: "sell",
-          items: items,
-          staffName: loggedInStaff,
-          phone: phone,
-          location: location
-        })
+        body: JSON.stringify({ action: "sell", items, staffName: loggedInStaff, phone, location }) 
       })
       .then(res => res.json())
-      .then(data => {
-        btn.disabled = false;
-        btn.innerText = "រក្សាទុក និងផ្ញើ";
-        if (data.status === "success") {
-          alert("ការលក់ត្រូវបានរក្សាទុក និងផ្ញើព័ត៌មានទៅ Telegram រួចរាល់!");
-          closeModal();
-          loadPlates();
-        } else {
-          alert("មានបញ្ហា៖ " + data.message);
-        }
+      .then(() => { 
+        alert("លក់បានជោគជ័យ!"); 
+        closeModal(); 
+        load(); 
       })
-      .catch(err => {
-        console.error("Sell Error:", err);
-        btn.disabled = false;
-        btn.innerText = "រក្សាទុក និងផ្ញើ";
-        alert("ការលក់ត្រូវបានរក្សាទុក និងផ្ញើព័ត៌មានទៅ Telegram រួចរាល់!");
+      .catch(() => {
+        alert("លក់បានជោគជ័យ!");
         closeModal();
-        setTimeout(loadPlates, 1500);
+        setTimeout(load, 1000);
+      })
+      .finally(() => {
+        btn.innerText = "បញ្ជាក់ការលក់";
+        disableAllButtons(false);
       });
     }
 
-    loadPlates();
+    function bookSelectedPlates() {
+      if(!loggedInStaff) return alert("សូមបញ្ចូល PIN ជាមុនសិន!");
+      if(selected.length === 0) return;
+
+      if(confirm(`តើអ្នក (${loggedInStaff}) ចង់កក់ស្លាកលេខ [${selected.join(', ')}] ទេ?`)) {
+        disableAllButtons(true);
+        fetch(API_URL, { 
+          method: "POST", 
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ action: "book", items: selected.map(p=>({plate:p})), staffName: loggedInStaff }) 
+        })
+        .then(res => res.json())
+        .then(() => { 
+          alert("កក់បានជោគជ័យ!"); 
+          load(); 
+        })
+        .catch(() => {
+          alert("កក់បានជោគជ័យ!");
+          setTimeout(load, 1000);
+        })
+        .finally(() => {
+          disableAllButtons(false);
+        });
+      }
+    }
+
+    function load() { 
+      const old = document.getElementById('jsonpScript');
+      if(old) old.remove();
+      const s = document.createElement('script'); 
+      s.id = 'jsonpScript';
+      s.src = API_URL + '?callback=handleData&t=' + new Date().getTime(); 
+      document.body.appendChild(s); 
+    }
+    
+    function handleData(d) { 
+      windowData = d || []; 
+      render(windowData); 
+    }
+    
+    load();
   </script>
 </body>
 </html>
