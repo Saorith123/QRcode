@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ប្រព័ន្ធគ្រប់គ្រងប្រាក់ជំពាក់</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Kantumruy Pro', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 15px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        header h2 {
+            color: var(--primary);
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+
+        header p {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        /* រចនាប័ទ្មសម្រាប់ប៊ូតុង Refresh / ពិនិត្យមើលឡើងវិញ */
+        .refresh-container {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .btn-refresh {
+            background: #0284c7;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: background 0.2s;
+            width: auto;
+        }
+
+        .btn-refresh:hover {
+            background: #0369a1;
+        }
+
+        .btn-refresh:disabled {
+            background: #cbd5e1 !important;
+            cursor: not-allowed;
+        }
+
+        /* Animation សម្រាប់ពេលកំពុងពិនិត្យ */
+        @keyframes pulse-animation {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(0.98); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .is-refreshing {
+            animation: pulse-animation 1s infinite;
+        }
+
+        .summary-dashboard {
+            background: linear-gradient(135deg, #4f46e5, #6366f1);
+            color: white;
+            padding: 18px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+            text-align: center;
+        }
+
+        .summary-dashboard h3 {
+            margin: 0 0 10px 0;
+            font-size: 15px;
+            font-weight: 500;
+            opacity: 0.9;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 6px;
+        }
+
+        .summary-main-value {
+            font-size: 22px;
+            font-weight: 700;
+            margin-top: 5px;
+        }
+
+        .summary-sub-value {
+            font-size: 15px;
+            opacity: 0.9;
+            margin-top: 2px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 18px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+            margin-bottom: 15px;
+        }
+
+        .card h3 {
+            margin-top: 0;
+            font-size: 16px;
+            color: #334155;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: 500;
+            font-size: 13px;
+            color: #475569;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 14px;
+            background: #fff;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .row-group {
+            display: flex;
+            gap: 10px;
+        }
+        .row-group .form-group {
+            flex: 1;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: inherit;
+        }
+
+        button:disabled {
+            background: #cbd5e1 !important;
+            cursor: not-allowed;
+        }
+
+        .btn-repay { background: var(--success); }
+
+        .debt-card {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 14px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .debt-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 10px;
+        }
+
+        .customer-toggle-btn {
+            background: none;
+            border: none;
+            padding: 0;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 17px;
+            color: var(--primary);
+            cursor: pointer;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .customer-toggle-btn:hover {
+            text-decoration: underline;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-debt { background: #fef2f2; color: var(--danger); border: 1px solid #fecaca; }
+        .status-paid { background: #ecfdf5; color: var(--success); border: 1px solid #a7f3d0; }
+
+        .info-grid {
+            display: grid;
+            gap: 8px;
+            font-size: 14px;
+            color: #475569;
+            margin-bottom: 8px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            background: #f8fafc;
+            padding: 8px 10px;
+            border-radius: 6px;
+        }
+
+        .info-title { color: #64748b; }
+        .info-data { font-weight: 600; color: #1e293b; text-align: right; }
+        .text-highlight { color: var(--primary); font-size: 15px; }
+
+        .total-summary-box {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: #1e40af;
+            display: none;
+        }
+
+        .history-container {
+            display: none; 
+            border-top: 1px dashed #e2e8f0;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+
+        .history-header-title {
+            font-weight: 600;
+            font-size: 13px;
+            color: #475569;
+            margin-bottom: 6px;
+        }
+
+        .history-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            background: #fff;
+            padding: 6px 8px;
+            border-radius: 4px;
+            border: 1px solid #f1f5f9;
+            margin-bottom: 4px;
+            align-items: center;
+        }
+
+        .loading-text {
+            text-align: center;
+            color: #94a3b8;
+            font-style: italic;
+            padding: 20px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 320px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .pin-input {
+            letter-spacing: 5px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-cancel { background: #e2e8f0; color: #475569; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h2>គ្រប់គ្រងប្រាក់ជំពាក់</h2>
+        <p>ប្រព័ន្ធកត់ត្រាទូទាត់ប្រាក់រួមគ្នា ($1 = 4,000៛)</p>
+    </header>
+
+    <!-- ប៊ូតុង ពិនិត្យមើលឡើងវិញ (Refresh Button) -->
+    <div class="refresh-container">
+        <button type="button" id="refreshBtn" class="btn-refresh" onclick="refreshData()">
+            🔄 ពិនិត្យមើលឡើងវិញ
+        </button>
+    </div>
+
+    <!-- ប្រអប់សរុបទឹកប្រាក់រួមគ្នា -->
+    <div class="summary-dashboard">
+        <h3>📈 សរុបទឹកប្រាក់ត្រូវទារសរុបទាំងអស់</h3>
+        <div class="summary-main-value" id="totalDebtUSD">0.00 $</div>
+        <div class="summary-sub-value" id="totalDebtRiel">(0 ៛)</div>
+    </div>
+
+    <!-- ផ្នែកទី ១៖ បញ្ចូលទិន្នន័យ -->
+    <div class="card">
+        <h3>១. កត់ត្រាប្រាក់ (ថ្មី ឬ ខ្ចីបន្ថែម)</h3>
+        <form id="debtForm" onsubmit="handleDebtFormSubmit(event)">
+            <div class="form-group">
+                <label>ប្រភេទប្រតិបត្តិការ</label>
+                <select id="formActionType" onchange="toggleFormMode()">
+                    <option value="add">កត់ត្រាអ្នកជំពាក់ថ្មី</option>
+                    <option value="borrow_more">ខ្ចីបន្ថែម (អ្នកចាស់)</option>
+                </select>
+            </div>
+
+            <div id="newCustomerGroup">
+                <div class="form-group">
+                    <label>ឈ្មោះអ្នកជំពាក់</label>
+                    <input type="text" id="name" placeholder="ឧ. ចាន់ ធីតា">
+                </div>
+            </div>
+
+            <div id="existingCustomerGroup" style="display: none;">
+                <div class="form-group">
+                    <label>ជ្រើសរើសឈ្មោះអ្នកជំពាក់</label>
+                    <select id="selectCustomerAdd">
+                        <option value="">-- ជ្រើសរើសឈ្មោះ --</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>មូលហេតុ</label>
+                <input type="text" id="reason" required placeholder="ឧ. ខ្ចីទិញទំនិញ">
+            </div>
+
+            <div class="row-group">
+                <div class="form-group" style="flex: 2;">
+                    <label>ចំនួនទឹកប្រាក់</label>
+                    <input type="number" step="any" id="totalAmount" required placeholder="ឧ. 10000 ឬ 50">
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>រូបិយប័ណ្ណ</label>
+                    <select id="currency">
+                        <option value="៛">រៀល (៛)</option>
+                        <option value="$">ដុល្លារ ($)</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit" id="formSubmitBtn">កត់ត្រាទុក</button>
+        </form>
+    </div>
+
+    <!-- ផ្នែកទី ២៖ បង់ប្រាក់សង -->
+    <div class="card">
+        <h3>២. កត់ត្រាការសងប្រាក់</h3>
+        <form id="actionForm" onsubmit="handleRepayFormSubmit(event)">
+            <div class="form-group">
+                <label>ជ្រើសរើសឈ្មោះអ្នកជំពាក់</label>
+                <select id="selectCustomerRepay" required onchange="updateRepayInfo()">
+                    <option value="">-- ជ្រើសរើសឈ្មោះ --</option>
+                </select>
+            </div>
+
+            <div id="totalDebtInfo" class="total-summary-box"></div>
+
+            <div class="row-group">
+                <div class="form-group" style="flex: 2;">
+                    <label>ចំនួនទឹកប្រាក់សង</label>
+                    <input type="number" step="any" id="amount" required placeholder="ឧ. 200000 ឬ 20">
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>រូបិយប័ណ្ណសង</label>
+                    <select id="repayCurrency">
+                        <option value="៛">រៀល (៛)</option>
+                        <option value="$">ដុល្លារ ($)</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn-repay" id="repaySubmitBtn">សងប្រាក់</button>
+        </form>
+    </div>
+
+    <!-- ផ្នែកទី ៣៖ បញ្ជីបង្ហាញ -->
+    <div class="list-section">
+        <h3>បញ្ជីអ្នកជំពាក់ និងប្រវត្តិ (ចុចលើឈ្មោះដើម្បីមើល)</h3>
+        <div id="debtListContainer">
+            <div class="loading-text">កំពុងទាញទិន្នន័យ...</div>
+        </div>
+    </div>
+</div>
+
+<!-- ផ្ទាំង PIN Code -->
+<div class="modal-overlay" id="pinModal">
+    <div class="modal-content">
+        <h3>🔒 បញ្ចូលលេខកូដសម្ងាត់</h3>
+        <p>សូមបញ្ចូលលេខកូដសម្ងាត់របស់អ្នកដើម្បីបញ្ជាក់ការប្រតិបត្តិការ</p>
+        <div class="form-group">
+            <input type="password" id="pinCodeInput" class="pin-input" maxlength="4" placeholder="••••">
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" onclick="closePinModal()">បោះបង់</button>
+            <button type="button" onclick="verifyAndSubmit()">យល់ព្រម</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyXzsf0iii1z0c7oOdGVHk-ImQtPBifUM0L_CDsd0p6FgkfB6JtcjkLNv8rk6TUz1cI/exec";
+    const CORRECT_PIN = "1234";
+    const EXCHANGE_RATE = 4000;
+    let pendingCallback = null;
+
+    function formatAmountDisplay(usdVal) {
+        let u = usdVal || 0;
+        let r = u * EXCHANGE_RATE;
+        return `${u.toFixed(2)} $ (${Math.round(r).toLocaleString()} ៛)`;
+    }
+
+    // មុខងារសម្រាប់ប៊ូតុង ពិនិត្យមើលឡើងវិញ (Refresh)
+    function refreshData() {
+        const btn = document.getElementById('refreshBtn');
+        const container = document.getElementById('debtListContainer');
+
+        // ប្តូរអត្ថបទ និងដាក់ Animation ពេលកំពុងពិនិត្យ
+        btn.disabled = true;
+        btn.classList.add('is-refreshing');
+        btn.innerHTML = '🔄 កំពុងពិនិត្យ...';
+        container.innerHTML = '<div class="loading-text">កំពុងធ្វើបច្ចុប្បន្នភាពទិន្នន័យ...</div>';
+
+        // ហៅទិន្នន័យមកវិញ
+        fetch(WEB_APP_URL)
+        .then(res => res.json())
+        .then(data => {
+            renderData(data);
+            // ដាក់ពេលបន្តិចដើម្បីបង្ហាញប៊ូតុងធម្មតាវិញ
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.classList.remove('is-refreshing');
+                btn.innerHTML = '🔄 ពិនិត្យមើលឡើងវិញ';
+            }, 500);
+        })
+        .catch(err => {
+            console.error('Fetch Error:', err);
+            container.innerHTML = '<div class="loading-text" style="color:red;">មានបញ្ហាក្នុងការទាញទិន្នន័យ!</div>';
+            btn.disabled = false;
+            btn.classList.remove('is-refreshing');
+            btn.innerHTML = '🔄 ពិនិត្យមើលឡើងវិញ';
+        });
+    }
+
+    function toggleFormMode() {
+        let type = document.getElementById('formActionType').value;
+        let newGroup = document.getElementById('newCustomerGroup');
+        let existGroup = document.getElementById('existingCustomerGroup');
+        let submitBtn = document.getElementById('formSubmitBtn');
+
+        if (type === 'borrow_more') {
+            newGroup.style.display = 'none';
+            existGroup.style.display = 'block';
+            submitBtn.textContent = 'កត់ត្រាការខ្ចីបន្ថែម';
+            submitBtn.style.background = 'var(--warning)';
+        } else {
+            newGroup.style.display = 'block';
+            existGroup.style.display = 'none';
+            submitBtn.textContent = 'កត់ត្រាទុក';
+            submitBtn.style.background = 'var(--primary)';
+        }
+    }
+
+    function updateRepayInfo() {
+        const select = document.getElementById('selectCustomerRepay');
+        const selectedOption = select.options[select.selectedIndex];
+        const infoBox = document.getElementById('totalDebtInfo');
+
+        if (!select.value) {
+            infoBox.style.display = 'none';
+            infoBox.innerHTML = '';
+            return;
+        }
+
+        let remUSD = parseFloat(selectedOption.getAttribute('data-rem-usd')) || 0;
+        let remRiel = remUSD * EXCHANGE_RATE;
+
+        infoBox.style.display = 'block';
+        infoBox.innerHTML = `<strong>📌 ទឹកប្រាក់សរុបដែលនៅសល់ត្រូវសង៖</strong><br>
+            • ${remUSD.toFixed(2)} $ (${Math.round(remRiel).toLocaleString()} ៛)`;
+    }
+
+    function renderData(data) {
+        const container = document.getElementById('debtListContainer');
+        const selectRepay = document.getElementById('selectCustomerRepay');
+        const selectAdd = document.getElementById('selectCustomerAdd');
+        
+        container.innerHTML = '';
+        selectRepay.innerHTML = '<option value="">-- ជ្រើសរើសឈ្មោះ --</option>';
+        selectAdd.innerHTML = '<option value="">-- ជ្រើសរើសឈ្មោះ --</option>';
+
+        if (!data || data.length === 0) {
+            container.innerHTML = '<div class="loading-text">មិនទាន់មានទិន្នន័យនៅឡើយទេ</div>';
+            document.getElementById('totalDebtUSD').textContent = '0.00 $';
+            document.getElementById('totalDebtRiel').textContent = '(0 ៛)';
+            return;
+        }
+
+        let sumGrandUSD = 0;
+
+        data.forEach((row, index) => {
+            let statusText = row.status === 'បានសងរួច' ? 'បានសងរួច' : 'កំពុងជំពាក់';
+            let statusClass = row.status === 'បានសងរួច' ? 'status-paid' : 'status-debt';
+
+            let tUSD = parseFloat(row.remUSD) || 0; 
+            let origUSD = (parseFloat(row.totalRiel) / EXCHANGE_RATE) + parseFloat(row.totalUSD);
+
+            if (row.status !== 'បានសងរួច') {
+                sumGrandUSD += tUSD;
+            }
+
+            let historyHtml = '';
+            if (row.history && Array.isArray(row.history) && row.history.length > 0) {
+                historyHtml = `
+                    <div class="history-container" id="history_${index}">
+                        <div class="history-header-title">📜 ប្រវត្តិប្រតិបត្តិការ៖</div>
+                `;
+                row.history.forEach(h => {
+                    let sign = (h.type === 'សងប្រាក់') ? '-' : '+';
+                    let colorStyle = (h.type === 'សងប្រាក់') ? 'color: #10b981;' : 'color: #f59e0b;';
+                    let hCurr = h.currency || '$';
+                    let formattedAmt = hCurr === '$' ? `${Number(h.amount).toFixed(2)} $` : `${Number(h.amount).toLocaleString()} ៛`;
+                    
+                    let reasonText = h.reason ? ` (${h.reason})` : '';
+
+                    historyHtml += `
+                        <div class="history-row">
+                            <span style="color: #64748b; font-size: 11px;">${h.date || ''}</span>
+                            <span style="font-weight: 600; ${colorStyle}">[${h.type}] ${sign}${formattedAmt}${reasonText}</span>
+                        </div>
+                    `;
+                });
+                historyHtml += `</div>`;
+            }
+
+            let totalDisplay = formatAmountDisplay(origUSD);
+            let remainingDisplay = formatAmountDisplay(tUSD);
+
+            let cardDiv = document.createElement('div');
+            cardDiv.className = 'debt-card';
+            cardDiv.innerHTML = `
+                <div class="debt-card-header">
+                    <button class="customer-toggle-btn" onclick="toggleHistory(${index})">
+                        👤 ${row.name} ▾
+                    </button>
+                    <span class="status-badge ${statusClass}">${statusText}</span>
+                </div>
+                <div class="info-grid">
+                    <div class="info-row">
+                        <span class="info-title">មូលហេតុ៖</span>
+                        <span class="info-data">${row.reason}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-title">ទឹកប្រាក់សរុប៖</span>
+                        <span class="info-data">${totalDisplay}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-title">នៅសល់ត្រូវសង៖</span>
+                        <span class="info-data text-highlight">${remainingDisplay}</span>
+                    </div>
+                </div>
+                ${historyHtml}
+            `;
+            container.appendChild(cardDiv);
+
+            if (row.status !== 'បានសងរួច') {
+                let option1 = document.createElement('option');
+                option1.value = row.id;
+                option1.textContent = `${row.name} (សល់៖ ${remainingDisplay})`;
+                option1.setAttribute('data-rem-usd', tUSD);
+                selectRepay.appendChild(option1);
+            }
+
+            let option2 = document.createElement('option');
+            option2.value = row.id;
+            option2.textContent = `${row.name}`;
+            selectAdd.appendChild(option2);
+        });
+
+        let grandTotalRiel = sumGrandUSD * EXCHANGE_RATE;
+        document.getElementById('totalDebtUSD').textContent = `${sumGrandUSD.toFixed(2)} $`;
+        document.getElementById('totalDebtRiel').textContent = `(${Math.round(grandTotalRiel).toLocaleString()} ៛)`;
+        updateRepayInfo();
+    }
+
+    function loadData() {
+        fetch(WEB_APP_URL)
+        .then(res => res.json())
+        .then(data => {
+            renderData(data);
+        })
+        .catch(err => {
+            console.error('Fetch Error:', err);
+            document.getElementById('debtListContainer').innerHTML = '<div class="loading-text" style="color:red;">មានបញ្ហាក្នុងการទាញទិន្នន័យ!</div>';
+        });
+    }
+
+    function toggleHistory(index) {
+        let historyEl = document.getElementById(`history_${index}`);
+        if (historyEl) {
+            historyEl.style.display = historyEl.style.display === 'block' ? 'none' : 'block';
+        }
+    }
+
+    function promptPin(callback) {
+        pendingCallback = callback;
+        document.getElementById('pinCodeInput').value = '';
+        document.getElementById('pinModal').style.display = 'flex';
+        document.getElementById('pinCodeInput').focus();
+    }
+
+    function closePinModal() {
+        document.getElementById('pinModal').style.display = 'none';
+        pendingCallback = null;
+    }
+
+    function verifyAndSubmit() {
+        if (document.getElementById('pinCodeInput').value !== CORRECT_PIN) {
+            alert('លេខកូដសម្ងាត់មិនត្រឹមត្រូវទេ!');
+            return;
+        }
+        let cb = pendingCallback;
+        closePinModal();
+        if (typeof cb === 'function') cb();
+    }
+
+    function handleDebtFormSubmit(e) {
+        e.preventDefault();
+        promptPin(executeDebtSubmit);
+    }
+
+    function executeDebtSubmit() {
+        let actionType = document.getElementById('formActionType').value;
+        let submitBtn = document.getElementById('formSubmitBtn');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'កំពុងដំណើរការ...';
+
+        let now = new Date();
+        let dateString = now.toLocaleDateString('km-KH') + ' ' + now.toLocaleTimeString();
+        let data = {};
+
+        if (actionType === 'add') {
+            data = {
+                action: "add",
+                id: 'ID_' + Date.now(),
+                name: document.getElementById('name').value,
+                reason: document.getElementById('reason').value,
+                totalAmount: document.getElementById('totalAmount').value,
+                currency: document.getElementById('currency').value,
+                date: dateString
+            };
+        } else {
+            let id = document.getElementById('selectCustomerAdd').value;
+            if (!id) {
+                alert('សូមជ្រើសរើសឈ្មោះអ្នកជំពាក់!');
+                submitBtn.disabled = false;
+                toggleFormMode();
+                return;
+            }
+            data = {
+                action: "borrow_more",
+                id: id,
+                amount: document.getElementById('totalAmount').value,
+                currency: document.getElementById('currency').value,
+                reason: document.getElementById('reason').value,
+                date: dateString
+            };
+        }
+
+        sendDataToGoogleSheet(data, () => {
+            alert('កត់ត្រាបានជោគជ័យ!');
+            document.getElementById('debtForm').reset();
+            toggleFormMode();
+            loadData();
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'កត់ត្រាទុក';
+        });
+    }
+
+    function handleRepayFormSubmit(e) {
+        e.preventDefault();
+        promptPin(executeRepaySubmit);
+    }
+
+    function executeRepaySubmit() {
+        const select = document.getElementById('selectCustomerRepay');
+        const id = select.value;
+        const amountInput = parseFloat(document.getElementById('amount').value);
+        const repayCurr = document.getElementById('repayCurrency').value;
+        const repayBtn = document.getElementById('repaySubmitBtn');
+
+        if (!id || !amountInput || amountInput <= 0) {
+            alert('សូមបញ្ចូលព័ត៌មានឱ្យបានត្រឹមត្រូវ!');
+            return;
+        }
+
+        repayBtn.disabled = true;
+        repayBtn.textContent = 'កំពុងដំណើរការ...';
+
+        let now = new Date();
+        let dateString = now.toLocaleDateString('km-KH') + ' ' + now.toLocaleTimeString();
+
+        const data = {
+            action: "repay",
+            id: id,
+            amount: amountInput,
+            currency: repayCurr,
+            date: dateString
+        };
+
+        sendDataToGoogleSheet(data, () => {
+            alert('សងប្រាក់បានជោគជ័យ!');
+            document.getElementById('actionForm').reset();
+            document.getElementById('totalDebtInfo').style.display = 'none';
+            loadData();
+            repayBtn.disabled = false;
+            repayBtn.textContent = 'សងប្រាក់';
+        });
+    }
+
+    function sendDataToGoogleSheet(dataObj, callback) {
+        fetch(WEB_APP_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(dataObj)
+        })
+        .then(() => {
+            setTimeout(() => {
+                if (typeof callback === 'function') callback();
+            }, 1200);
+        })
+        .catch(err => {
+            console.error('Submit Error:', err);
+            alert('មានបញ្ហាក្នុងការបញ្ជូនទិន្នន័យ!');
+        });
+    }
+
+    loadData();
+</script>
+
+</body>
+</html>
