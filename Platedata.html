@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ប្រព័ន្ធគ្រប់គ្រង និងបញ្ចូលទិន្នន័យយានយន្ត</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <style>
+        body {
+            font-family: 'Kantumruy Pro', sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+        .admin-container {
+            max-width: 650px;
+            margin: 40px auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .form-control {
+            border-radius: 6px;
+            height: 40px;
+        }
+        .btn-save {
+            background-color: #2a587a;
+            color: white;
+            font-weight: bold;
+            border-radius: 6px;
+            padding: 10px 20px;
+            width: 100%;
+            font-size: 16px;
+        }
+        .btn-save:hover {
+            background-color: #1f425c;
+            color: white;
+        }
+        h2 {
+            color: #2a587a;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="admin-container">
+            <h2 class="text-center">ប្រព័ន្ធបញ្ចូល និងកែទិន្នន័យផ្លាកលេខ</h2>
+            <p class="text-center text-muted">ក្រសួងសាធារណការ និងដឹកជញ្ជូន</p>
+            <hr>
+
+            <div id="alert-box"></div>
+
+            <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted) { successMessage(); }"></iframe>
+
+            <form id="vehicleForm" method="POST" target="hidden_iframe" action="https://script.google.com/macros/s/AKfycbwFsQGkatLsu5niwUUOGnLT4_b9u5WAVeZUsI22t6EhoWf1sDn74Z-3z7W9_1NfEyWrfQ/exec">
+                <!-- រាជធានី-ខេត្ត និង លេខផ្លាកលេខ -->
+                <div class="row">
+                    <div class="col-sm-6 form-group">
+                        <label>រាជធានី-ខេត្ត</label>
+                        <select class="form-control" id="province" required>
+                            <option value="ភ្នំពេញ">ភ្នំពេញ</option>
+                            <option value="កណ្តាល">កណ្តាល</option>
+                            <option value="បាត់ដំបង">បាត់ដំបង</option>
+                            <option value="សៀមរាប">សៀមរាប</option>
+                            <option value="ព្រះសីហនុ">ព្រះសីហនុ</option>
+                            <option value="កំពត">កំពត</option>
+                            <option value="តាកែវ">តាកែវ</option>
+                            <option value="ព្រៃវែង">ព្រៃវែង</option>
+                            <option value="ស្វាយរៀង">ស្វាយរៀង</option>
+                            <option value="កំពង់ចាម">កំពង់ចាម</option>
+                            <option value="កំពង់ស្ពឺ">កំពង់ស្ពឺ</option>
+                            <option value="កំពង់ឆ្នាំង">កំពង់ឆ្នាំង</option>
+                            <option value="ពោធិ៍សាត់">ពោធិ៍សាត់</option>
+                            <option value="កោះកុង">កោះកុង</option>
+                            <option value="ក្រចេះ">ក្រចេះ</option>
+                            <option value="ស្ទឹងត្រែង">ស្ទឹងត្រែង</option>
+                            <option value="ព្រះវិហារ">ព្រះវិហារ</option>
+                            <option value="ឧត្តរមានជ័យ">ឧត្តរមានជ័យ</option>
+                            <option value="បន្ទាយមានជ័យ">បន្ទាយមានជ័យ</option>
+                            <option value="ប៉ៃលិន">ប៉ៃលិន</option>
+                            <option value="កែប">កែប</option>
+                            <option value="ត្បូងឃ្មុំ">ត្បូងឃ្មុំ</option>
+                            <option value="កំពង់ធំ">កំពង់ធំ</option>
+                            <option value="មណ្ឌលគីរី">មណ្ឌលគីរី</option>
+                            <option value="រតនគីរី">រតនគីរី</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-6 form-group">
+                        <label>លេខផ្លាកលេខ</label>
+                        <input type="text" class="form-control" id="plate_number" placeholder="ឧ. 1LO-0707" required>
+                    </div>
+                </div>
+
+                <!-- ប្រអប់លាក់សម្រាប់បញ្ជូនតម្លៃបង្រួមចូលគ្នា -->
+                <input type="hidden" name="plate" id="full_plate">
+
+                <div class="row">
+                    <div class="col-sm-6 form-group">
+                        <label>ម៉ាកយានយន្ត (Brand)</label>
+                        <input type="text" class="form-control" name="brand" id="brand" placeholder="ឧ. HONDA" required>
+                    </div>
+                    <div class="col-sm-6 form-group">
+                        <label>ប្រភេទ (Type)</label>
+                        <input type="text" class="form-control" name="type" id="type" value="ទោចក្រយានយន្ត" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 form-group">
+                        <label>ពណ៌ (Color) - អាចរើស ឬវាយបញ្ចូលផ្ទាល់បាន</label>
+                        <input class="form-control" name="color" id="color" list="colorList" placeholder="ឧ. ខ្មៅ ឬ វាយបញ្ចូលតាមចិត្ត" required>
+                        <datalist id="colorList">
+                            <option value="ខ្មៅ">
+                            <option value="ស">
+                            <option value="ក្រហម">
+                            <option value="ខៀវ">
+                            <option value="លឿង">
+                            <option value="ប្រផេះ">
+                            <option value="ទឹកប្រាក់">
+                            <option value="ស-ខ្មៅ">
+                            <option value="ក្រហម-ខ្មៅ">
+                            <option value="ខៀវ-ស">
+                        </datalist>
+                    </div>
+                    <div class="col-sm-6 form-group">
+                        <label>ឆ្នាំផលិត (Year)</label>
+                        <input type="text" class="form-control" name="year" id="year" placeholder="ឧ. 2024" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 form-group">
+                        <label>លេខម៉ាស៊ីន (Engine No)</label>
+                        <input type="text" class="form-control" name="engine" id="engine" placeholder="លេខម៉ាស៊ីន" required>
+                    </div>
+                    <div class="col-sm-6 form-group">
+                        <label>លេខតួ (Chassis No)</label>
+                        <input type="text" class="form-control" name="chassis" id="chassis" placeholder="លេខតួ" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 form-group">
+                        <label>កម្លាំងម៉ាស៊ីន (Power)</label>
+                        <input type="text" class="form-control" name="power" id="power" value="NIL" required>
+                    </div>
+                    <div class="col-sm-6 form-group">
+                        <label>ទំហំស៊ីឡាំង (Cylinder)</label>
+                        <input type="text" class="form-control" name="cylinder" id="cylinder" placeholder="ឧ. 1" required>
+                    </div>
+                </div>
+
+                <!-- ប៊ូតុងបញ្ជូន -->
+                <button type="button" class="btn btn-save" id="previewBtn">ពិនិត្យទិន្នន័យមុនរក្សាទុក</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal ផ្ទៀងផ្ទាត់ទិន្នន័យ -->
+    <div class="modal fade" id="previewModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #2a587a; color: white;">
+                    <button type="button" class="close" data-dismiss="modal" style="color: white;">&times;</button>
+                    <h4 class="modal-title"><strong>សូមផ្ទៀងផ្ទាត់ទិន្នន័យមុនពេលបញ្ជូន</strong></h4>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered">
+                        <tr><td><strong>ផ្លាកលេខ៖</strong></td><td id="prev-plate"></td></tr>
+                        <tr><td><strong>ម៉ាក៖</strong></td><td id="prev-brand"></td></tr>
+                        <tr><td><strong>ប្រភេទ៖</strong></td><td id="prev-type"></td></tr>
+                        <tr><td><strong>ពណ៌៖</strong></td><td id="prev-color"></td></tr>
+                        <tr><td><strong>ឆ្នាំផលិត៖</strong></td><td id="prev-year"></td></tr>
+                        <tr><td><strong>លេខម៉ាស៊ីន៖</strong></td><td id="prev-engine"></td></tr>
+                        <tr><td><strong>លេខតួ៖</strong></td><td id="prev-chassis"></td></tr>
+                        <tr><td><strong>កម្លាំងម៉ាស៊ីន៖</strong></td><td id="prev-power"></td></tr>
+                        <tr><td><strong>ទំហំស៊ីឡាំង៖</strong></td><td id="prev-cylinder"></td></tr>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">កែសម្រួលវិញ</button>
+                    <button type="button" class="btn btn-primary" id="confirmSubmitBtn" style="background-color: #2a587a;">យល់ព្រម និងបញ្ជូន</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let submitted = false;
+
+        $('#previewBtn').click(function() {
+            let province = $('#province').val();
+            let num = $('#plate_number').val().trim();
+
+            if(num === "") {
+                alert("សូមបញ្ចូលលេខផ្លាកលេខសិន!");
+                $('#plate_number').focus();
+                return;
+            }
+
+            let fullPlate = province + " " + num;
+            $('#full_plate').val(fullPlate);
+
+            $('#prev-plate').text(fullPlate);
+            $('#prev-brand').text($('#brand').val());
+            $('#prev-type').text($('#type').val());
+            $('#prev-color').text($('#color').val());
+            $('#prev-year').text($('#year').val());
+            $('#prev-engine').text($('#engine').val());
+            $('#prev-chassis').text($('#chassis').val());
+            $('#prev-power').text($('#power').val());
+            $('#prev-cylinder').text($('#cylinder').val());
+
+            $('#previewModal').modal('show');
+        });
+
+        $('#confirmSubmitBtn').click(function() {
+            $('#previewModal').modal('hide');
+            submitted = true;
+            $('#previewBtn').text('កំពុងបញ្ជូន...').prop('disabled', true);
+            $('#vehicleForm').submit();
+        });
+
+        function successMessage() {
+            if (submitted) {
+                $('#alert-box').html('<div class="alert alert-success text-center"><strong>ជោគជ័យ!</strong> ការបញ្ចូលទិន្នន័យជោគជ័យ!</div>');
+                $('#previewBtn').text('ពិនិត្យទិន្នន័យមុនរក្សាទុក').prop('disabled', false);
+                $('#vehicleForm')[0].reset();
+                $('#type').val('ទោចក្រយានយន្ត');
+                $('#power').val('NIL');
+                submitted = false;
+            }
+        }
+    </script>
+</body>
+</html>
