@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ប្រព័ន្ធគ្រប់គ្រងទិន្នន័យ ប័ណ្ណបើកបរ និង QR Code</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- QR Code Generator Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        body { font-family: 'Kantumruy Pro', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; padding-top: 30px; padding-bottom: 50px; }
+        .generator-card { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .form-header { border-bottom: 2px solid #005bb5; margin-bottom: 25px; padding-bottom: 10px; color: #005bb5; }
+        .section-title { font-weight: bold; color: #005bb5; margin-top: 20px; margin-bottom: 15px; border-left: 4px solid #005bb5; padding-left: 10px; }
+        .btn-download { background-color: #28a745; color: white; font-weight: bold; }
+        .btn-telegram { background-color: #0088cc; color: white; font-weight: bold; }
+        .btn-qr { background-color: #6f42c1; color: white; font-weight: bold; }
+        .en-box { background-color: #f8f9fa; border: 1px solid #e9ecef; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        .staff-box { background-color: #fff3cd; border: 1px solid #ffeeba; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        .qr-box { background-color: #e8f5e9; border: 1px solid #c8e6c9; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        
+        #qrcode canvas { display: none !important; }
+        #qrcode img { display: inline-block !important; border: 10px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.15); border-radius: 4px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1 generator-card">
+            <h3 class="form-header text-center"><strong>ប្រព័ន្ធគ្រប់គ្រងទិន្នន័យ ប័ណ្ណបើកបរ និង បង្កើត QR Code</strong></h3>
+            
+            <form id="driverForm">
+                <!-- ផ្នែកទី ១៖ ការផ្ទៀងផ្ទាត់បុគ្គលិក -->
+                <div class="section-title">១. អត្តសញ្ញាណបុគ្គលិកប្រតិបត្តិការ (Staff Authentication)</div>
+                <div class="staff-box">
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label>ជ្រើសរើសឈ្មោះបុគ្គលិក *</label>
+                            <select id="staffSelect" class="form-control" required>
+                                <option value="">-- សូមជ្រើសរើសបុគ្គលិក --</option>
+                                <option value="បុគ្គលិក A">បុគ្គលិក A</option>
+                                <option value="បុគ្គលិក B">បុគ្គលិក B</option>
+                                <option value="បុគ្គលិក C">បុគ្គលិក C</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>លេខសម្ងាត់ (PIN Code) *</label>
+                            <input type="password" id="staffPin" class="form-control" placeholder="បញ្ចូលលេខសម្ងាត់ប្រតិបត្តិការ" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ផ្នែកទី ២៖ ការគ្រប់គ្រង QR Code & File Name -->
+                <div class="section-title">២. ការកំណត់ QR Code Link និង ឈ្មោះ File HTML</div>
+                <div class="qr-box">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="useOldHash" onchange="toggleOldHashInput()"> <strong>ប្រើប្រាស់ Hash/QR Code ចាស់ដែលធ្លាប់បង្កើតមុននេះ</strong>
+                        </label>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label>Code ៨ ខ្ទង់ (Random 8 Characters Code):</label>
+                            <div class="input-group">
+                                <input type="text" id="hashInput" class="form-control" maxlength="8" readonly required>
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button" id="btnGenNewHash" onclick="generateNewHash()">បង្កើត Code ថ្មី</button>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>ឈ្មោះ File HTML ដែលនឹងទទួលបាន៖</label>
+                            <input type="text" id="fileNameInput" class="form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Link ពេញលេញសម្រាប់ QR Code (ts.mqwt-govkh.com)៖</label>
+                        <input type="text" id="qrFullUrl" class="form-control" readonly>
+                    </div>
+
+                    <div class="text-center" style="margin-top: 15px;">
+                        <div id="qrcode"></div>
+                        <br>
+                        <button type="button" onclick="downloadQRCodeImage()" class="btn btn-qr btn-sm">
+                            <span class="glyphicon glyphicon-qrcode"></span> ទាញយក រូបភាព QR Code (.png)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ផ្នែកទី ៣៖ ទិន្នន័យដើម (ភាសាខ្មែរ) -->
+                <div class="section-title">៣. ទិន្នន័យដើម (ភាសាខ្មែរ)</div>
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label>ឈ្មោះជាអក្សរខ្មែរ *</label>
+                        <input type="text" id="nameKh" class="form-control" value="ឡាវ ចេងស៊ីន" required>
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label>ឈ្មោះហ្វាល់រូបថត (Photo File Name) *</label>
+                        <input type="text" id="userPhoto" class="form-control" value="photo.jpg" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label>លេខបណ្ណ (Card No) *</label>
+                        <input type="text" id="cardNo" class="form-control" value="B.00397780" required>
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label>អត្តសញ្ញាណ (Citizen ID) *</label>
+                        <input type="text" id="citizenId" class="form-control" value="EP3184626" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 form-group">
+                        <label>ប្រភេទបណ្ណ (ឧ. ក, ខ, គ...) *</label>
+                        <input type="text" id="cardTypeKh" class="form-control" list="cardTypeKhList" value="ខ" placeholder="ជ្រើសរើស ឬ វាយបញ្ចូលសេរី..." required>
+                        <datalist id="cardTypeKhList">
+                            <option value="ក">
+                            <option value="ខ">
+                            <option value="គ">
+                            <option value="ឃ">
+                            <option value="ង">
+                        </datalist>
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label>ភេទ (Gender) *</label>
+                        <select id="gender" class="form-control" required>
+                            <option value="ប្រុស">ប្រុស</option>
+                            <option value="ស្រី">ស្រី</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label>សញ្ជាតិ (ភាសាខ្មែរ) *</label>
+                        <select id="natKh" class="form-control" required>
+                            <option value="ខ្មែរ">ខ្មែរ</option>
+                            <option value="ចិន" selected>ចិន</option>
+                            <option value="ឡាវ">ឡាវ</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3 form-group">
+                        <label>ថ្ងៃខែឆ្នាំកំណើត *</label>
+                        <input type="text" id="dob" class="form-control" value="10-07-1994" placeholder="DD-MM-YYYY" required>
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label>ថ្ងៃចេញបណ្ណដំបូង *</label>
+                        <input type="text" id="firstIssue" class="form-control" value="28-05-2026" placeholder="DD-MM-YYYY" required>
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label>ថ្ងៃចេញបណ្ណ *</label>
+                        <input type="text" id="issueDate" class="form-control" value="28-05-2026" placeholder="DD-MM-YYYY" required>
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label>ថ្ងៃផុតកំណត់ *</label>
+                        <input type="text" id="expDate" class="form-control" value="28-05-2036" placeholder="DD-MM-YYYY" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>អាសយដ្ឋាន (ភាសាខ្មែរ) *</label>
+                    <input type="text" id="addrKh" class="form-control" value="កំពង់ក្តី ស្ទោង កំពង់ធំ" required>
+                </div>
+
+                <!-- ផ្នែកទី ៤៖ ត្រួតពិនិត្យទិន្នន័យភាសាអង់គ្លេស/ឡាតាំង -->
+                <div class="section-title">៤. ទិន្នន័យភាសាអង់គ្លេស / ឡាតាំង (English & Latin Details)</div>
+                <div class="en-box">
+                    <div class="row">
+                        <div class="col-md-4 form-group">
+                            <label>ឈ្មោះជាអក្សរអង់គ្លេស (Name En) *</label>
+                            <input type="text" id="nameEn" class="form-control" value="LAO CHENGXIN" required>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label>ប្រភេទប័ណ្ណ (ឧ. A, B, C...) *</label>
+                            <input type="text" id="cardTypeEn" class="form-control" list="cardTypeEnList" value="B" placeholder="ជ្រើសរើស ឬ វាយបញ្ចូលសេរី..." required>
+                            <datalist id="cardTypeEnList">
+                                <option value="A">
+                                <option value="B">
+                                <option value="C">
+                                <option value="D">
+                                <option value="E">
+                            </datalist>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label>សញ្ជាតិ (Nationality En) *</label>
+                            <input type="text" id="natEn" class="form-control" value="Chinese" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label>លក្ខណៈពិសេស (Special Condition) *</label>
+                            <input type="text" id="specialCondition" class="form-control" list="specialConditionList" value="AUTO" placeholder="ជ្រើសរើស ឬ វាយបញ្ចូលសេរី..." required>
+                            <datalist id="specialConditionList">
+                                <option value="AUTO">AUTO (អូតូ)</option>
+                                <option value="MANUAL">MANUAL (លេខដៃ)</option>
+                                <option value="ស្វ័យប្រវត្តិ">ស្វ័យប្រវត្តិ</option>
+                                <option value="ប្រអប់លេខដៃ">ប្រអប់លេខដៃ</option>
+                                <option value="None">None</option>
+                                <option value="គ្មាន">គ្មាន</option>
+                                <option value="N/A">N/A</option>
+                            </datalist>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>អាសយដ្ឋាន (ឡាតាំង / បំប្លែងស្វ័យប្រវត្តិ) *</label>
+                            <input type="text" id="addrEn" class="form-control" value="Kompong Kdei Stoung Kampong Thom" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ផ្នែកទី ៥៖ ព័ត៌មានអតិថិជន និង ចំណាំបន្ថែម -->
+                <div class="section-title">៥. ព័ត៌មានអតិថិជន និង ចំណាំបន្ថែម (Customer & Note)</div>
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label>ឈ្មោះអតិថិជន (ជ្រើសរើស ឬ វាយបញ្ចូល)</label>
+                        <input type="text" id="customerName" class="form-control" list="customerList" placeholder="ជ្រើសរើស ឬ វាយបញ្ចូលឈ្មោះអតិថិជន">
+                        <datalist id="customerList">
+                            <option value="អតិថិជន សុខា">
+                            <option value="អតិថិជន វណ្ណា">
+                            <option value="អតិថិជន ពិសិដ្ឋ">
+                            <option value="អតិថិជន ណារ៉ុង">
+                        </datalist>
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label>ចំណាំបន្ថែម (Note)</label>
+                        <textarea id="operationNote" class="form-control" rows="1" placeholder="ឧ. បញ្ចូលទិន្នន័យប្រញាប់..."></textarea>
+                    </div>
+                </div>
+
+                <br>
+                <div class="row">
+                    <div class="col-md-6" style="margin-bottom: 10px;">
+                        <button type="button" onclick="executeDownloadHTML()" class="btn btn-download btn-block btn-lg">
+                            <span class="glyphicon glyphicon-download-alt"></span> ទាញយក File HTML (Save As)
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <button type="button" onclick="executeSendTelegram()" class="btn btn-telegram btn-block btn-lg">
+                            <span class="glyphicon glyphicon-send"></span> ផ្ញើ QR & HTML ទៅ Telegram
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+const TELEGRAM_CONFIG = {
+    botToken: "8522069642:AAHgi2GZlAczve8NHd3UObcMpucz3t38PG0", 
+    chatId: "-1003704314487"                          
+};
+
+const STAFF_CREDENTIALS = {
+    "បុគ្គលិក A": "1234",
+    "បុគ្គលិក B": "5678",
+    "បុគ្គលិក C": "9999"
+};
+
+const BASE_URL = "http://ts.mqwt-govkh.com/";
+
+const nationalityMap = {
+    "ខ្មែរ": "Cambodian", 
+    "ចិន": "Chinese", 
+    "ឡាវ": "Lao"
+};
+
+const cardTypeMap = {
+    "ក": "A",
+    "ខ": "B",
+    "គ": "C",
+    "ឃ": "D",
+    "ង": "E"
+};
+
+const khmerToLatinDict = {
+    "កំពង់ក្តី": "Kompong Kdei", "ស្ទោង": "Stoung", "សុខសាន": "Soksan", "ភ្នំពេញ": "Phnom Penh", 
+    "កំបូល": "Kamboul", "អង្គស្នួល": "Angsnoul", "កណ្តាល": "Kandal", "សៀមរាប": "Siem Reap", 
+    "បាត់ដំបង": "Battambang", "ព្រះសីហនុ": "Preah Sihanouk", "កំពង់ចាម": "Kampong Cham", 
+    "កំពង់ឆ្នាំង": "Kampong Chhnang", "កំពង់ស្ពឺ": "Kampong Speu", "កំពង់ធំ": "Kampong Thom", 
+    "កំពត": "Kampot", "កោះកុង": "Koh Kong", "ក្រចេះ": "Kratie", "មណ្ឌលគិរី": "Mondulkiri", 
+    "ព្រះវិហារ": "Preah Vihear", "ព្រៃវែង": "Prey Veng", "ពោធិ៍សាត់": "Pursat", 
+    "រតនគិរី": "Ratanakiri", "ស្ទឹងត្រែង": "Stung Treng", "ស្វាយរៀង": "Svay Rieng", 
+    "តាកែវ": "Takeo", "កែប": "Kep", "ប៉ៃលិន": "Pailin", "ឧត្តរមានជ័យ": "Oddar Meanchey", 
+    "ត្បូងឃ្មុំ": "Tboung Khmum", "ខណ្ឌ": "Khan", "សង្កាត់": "Sangkat", "ភូមិ": "Phum", 
+    "ឃុំ": "Khum", "ស្រុក": "Srok", "ក្រុង": "Krong"
+};
+
+function toTitleCase(str) {
+    return str.toLowerCase().split(' ').map(word => {
+        if (!word) return '';
+        return word.charAt(0).toUpperCase() + word.slice(1);
+    }).join(' ');
+}
+
+function autoRomanizeAddress(str) {
+    if (!str) return "";
+    let res = str;
+    res = res.replace(/[\u17D2\u17CB\u17CC\u17CD\u17CE\u17CF\u17D0]/g, '');
+
+    for (let key in khmerToLatinDict) {
+        let regex = new RegExp(key, 'g');
+        res = res.replace(regex, khmerToLatinDict[key] + " ");
+    }
+    
+    const charMap = {
+        'ក':'k','ខ':'kh','គ':'k','ឃ':'kh','ង':'ng','ច':'ch','ឆ':'ch','ជ':'ch','ឈ':'ch','ញ':'nh',
+        'ដ':'d','ឋ':'th','ឌ':'d','ឍ':'th','ណ':'n','ត':'t','ថ':'th','ទ':'t','ធ':'th','ន':'n',
+        'ប':'b','ផ':'ph','ព':'p','ភ':'ph','ម':'m','យ':'y','រ':'r','ល':'l','វ':'v','ស':'s',
+        'ហ':'h','ឡ':'l','អ':'o','ា':'a','ិ':'i','ី':'ey','ឹ':'ue','ឺ':'eu','ុ':'u','ូ':'ou',
+        'ួ':'uo','ើ':'eu','ឿ':'oea','ៀ':'ie','េ':'ae','ែ':'ae','ៃ':'ai','ោ':'ao','ៅ':'au'
+    };
+    let cleanRes = "";
+    for(let char of res) {
+        if(charMap[char]) {
+            cleanRes += charMap[char];
+        } else {
+            cleanRes += char;
+        }
+    }
+    
+    let formatted = cleanRes.replace(/\s+/g, ' ').trim();
+    return toTitleCase(formatted);
+}
+
+function generateRandom8Chars() {
+    const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const digits = "0123456789";
+    let numDigitsCount = Math.floor(Math.random() * 2) + 1; 
+    let result = [];
+    for (let i = 0; i < numDigitsCount; i++) {
+        result.push(digits.charAt(Math.floor(Math.random() * digits.length)));
+    }
+    for (let i = 0; i < (8 - numDigitsCount); i++) {
+        result.push(letters.charAt(Math.floor(Math.random() * letters.length)));
+    }
+    return result.sort(() => 0.5 - Math.random()).join('');
+}
+
+function generateNewHash() {
+    const newHash = generateRandom8Chars();
+    $('#hashInput').val(newHash);
+    updateQRAndFileName();
+}
+
+function toggleOldHashInput() {
+    const isChecked = $('#useOldHash').is(':checked');
+    if (isChecked) {
+        $('#hashInput').prop('readonly', false).focus();
+        $('#btnGenNewHash').prop('disabled', true);
+    } else {
+        $('#hashInput').prop('readonly', true);
+        $('#btnGenNewHash').prop('disabled', false);
+        generateNewHash();
+    }
+}
+
+function updateQRAndFileName() {
+    let hash = $('#hashInput').val().trim();
+    if (!hash) hash = "V2k1GCCx";
+
+    const fullUrl = BASE_URL + hash;
+    const fileName = hash + ".html";
+
+    $('#fileNameInput').val(fileName);
+    $('#qrFullUrl').val(fullUrl);
+
+    $('#qrcode').empty();
+    new QRCode(document.getElementById("qrcode"), {
+        text: fullUrl,
+        width: 260,
+        height: 260,
+        colorDark : "#000000",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
+    });
+}
+
+function autoTranslateNationality() {
+    let natVal = $('#natKh').val();
+    if (nationalityMap[natVal]) {
+        $('#natEn').val(nationalityMap[natVal]);
+    }
+}
+
+function autoTranslateCardType() {
+    let cardKh = $('#cardTypeKh').val().trim();
+    if (cardTypeMap[cardKh]) {
+        $('#cardTypeEn').val(cardTypeMap[cardKh]);
+    }
+}
+
+function getFramedQRBlob(callback) {
+    const qrImg = document.querySelector('#qrcode img');
+    if (!qrImg || !qrImg.src) {
+        alert("QR Code មិនទាន់បង្កើតរួចរាល់!");
+        return;
+    }
+
+    const img = new Image();
+    img.src = qrImg.src;
+    img.onload = function() {
+        const padding = 25; 
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = img.width + (padding * 2);
+        canvas.height = img.height + (padding * 2);
+
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, padding, padding);
+
+        canvas.toBlob(function(blob) {
+            callback(blob);
+        }, 'image/png');
+    };
+}
+
+function downloadQRCodeImage() {
+    getFramedQRBlob(function(blob) {
+        const hash = $('#hashInput').val().trim();
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `QR_${hash}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    });
+}
+
+$(document).ready(function() {
+    generateNewHash();
+    autoTranslateNationality();
+
+    $('#hashInput').on('input', function() {
+        updateQRAndFileName();
+    });
+
+    $('#natKh').on('change', function() {
+        autoTranslateNationality();
+    });
+
+    $('#cardTypeKh').on('input change', function() {
+        autoTranslateCardType();
+    });
+
+    $('#addrKh').on('input change', function() {
+        const khAddr = $(this).val();
+        const latAddr = autoRomanizeAddress(khAddr);
+        $('#addrEn').val(latAddr);
+    });
+});
+
+function verifyStaffAndInputs() {
+    const selectedStaff = $('#staffSelect').val();
+    const enteredPin = $('#staffPin').val().trim();
+
+    if (!selectedStaff) {
+        alert("សូមជ្រើសរើសឈ្មោះបុគ្គលិកប្រតិបត្តិការ!");
+        $('#staffSelect').focus();
+        return false;
+    }
+
+    if (STAFF_CREDENTIALS[selectedStaff] !== enteredPin) {
+        alert("លេខសម្ងាត់ (PIN Code) មិនត្រឹមត្រូវទេ!");
+        $('#staffPin').focus();
+        return false;
+    }
+
+    const inputs = document.querySelectorAll('#driverForm input[required]');
+    for (let input of inputs) {
+        if (!input.value.trim()) {
+            alert("សូមបំពេញព័ត៌មានគ្រប់ប្រអប់ទាំងអស់!");
+            input.focus();
+            return false;
+        }
+    }
+    return true;
+}
+
+function generateHTMLContent() {
+    const nameKh = $('#nameKh').val().trim();
+    const nameEn = $('#nameEn').val().trim();
+    const photo = $('#userPhoto').val().trim();
+    const cardNo = $('#cardNo').val().trim();
+    const citizenId = $('#citizenId').val().trim();
+    const cardTypeKh = $('#cardTypeKh').val().trim();
+    const cardTypeEn = $('#cardTypeEn').val().trim();
+    const specialCond = $('#specialCondition').val().trim();
+    const genderKh = $('#gender').val().trim();
+    const genderEn = (genderKh === 'ប្រុស') ? 'Male' : 'Female';
+    const natKh = $('#natKh').val().trim();
+    const natEn = $('#natEn').val().trim();
+    const dob = $('#dob').val().trim();
+    const firstIssue = $('#firstIssue').val().trim();
+    const issueDate = $('#issueDate').val().trim();
+    const expDate = $('#expDate').val().trim();
+    const addrKh = $('#addrKh').val().trim();
+    const addrEn = $('#addrEn').val().trim();
+
+    return `<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ផ្ទៀងផ្ទាត់ - ប័ណ្ណបើកបរយានយន្ត</title>
+    <script src="https://www.google.com/recaptcha/api.js?render=6LdnQLcrAAAAAMnVs24FijDoG9JbudVeAx321zLF"><\/script>
+    <link rel="icon" type="image/png" href="verify-icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Battambang:wght@400;700&family=Kantumruy+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        :root { --verify-blue: #005bb5; --header-blue: #1b436c; --border-blue: #1a6fb3; --success-green: #2e7d32; --bg-gray: #f8f9fa; --text-dark: #212529; --text-gray: #555555; --light-line: #d0d7de; --footer-blue: #004d9c; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: var(--bg-gray); color: var(--text-dark); font-family: 'Kantumruy Pro', 'Battambang', sans-serif; min-height: 100vh; }
+        .page-container { width: 100%; max-width: 850px; margin: 0 auto; background: #ffffff; box-shadow: 0 2px 10px rgba(0,0,0,0.05); min-height: 100vh; display: flex; flex-direction: column; position: relative; }
+        .top-navbar { background: #ffffff; border-bottom: 1px solid #edf2f7; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; }
+        .company-header-logo img { height: 32px; width: auto; }
+        .nav-right-group { display: flex; align-items: center; gap: 12px; }
+        .flag-btn { background: none; border: 1px solid transparent; cursor: pointer; padding: 2px; display: inline-flex; border-radius: 3px; }
+        .flag-btn.active { border-color: var(--verify-blue); }
+        .flag-btn img { width: 22px; height: 15px; object-fit: cover; }
+        .menu-icon-btn { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-dark); }
+        .status-banner { background-color: #f0fdf4; color: var(--success-green); text-align: center; padding: 10px 16px; font-size: 0.95rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .issuer-info { text-align: center; margin-top: 16px; font-size: 0.88rem; color: var(--text-gray); }
+        .issuer-name { color: var(--text-dark); font-weight: 700; }
+        .sub-header-text { text-align: center; margin: 12px 16px 24px 16px; color: var(--verify-blue); font-size: 1rem; font-weight: 700; }
+        .main-content { padding: 0 24px 40px 24px; flex: 1; }
+        .profile-center-block { text-align: center; margin-bottom: 24px; }
+        .header-company-logo { max-width: 220px; height: auto; margin-bottom: 12px; display: inline-block; }
+        .document-type-title { font-size: 1.35rem; color: var(--header-blue); margin-bottom: 20px; }
+        .mid-lang-toggle { display: inline-flex; width: 260px; border: 1px solid #b0bec5; border-radius: 4px; overflow: hidden; margin-bottom: 24px; }
+        .mid-lang-btn { flex: 1; padding: 8px 0; border: none; background: #ffffff; color: #333333; font-size: 0.9rem; cursor: pointer; }
+        .mid-lang-btn.active { background: #0056a3; color: #ffffff; }
+        .user-photo-container { display: flex; justify-content: center; margin-bottom: 12px; }
+        .user-photo { width: 155px; height: 155px; object-fit: cover; border-radius: 50%; border: 1px solid #d1d5db; }
+        .user-single-fullname { font-size: 1.15rem; font-weight: 700; color: #333333; margin-bottom: 24px; }
+        .data-table-wrapper { max-width: 520px; margin: 0 auto; }
+        .data-table { width: 100%; border-collapse: collapse; border: 1.5px solid var(--border-blue); background: #ffffff; }
+        .data-table tr { border-bottom: 1px solid var(--light-line); }
+        .data-table td { padding: 9px 14px; font-family: 'Battambang', sans-serif; vertical-align: middle; }
+        .label-col { width: 45%; font-weight: 700; font-size: 0.95rem; color: #000; }
+        .value-col { width: 55%; font-weight: 400; font-size: 0.9rem; color: #333; }
+        .text-green { color: var(--success-green); font-weight: 600; }
+        .footer-nav-links { max-width: 520px; margin: 28px auto 0 auto; display: flex; flex-direction: column; gap: 8px; }
+        .footer-nav-link { color: var(--verify-blue); text-decoration: none; font-size: 0.85rem; font-weight: 600; }
+        .bottom-logos-section { max-width: 520px; margin: 20px auto 30px auto; }
+        .section-label { font-size: 0.8rem; color: var(--text-gray); margin-bottom: 8px; }
+        .organizer-row { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+        .org-logo-item { width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; }
+        .org-logo-item img { width: 100%; height: 100%; object-fit: contain; }
+        
+        .marquee-stepper-box { width: 100%; overflow: hidden; padding: 10px 0; background: transparent; display: flex; flex-direction: column; gap: 16px; }
+        .marquee-row { display: flex; width: max-content; animation: slowTickAndPause 16s ease-in-out infinite; }
+        .logo-item { width: 55px; height: 55px; margin: 0 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: transparent; border: none; }
+        .logo-item img { width: 100%; height: 100%; object-fit: contain; }
+
+        @keyframes slowTickAndPause {
+            0% { transform: translateX(0); }
+            12% { transform: translateX(-79px); }
+            16.6% { transform: translateX(-79px); }
+            28.6% { transform: translateX(-158px); }
+            33.3% { transform: translateX(-158px); }
+            45.3% { transform: translateX(-237px); }
+            50% { transform: translateX(-237px); }
+            62% { transform: translateX(-316px); }
+            66.6% { transform: translateX(-316px); }
+            78.6% { transform: translateX(-395px); }
+            83.3% { transform: translateX(-395px); }
+            95.3% { transform: translateX(-474px); }
+            100% { transform: translateX(-474px); }
+        }
+
+        .blue-footer { background-color: var(--footer-blue); color: #ffffff; padding: 20px 24px; font-size: 0.85rem; }
+        .footer-info-item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+        .social-icons-row { display: flex; gap: 12px; margin: 12px 0; }
+        .social-icon-btn { width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; color: #fff; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <div class="top-navbar">
+            <div class="company-header-logo"><img src="verify-gov-kh-logo.webp" alt="VERIFY Logo"></div>
+            <div class="nav-right-group">
+                <button class="flag-btn active" id="flag-km" onclick="switchLanguage('km')"><img src="https://flagcdn.com/w40/kh.png" alt="Khmer"></button>
+                <button class="flag-btn" id="flag-en" onclick="switchLanguage('en')"><img src="https://flagcdn.com/w40/gb.png" alt="English"></button>
+                <button class="menu-icon-btn">&#9776;</button>
+            </div>
+        </div>
+
+        <div class="status-banner">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            <span id="txt-status">ឯកសារមានសុពលភាព</span>
+        </div>
+
+        <div class="issuer-info"><span id="txt-issued-by">ចេញដោយ</span> <span class="issuer-name" id="txt-company-name">ក្រសួងសាធារណការ និងដឹកជញ្ជូន</span></div>
+        <div class="sub-header-text" id="txt-instruction">សូមពិនិត្យឯកសាររបស់អ្នកជាមួយទិន្នន័យខាងក្រោម ដើម្បីផ្ទៀងផ្ទាត់ភាពត្រឹមត្រូវ</div>
+
+        <div class="main-content">
+            <div class="profile-center-block">
+                <img src="mpwt_logo_on_card_license.png" class="header-company-logo" alt="MPWT Logo">
+                <div class="document-type-title" id="txt-doc-title">ព័ត៌មានប័ណ្ណបើកបរយានយន្ត</div>
+                <div class="mid-lang-toggle">
+                    <button class="mid-lang-btn active" id="btn-mid-km" onclick="switchLanguage('km')">ភាសាខ្មែរ</button>
+                    <button class="mid-lang-btn" id="btn-mid-en" onclick="switchLanguage('en')">English</button>
+                </div>
+                <div class="user-photo-container">
+                    <img id="img-user-photo" src="${photo}" class="user-photo" alt="Photo">
+                </div>
+                <div class="user-single-fullname" id="txt-single-profile-name">${nameKh}</div>
+            </div>
+
+            <div class="data-table-wrapper">
+                <table class="data-table">
+                    <tr><td class="label-col" id="lbl-status">ស្ថានភាពវិញ្ញាបនបត្រ</td><td class="value-col text-green" id="val-status">មានសុពលភាព</td></tr>
+                    <tr><td class="label-col" id="lbl-name">ឈ្មោះ</td><td class="value-col" id="val-name">${nameEn}</td></tr>
+                    <tr><td class="label-col" id="lbl-scope">វិសាលភាព</td><td class="value-col text-green" id="val-scope">ផ្លូវការ</td></tr>
+                    <tr><td class="label-col" id="lbl-score">ពិន្ទុ</td><td class="value-col" id="val-score">១២/១២</td></tr>
+                    <tr><td class="label-col" id="lbl-first-issue">ថ្ងៃចេញបណ្ណដំបូង</td><td class="value-col" id="val-first-issue"></td></tr>
+                    <tr><td class="label-col" id="lbl-issue-date">ថ្ងៃចេញបណ្ណ</td><td class="value-col" id="val-issue-date"></td></tr>
+                    <tr><td class="label-col" id="lbl-exp-date">ថ្ងៃផុតកំណត់</td><td class="value-col" id="val-exp-date"></td></tr>
+                    <tr><td class="label-col" id="lbl-card-no">លេខបណ្ណ</td><td class="value-col">${cardNo}</td></tr>
+                    <tr><td class="label-col" id="lbl-identity">អត្តសញ្ញាណ</td><td class="value-col">${citizenId}</td></tr>
+                    <tr><td class="label-col" id="lbl-card-type">ប្រភេទប័ណ្ណ</td><td class="value-col" id="val-card-type">${cardTypeKh}</td></tr>
+                    <tr><td class="label-col" id="lbl-feature">លក្ខណៈពិសេស</td><td class="value-col" id="val-feature">${specialCond}</td></tr>
+                    <tr><td class="label-col" id="lbl-gender">ភេទ</td><td class="value-col" id="val-gender">${genderKh}</td></tr>
+                    <tr><td class="label-col" id="lbl-nationality">សញ្ជាតិ</td><td class="value-col" id="val-nationality">${natKh}</td></tr>
+                    <tr><td class="label-col" id="lbl-dob">ថ្ងៃខែឆ្នាំកំណើត</td><td class="value-col" id="val-dob"></td></tr>
+                    <tr><td class="label-col" id="lbl-address">អាសយដ្ឋាន</td><td class="value-col" id="val-address">${addrKh}</td></tr>
+                </table>
+            </div>
+
+            <div class="footer-nav-links">
+                <a href="#" class="footer-nav-link" id="link-gov">ផ្ទៀងផ្ទាត់ឯកសាររដ្ឋាភិបាល</a>
+                <a href="#" class="footer-nav-link" id="link-process">របៀបដំណើរការ</a>
+                <a href="#" class="footer-nav-link" id="link-faq">សំណួរដែលត្រូវបានគេសួរញឹកញាប់</a>
+            </div>
+
+            <div class="bottom-logos-section">
+                <div class="section-label" id="lbl-org">រៀបចំនិងដំណើរការដោយ៖</div>
+                <div class="organizer-row">
+                    <div class="org-logo-item"><img src="MPTC.webp" alt="MPTC"></div>
+                    <div class="org-logo-item"><img src="DGC.webp" alt="DGC"></div>
+                </div>
+
+                <div class="section-label" id="lbl-partners">កិច្ចសហប្រតិបត្តិការ៖</div>
+                <div class="marquee-stepper-box">
+                    <div class="marquee-row">
+                        <div class="logo-item"><img src="CADT.png" alt="CADT"></div>
+                        <div class="logo-item"><img src="RUFA.png" alt="RUFA"></div>
+                        <div class="logo-item"><img src="NUM.png" alt="NUM"></div>
+                        <div class="logo-item"><img src="UHST.png" alt="UHST"></div>
+                        <div class="logo-item"><img src="BMU.png" alt="BMU"></div>
+                        <div class="logo-item"><img src="BTEC.png" alt="BTEC"></div>
+                        <div class="logo-item"><img src="CADT.png" alt="CADT"></div>
+                        <div class="logo-item"><img src="RUFA.png" alt="RUFA"></div>
+                        <div class="logo-item"><img src="NUM.png" alt="NUM"></div>
+                        <div class="logo-item"><img src="UHST.png" alt="UHST"></div>
+                        <div class="logo-item"><img src="BMU.png" alt="BMU"></div>
+                        <div class="logo-item"><img src="BTEC.png" alt="BTEC"></div>
+                    </div>
+
+                    <div class="marquee-row">
+                        <div class="logo-item"><img src="AUPP.png" alt="AUPP"></div>
+                        <div class="logo-item"><img src="RULE.png" alt="RULE"></div>
+                        <div class="logo-item"><img src="ITC.png" alt="ITC"></div>
+                        <div class="logo-item"><img src="KCIT.png" alt="KCIT"></div>
+                        <div class="logo-item"><img src="AUB.png" alt="AUB"></div>
+                        <div class="logo-item"><img src="BELTIE.png" alt="BELTIE"></div>
+                        <div class="logo-item"><img src="AUPP.png" alt="AUPP"></div>
+                        <div class="logo-item"><img src="RULE.png" alt="RULE"></div>
+                        <div class="logo-item"><img src="ITC.png" alt="ITC"></div>
+                        <div class="logo-item"><img src="KCIT.png" alt="KCIT"></div>
+                        <div class="logo-item"><img src="AUB.png" alt="AUB"></div>
+                        <div class="logo-item"><img src="BELTIE.png" alt="BELTIE"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="blue-footer">
+            <div class="footer-info-item"><i class="fa fa-map-marker"></i><span id="txt-footer-addr">អគារលេខ១០៣ មហាវិថីព្រះមុនីវង្ស សង្កាត់ស្រះចក ខណ្ឌដូនពេញ រាជធានីភ្នំពេញ 120210</span></div>
+            <div class="footer-info-item"><i class="fa fa-envelope-o"></i><span>info@mptc.gov.kh</span></div>
+            <div class="social-icons-row">
+                <a href="#" class="social-icon-btn"><i class="fa fa-facebook"></i></a>
+                <a href="#" class="social-icon-btn"><i class="fa fa-telegram"></i></a>
+            </div>
+            <div style="font-size:0.75rem; border-top:1px solid rgba(255,255,255,0.2); padding-top:10px;">© 2026 | គណៈកម្មាធិការរដ្ឋាភិបាលឌីជីថល</div>
+        </div>
+    </div>
+
+    <script>
+        function formatKhmerDate(dateStr) {
+            if (!dateStr || !dateStr.includes('-')) return dateStr;
+            const monthsKhmer = ["មករា", "កុម្ភៈ", "មីនា", "មេសា", "ឧសភា", "មិថុនា", "កក្កដា", "សីហា", "កញ្ញា", "តុលា", "វិច្ឆិកា", "ធ្នូ"];
+            const khmerDigits = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
+            const parts = dateStr.split('-');
+            const dayStr = parts[0];
+            const monthIdx = parseInt(parts[1], 10) - 1;
+            const yearStr = parts[2];
+            const khDay = dayStr.split('').map(char => khmerDigits[char] || char).join('');
+            const khYear = yearStr.split('').map(char => khmerDigits[char] || char).join('');
+            return khDay + ' ' + (monthsKhmer[monthIdx] || parts[1]) + ' ' + khYear;
+        }
+
+        function formatEnglishDate(dateStr) {
+            return dateStr;
+        }
+
+        let currentLang = 'km';
+        const rawData = {
+            nameKh: "${nameKh}", nameEn: "${nameEn}",
+            cardTypeKh: "${cardTypeKh}", cardTypeEn: "${cardTypeEn}",
+            genderKh: "${genderKh}", genderEn: "${genderEn}",
+            natKh: "${natKh}", natEn: "${natEn}",
+            dob: "${dob}", firstIssue: "${firstIssue}", issueDate: "${issueDate}", expDate: "${expDate}",
+            addrKh: "${addrKh}", addrEn: "${addrEn}"
+        };
+
+        const translations = {
+            km: {
+                txtStatus: "ឯកសារមានសុពលភាព", txtIssuedBy: "ចេញដោយ", txtCompanyName: "ក្រសួងសាធារណការ និងដឹកជញ្ជូន",
+                txtInstruction: "សូមពិនិត្យឯកសាររបស់អ្នកជាមួយទិន្នន័យខាងក្រោម ដើម្បីផ្ទៀងផ្ទាត់ភាពត្រឹមត្រូវ",
+                txtDocTitle: "ព័ត៌មានប័ណ្ណបើកបរយានយន្ត", lblStatus: "ស្ថានភាពវិញ្ញាបនបត្រ", valStatus: "មានសុពលភាព",
+                lblName: "ឈ្មោះ", lblScope: "វិសាលភាព", valScope: "ផ្លូវការ", lblScore: "ពិន្ទុ", valScore: "១២/១២",
+                lblFirstIssue: "ថ្ងៃចេញបណ្ណដំបូង", lblIssueDate: "ថ្ងៃចេញបណ្ណ", lblExpDate: "ថ្ងៃផុតកំណត់",
+                lblCardNo: "លេខបណ្ណ", lblIdentity: "អត្តសញ្ញាណ", lblCardType: "ប្រភេទប័ណ្ណ", lblFeature: "លក្ខណៈពិសេស",
+                lblGender: "ភេទ", lblNationality: "សញ្ជាតិ", lblDob: "ថ្ងៃខែឆ្នាំកំណើត", lblAddress: "អាសយដ្ឋាន",
+                linkGov: "ផ្ទៀងផ្ទាត់ឯកសាររដ្ឋាភិបាល", linkProcess: "របៀបដំណើរការ", linkFaq: "សំណួរដែលត្រូវបានគេសួរញឹកញាប់",
+                lblOrg: "រៀបចំនិងដំណើរការដោយ៖", lblPartners: "កិច្ចសហប្រតិបត្តិការ៖",
+                txtFooterAddr: "អគារលេខ១០៣ មហាវិថីព្រះមុនីវង្ស សង្កាត់ស្រះចក ខណ្ឌដូនពេញ រាជធានីភ្នំពេញ 120210"
+            },
+            en: {
+                txtStatus: "Document is Valid", txtIssuedBy: "Issued by", txtCompanyName: "Ministry of Public Works and Transport",
+                txtInstruction: "Please check your document with the data below to verify accuracy.",
+                txtDocTitle: "Driving License Information", lblStatus: "Certificate Status", valStatus: "Valid",
+                lblName: "Name", lblScope: "Scope", valScope: "Official", lblScore: "Score", valScore: "12/12",
+                lblFirstIssue: "First Issue Date", lblIssueDate: "Issue Date", lblExpiry: "Expiry Date",
+                lblCardNo: "Card No.", lblIdentity: "Identity", lblCardType: "Category", lblFeature: "Special Condition",
+                lblGender: "Gender", lblNationality: "Nationality", lblDob: "Date of Birth", lblAddress: "Address",
+                linkGov: "Verify Government Documents", linkProcess: "How it works", linkFaq: "Frequently Asked Questions",
+                lblOrg: "Organized and Operated by:", lblPartners: "Cooperation:",
+                txtFooterAddr: "Building 103, Preah Monivong Blvd, Sangkat Srah Chak, Khan Daun Penh, Phnom Penh 120210"
+            }
+        };
+
+        function switchLanguage(lang) {
+            currentLang = lang;
+            const t = translations[lang];
+
+            document.getElementById('flag-km').classList.toggle('active', lang === 'km');
+            document.getElementById('flag-en').classList.toggle('active', lang === 'en');
+            document.getElementById('btn-mid-km').classList.toggle('active', lang === 'km');
+            document.getElementById('btn-mid-en').classList.toggle('active', lang === 'en');
+
+            document.getElementById('txt-status').innerText = t.txtStatus;
+            document.getElementById('txt-issued-by').innerText = t.txtIssuedBy;
+            document.getElementById('txt-company-name').innerText = t.txtCompanyName;
+            document.getElementById('txt-instruction').innerText = t.txtInstruction;
+            document.getElementById('txt-doc-title').innerText = t.txtDocTitle;
+
+            document.getElementById('lbl-status').innerText = t.lblStatus;
+            document.getElementById('val-status').innerText = t.valStatus;
+            document.getElementById('lbl-name').innerText = t.lblName;
+            document.getElementById('lbl-scope').innerText = t.lblScope;
+            
+            // កំណត់តម្លៃ និងដាក់ពណ៌បៃតងឱ្យចំចំណុច វិសាលភាព (Scope) ទាំងខ្មែរ និងអង់គ្លេស
+            const valScopeEl = document.getElementById('val-scope');
+            valScopeEl.innerText = t.valScope;
+            valScopeEl.className = "value-col text-green";
+
+            document.getElementById('lbl-score').innerText = t.lblScore;
+            document.getElementById('val-score').innerText = t.valScore;
+
+            document.getElementById('lbl-first-issue').innerText = t.lblFirstIssue;
+            document.getElementById('lbl-issue-date').innerText = t.lblIssueDate;
+            document.getElementById('lbl-exp-date').innerText = t.lblExpDate;
+            document.getElementById('lbl-card-no').innerText = t.lblCardNo;
+            document.getElementById('lbl-identity').innerText = t.lblIdentity;
+            document.getElementById('lbl-card-type').innerText = t.lblCardType;
+            document.getElementById('lbl-feature').innerText = t.lblFeature;
+            document.getElementById('lbl-gender').innerText = t.lblGender;
+            document.getElementById('lbl-nationality').innerText = t.lblNationality;
+            document.getElementById('lbl-dob').innerText = t.lblDob;
+            document.getElementById('lbl-address').innerText = t.lblAddress;
+
+            document.getElementById('link-gov').innerText = t.linkGov;
+            document.getElementById('link-process').innerText = t.linkProcess;
+            document.getElementById('link-faq').innerText = t.linkFaq;
+            document.getElementById('lbl-org').innerText = t.lblOrg;
+            document.getElementById('lbl-partners').innerText = t.lblPartners;
+            document.getElementById('txt-footer-addr').innerText = t.txtFooterAddr;
+
+            if (lang === 'km') {
+                document.getElementById('txt-single-profile-name').innerText = rawData.nameKh;
+                document.getElementById('val-name').innerText = rawData.nameEn;
+                document.getElementById('val-card-type').innerText = rawData.cardTypeKh;
+                document.getElementById('val-gender').innerText = rawData.genderKh;
+                document.getElementById('val-nationality').innerText = rawData.natKh;
+                document.getElementById('val-address').innerText = rawData.addrKh;
+
+                document.getElementById('val-dob').innerText = formatKhmerDate(rawData.dob);
+                document.getElementById('val-first-issue').innerText = formatKhmerDate(rawData.firstIssue);
+                document.getElementById('val-issue-date').innerText = formatKhmerDate(rawData.issueDate);
+                document.getElementById('val-exp-date').innerText = formatKhmerDate(rawData.expDate);
+            } else {
+                document.getElementById('txt-single-profile-name').innerText = rawData.nameEn;
+                document.getElementById('val-name').innerText = rawData.nameEn;
+                document.getElementById('val-card-type').innerText = rawData.cardTypeEn;
+                document.getElementById('val-gender').innerText = rawData.genderEn;
+                document.getElementById('val-nationality').innerText = rawData.natEn;
+                document.getElementById('val-address').innerText = rawData.addrEn;
+
+                document.getElementById('val-dob').innerText = formatEnglishDate(rawData.dob);
+                document.getElementById('val-first-issue').innerText = formatEnglishDate(rawData.firstIssue);
+                document.getElementById('val-issue-date').innerText = formatEnglishDate(rawData.issueDate);
+                document.getElementById('val-exp-date').innerText = formatEnglishDate(rawData.expDate);
+            }
+        }
+
+        window.onload = function() { switchLanguage('km'); };
+    <\/script>
+</body>
+</html>`;
+}
+
+async function executeDownloadHTML() {
+    if (!verifyStaffAndInputs()) return;
+
+    const htmlContent = generateHTMLContent();
+    const fileName = $('#fileNameInput').val().trim() || 'document.html';
+
+    // ប្រើប្រាស់ File System Access API (Save As Dialog) ប្រសិនបើ Browser គាំទ្រ
+    if (window.showSaveFilePicker) {
+        try {
+            const options = {
+                suggestedName: fileName,
+                types: [{
+                    description: 'HTML Files',
+                    accept: { 'text/html': ['.html'] },
+                }],
+            };
+            const handle = await window.showSaveFilePicker(options);
+            const writable = await handle.createWritable();
+            await writable.write(htmlContent);
+            await writable.close();
+            alert("រក្សាទុក File HTML (Save As) បានជោគជ័យ!");
+            return;
+        } catch (err) {
+            // ប្រសិនបើអ្នកប្រើប្រាស់ចុច Cancel គឺមិនបាច់បង្ហាញ Error អ្វីទេ
+            if (err.name !== 'AbortError') {
+                console.log("Fallback to standard download: ", err);
+            } else {
+                return;
+            }
+        }
+    }
+
+    // វិធីសាស្ត្រជំនួស (Fallback) សម្រាប់ Browser ដែលមិនមាន showSaveFilePicker
+    const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+
+function executeSendTelegram() {
+    if (!verifyStaffAndInputs()) return;
+
+    const staffName = $('#staffSelect').val();
+    const customer = $('#customerName').val().trim() || 'មិនបានបញ្ជាក់';
+    const note = $('#operationNote').val().trim() || 'គ្មាន';
+
+    const nameKh = $('#nameKh').val().trim();
+    const nameEn = $('#nameEn').val().trim();
+    const cardNo = $('#cardNo').val().trim();
+    const citizenId = $('#citizenId').val().trim();
+    const hash = $('#hashInput').val().trim();
+    const fileName = $('#fileNameInput').val().trim();
+    const qrUrl = $('#qrFullUrl').val().trim();
+
+    const captionMessage = 
+`📌 **របាយការណ៍បង្កើតទិន្នន័យប័ណ្ណបើកបរ**
+----------------------------------
+👤 **អតិថិជន:** ${customer}
+👨‍គ **បុគ្គលិកប្រតិបត្តិការ:** ${staffName}
+📝 **ចំណាំ:** ${note}
+
+👤 **ឈ្មោះម្ចាស់បណ្ណ:** ${nameKh} (${nameEn})
+💳 **លេខបណ្ណ:** ${cardNo}
+🆔 **អត្តសញ្ញាណ:** ${citizenId}
+🔑 **Code / Hash:** \`${hash}\`
+📄 **ឈ្មោះ File:** \`${fileName}\`
+🔗 **Link ផ្ទៀងផ្ទាត់:** ${qrUrl}`;
+
+    getFramedQRBlob(function(qrBlob) {
+        let formDataPhoto = new FormData();
+        formDataPhoto.append("chat_id", TELEGRAM_CONFIG.chatId);
+        formDataPhoto.append("photo", qrBlob, `QR_${hash}.png`);
+        formDataPhoto.append("caption", captionMessage);
+        formDataPhoto.append("parse_mode", "Markdown");
+
+        fetch(`https://api.telegram.org/bot${TELEGRAM_CONFIG.botToken}/sendPhoto`, {
+            method: "POST",
+            body: formDataPhoto
+        })
+        .then(res => res.json())
+        .then(dataPhoto => {
+            if (!dataPhoto.ok) {
+                alert("បរាជ័យក្នុងការផ្ញើរូបភាព QR Code ទៅ Telegram: " + dataPhoto.description);
+                return;
+            }
+
+            const htmlContent = generateHTMLContent();
+            const htmlBlob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+
+            let formDataDoc = new FormData();
+            formDataDoc.append("chat_id", TELEGRAM_CONFIG.chatId);
+            formDataDoc.append("document", htmlBlob, fileName);
+            formDataDoc.append("caption", `📄 File HTML សម្រាប់ទិន្នន័យ៖ ${nameKh} (${hash})`);
+
+            return fetch(`https://api.telegram.org/bot${TELEGRAM_CONFIG.botToken}/sendDocument`, {
+                method: "POST",
+                body: formDataDoc
+            });
+        })
+        .then(res => res ? res.json() : null)
+        .then(dataDoc => {
+            if (dataDoc && dataDoc.ok) {
+                alert("ផ្ញើសារ រូបភាព QR Code និង File HTML ទៅ Telegram ได้ជោគជ័យ!");
+            } else if (dataDoc) {
+                alert("បរាជ័យក្នុងការផ្ញើ File HTML: " + dataDoc.description);
+            }
+        })
+        .catch(err => {
+            alert("មានបញ្ហាក្នុងការតភ្ជាប់ទៅ Telegram៖ " + err);
+        });
+    });
+}
+</script>
+
+</body>
+</html>
