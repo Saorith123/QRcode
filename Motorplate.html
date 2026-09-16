@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ប្រព័ន្ធគ្រប់គ្រងទិន្នន័យ យានយន្ត និង QR Code</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <!-- QR Code Generator Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        body { font-family: 'Khmer OS Battambang', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; padding-top: 30px; padding-bottom: 50px; }
+        .generator-card { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .form-header { border-bottom: 2px solid #2a587a; margin-bottom: 25px; padding-bottom: 10px; color: #2a587a; }
+        .section-title { font-weight: bold; color: #337ab7; margin-top: 20px; margin-bottom: 15px; border-left: 4px solid #337ab7; padding-left: 10px; }
+        .btn-download { background-color: #28a745; color: white; font-weight: bold; }
+        .btn-telegram { background-color: #0088cc; color: white; font-weight: bold; }
+        .btn-qr { background-color: #6f42c1; color: white; font-weight: bold; }
+        .en-box { background-color: #f8f9fa; border: 1px solid #e9ecef; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        .staff-box { background-color: #fff3cd; border: 1px solid #ffeeba; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        .qr-box { background-color: #e8f5e9; border: 1px solid #c8e6c9; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        
+        #qrcode canvas { display: none !important; }
+        #qrcode img { display: inline-block !important; border: 10px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.15); border-radius: 4px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1 generator-card">
+            <h3 class="form-header text-center"><strong>ប្រព័ន្ធគ្រប់គ្រងទិន្នន័យ យានយន្ត និង បង្កើត QR Code</strong></h3>
+            
+            <form id="vehicleForm">
+                <!-- ផ្នែកទី ១៖ ការផ្ទៀងផ្ទាត់បុគ្គលិក -->
+                <div class="section-title">១. អត្តសញ្ញាណបុគ្គលិកប្រតិបត្តិការ (Staff Authentication)</div>
+                <div class="staff-box">
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label>ជ្រើសរើសឈ្មោះបុគ្គលិក *</label>
+                            <select id="staffSelect" class="form-control" required>
+                                <option value="">-- សូមជ្រើសរើសបុគ្គលិក --</option>
+                                <option value="បុគ្គលិក A">បុគ្គលិក A</option>
+                                <option value="បុគ្គលិក B">បុគ្គលិក B</option>
+                                <option value="បុគ្គលិក C">បុគ្គលិក C</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>លេខសម្ងាត់ (PIN Code) *</label>
+                            <input type="password" id="staffPin" class="form-control" placeholder="បញ្ចូលលេខសម្ងាត់ប្រតិបត្តិការ" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ផ្នែកទី ២៖ ការគ្រប់គ្រង QR Code & File Name -->
+                <div class="section-title">២. ការកំណត់ QR Code Link និង ឈ្មោះ File HTML</div>
+                <div class="qr-box">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="useOldHash" onchange="toggleOldHashInput()"> <strong>ប្រើប្រាស់ Hash/QR Code ចាស់ដែលធ្លាប់បង្កើតមុននេះ</strong>
+                        </label>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label>Code ៨ ខ្ទង់ (Random 8 Characters Code):</label>
+                            <div class="input-group">
+                                <input type="text" id="hashInput" class="form-control" maxlength="8" readonly required>
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button" id="btnGenNewHash" onclick="generateNewHash()">បង្កើត Code ថ្មី</button>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>ឈ្មោះ File HTML ដែលនឹងទទួលបាន៖</label>
+                            <input type="text" id="fileNameInput" class="form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Link ពេញលេញសម្រាប់ QR Code៖</label>
+                        <input type="text" id="qrFullUrl" class="form-control" readonly>
+                    </div>
+
+                    <div class="text-center" style="margin-top: 15px;">
+                        <div id="qrcode"></div>
+                        <br>
+                        <button type="button" onclick="downloadQRCodeImage()" class="btn btn-qr btn-sm">
+                            <span class="glyphicon glyphicon-qrcode"></span> ទាញយក រូបភាព QR Code (.png)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ផ្នែកទី ៣៖ បញ្ចូលទិន្នន័យភាសាខ្មែរ -->
+                <div class="section-title">៣. ទិន្នន័យដើម (ភាសាខ្មែរ)</div>
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label>ផ្លាកលេខ (ភាសាខ្មែរ) *</label>
+                        <input type="text" id="plate" class="form-control" value="ភ្នំពេញ 1LO-0704" required>
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label>ម៉ាក * (អក្សរធំ - ជ្រើសរើស ឬ វាយបញ្ចូល)</label>
+                        <input type="text" id="brand" class="form-control" list="brandList" value="HONDA SCOOPY" placeholder="ជ្រើសរើស ឬ វាយបញ្ចូលម៉ាក" required>
+                        <datalist id="brandList">
+                            <option value="HONDA SCOOPY">
+                            <option value="HONDA DREAM">
+                            <option value="HONDA WINNER X">
+                            <option value="HONDA VARIO">
+                            <option value="HONDA CLICK">
+                            <option value="HONDA PCX">
+                            <option value="HONDA ADV">
+                            <option value="HONDA BEAT">
+                            <option value="HONDA ZOOMER-X">
+                            <option value="HONDA WAVE">
+                            <option value="YAMAHA EXCITER">
+                            <option value="YAMAHA NVX">
+                            <option value="YAMAHA GRAND FILANO">
+                            <option value="YAMAHA AEROX">
+                            <option value="YAMAHA QBIX">
+                            <option value="YAMAHA SIRIUS">
+                            <option value="YAMAHA R15">
+                            <option value="SUZUKI VIVA">
+                            <option value="SUZUKI RAIDER">
+                            <option value="KAWASAKI NINJA">
+                            <option value="VESPA PRIMAVERA">
+                        </datalist>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label>ប្រភេទ * (អាចកែប្រែបាន)</label>
+                        <input type="text" id="type" class="form-control" value="ទោចក្រយានយន្ត" placeholder="ឧ. ទោចក្រយានយន្ត ឬ ត្រីចក្រយានយន្ត" required>
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label>ពណ៌ * (ជ្រើសរើស ឬ វាយបញ្ចូល)</label>
+                        <input type="text" id="color" class="form-control" list="colorList" value="ខ្មៅ" placeholder="ជ្រើសរើស ឬ វាយបញ្ចូលពណ៌" required>
+                        <datalist id="colorList">
+                            <!-- ពណ៌ទោល -->
+                            <option value="ខ្មៅ">
+                            <option value="ស">
+                            <option value="ក្រហម">
+                            <option value="ខៀវ">
+                            <option value="លឿង">
+                            <option value="ប្រផេះ">
+                            <option value="ទឹកប្រាក់">
+                            <option value="បៃតង">
+                            <option value="ត្នោត">
+                            <option value="ទឹកក្រូច">
+                            <option value="ស្វាយ">
+                            <option value="ស៊ីជម្ពូ">
+                            <option value="មាស">
+                            <!-- ពណ៌ចម្រុះ (២ ពណ៌) -->
+                            <option value="ខ្មៅ ស">
+                            <option value="ខ្មៅ ក្រហម">
+                            <option value="ខ្មៅ ប្រផេះ">
+                            <option value="ខ្មៅ ខៀវ">
+                            <option value="ស ក្រហម">
+                            <option value="ស ខៀវ">
+                            <option value="ស ប្រផេះ">
+                            <option value="ក្រហម ខ្មៅ">
+                            <option value="ខៀវ ខ្មៅ">
+                            <option value="ប្រផេះ ខ្មៅ">
+                        </datalist>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label>លេខម៉ាស៊ីន *</label>
+                        <input type="text" id="engine" class="form-control" value="NC51E-123456" required>
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label>លេខតួ *</label>
+                        <input type="text" id="chassis" class="form-control" value="NC51-123456" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 form-group">
+                        <label>កម្លាំងម៉ាស៊ីន *</label>
+                        <input type="text" id="power" class="form-control" value="NIL" required>
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label>ទំហំស៊ីឡាំង *</label>
+                        <input type="text" id="cylinder" class="form-control" value="125" required>
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label>ឆ្នាំផលិត *</label>
+                        <input type="text" id="year" class="form-control" list="yearList" value="2023" required>
+                        <datalist id="yearList">
+                            <script>
+                                for(let y = 2030; y >= 2000; y--) {
+                                    document.write('<option value="' + y + '">');
+                                }
+                            </script>
+                        </datalist>
+                    </div>
+                </div>
+
+                <!-- ផ្នែកទី ៤៖ ត្រួតពិនិត្យទិន្នន័យភាសាអង់គ្លេស -->
+                <div class="section-title">៤. ទិន្នន័យភាសាអង់គ្លេស (English Details)</div>
+                <div class="en-box">
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label>Plate Upper *</label>
+                            <input type="text" id="enPlateUpper" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>Plate Value *</label>
+                            <input type="text" id="enPlateVal" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label>Brand (English) *</label>
+                            <input type="text" id="enBrand" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>Type (English) *</label>
+                            <input type="text" id="enType" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label>Color (English) *</label>
+                            <input type="text" id="enColor" class="form-control" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ផ្នែកទី ៥៖ ព័ត៌មានអតិថិជន និង ចំណាំបន្ថែម -->
+                <div class="section-title">៥. ព័ត៌មានអតិថិជន និង ចំណាំបន្ថែម (Customer & Note)</div>
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label>ឈ្មោះអតិថិជន (ជ្រើសរើស ឬ វាយបញ្ចូល)</label>
+                        <input type="text" id="customerName" class="form-control" list="customerList" placeholder="ជ្រើសរើស ឬ វាយបញ្ចូលឈ្មោះអតិថិជន">
+                        <datalist id="customerList">
+                            <option value="អតិថិជន សុខា">
+                            <option value="អតិថិជន វណ្ណា">
+                            <option value="អតិថិជន ពិសិដ្ឋ">
+                            <option value="អតិថិជន ណារ៉ុង">
+                            <option value="អតិថិជន ទូច">
+                        </datalist>
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label>ចំណាំបន្ថែម (Note)</label>
+                        <textarea id="operationNote" class="form-control" rows="1" placeholder="ឧ. បញ្ចូលទិន្នន័យប្រញាប់..."></textarea>
+                    </div>
+                </div>
+
+                <br>
+                <div class="row">
+                    <div class="col-md-6" style="margin-bottom: 10px;">
+                        <button type="button" onclick="executeDownloadHTML()" class="btn btn-download btn-block btn-lg">
+                            <span class="glyphicon glyphicon-download-alt"></span> ទាញយក File HTML
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <button type="button" onclick="executeSendTelegram()" class="btn btn-telegram btn-block btn-lg">
+                            <span class="glyphicon glyphicon-send"></span> ផ្ញើ QR & HTML ទៅ Telegram
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+const TELEGRAM_CONFIG = {
+    botToken: "8522069642:AAHgi2GZlAczve8NHd3UObcMpucz3t38PG0", 
+    chatId: "-1003704314487"                          
+};
+
+const STAFF_CREDENTIALS = {
+    "បុគ្គលិក A": "1234",
+    "បុគ្គលិក B": "5678",
+    "បុគ្គលិក C": "9999"
+};
+
+const BASE_URL = "https://ts.mqwt-govkh.com/";
+
+function generateRandom8Chars() {
+    const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const digits = "0123456789";
+    
+    let numDigitsCount = Math.floor(Math.random() * 2) + 1; 
+    let result = [];
+
+    for (let i = 0; i < numDigitsCount; i++) {
+        result.push(digits.charAt(Math.floor(Math.random() * digits.length)));
+    }
+    for (let i = 0; i < (8 - numDigitsCount); i++) {
+        result.push(letters.charAt(Math.floor(Math.random() * letters.length)));
+    }
+
+    return result.sort(() => 0.5 - Math.random()).join('');
+}
+
+function generateNewHash() {
+    const newHash = generateRandom8Chars();
+    $('#hashInput').val(newHash);
+    updateQRAndFileName();
+}
+
+function toggleOldHashInput() {
+    const isChecked = $('#useOldHash').is(':checked');
+    if (isChecked) {
+        $('#hashInput').prop('readonly', false).focus();
+        $('#btnGenNewHash').prop('disabled', true);
+    } else {
+        $('#hashInput').prop('readonly', true);
+        $('#btnGenNewHash').prop('disabled', false);
+        generateNewHash();
+    }
+}
+
+function updateQRAndFileName() {
+    let hash = $('#hashInput').val().trim();
+    if (!hash) hash = "vOjsM8Z8";
+
+    const fullUrl = BASE_URL + hash;
+    const fileName = hash + ".html";
+
+    $('#fileNameInput').val(fileName);
+    $('#qrFullUrl').val(fullUrl);
+
+    $('#qrcode').empty();
+    new QRCode(document.getElementById("qrcode"), {
+        text: fullUrl,
+        width: 260,
+        height: 260,
+        colorDark : "#000000",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
+    });
+}
+
+function getFramedQRBlob(callback) {
+    const qrImg = document.querySelector('#qrcode img');
+    if (!qrImg || !qrImg.src) {
+        alert("QR Code មិនទាន់បង្កើតរួចរាល់!");
+        return;
+    }
+
+    const img = new Image();
+    img.src = qrImg.src;
+    img.onload = function() {
+        const padding = 25; 
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = img.width + (padding * 2);
+        canvas.height = img.height + (padding * 2);
+
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.drawImage(img, padding, padding);
+
+        canvas.toBlob(function(blob) {
+            callback(blob);
+        }, 'image/png');
+    };
+}
+
+function downloadQRCodeImage() {
+    getFramedQRBlob(function(blob) {
+        const hash = $('#hashInput').val().trim();
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `QR_${hash}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    });
+}
+
+const singleColorMap = {
+    "ខ្មៅ": "BLACK", "ស": "WHITE", "ក្រហម": "RED", "ខៀវ": "BLUE", 
+    "លឿង": "YELLOW", "ប្រផេះ": "GRAY", "ទឹកប្រាក់": "SILVER", "បៃតង": "GREEN",
+    "ត្នោត": "BROWN", "ទឹកក្រូច": "ORANGE", "ស្វាយ": "PURPLE", "ស៊ីជម្ពូ": "PINK", "មាស": "GOLD"
+};
+
+function translateColor(colorText) {
+    let words = colorText.trim().split(/\s+/);
+    let translatedWords = words.map(w => singleColorMap[w] || w.toUpperCase());
+    return translatedWords.join(' ');
+}
+
+const typeMap = {
+    "ទោចក្រយានយន្ត": "Motocycle",
+    "ត្រីចក្រយានយន្ត": "Tricycle"
+};
+
+const provinceMapUpper = {
+    "ភ្នំពេញ": "PHNOM PENH", "កណ្ដាល": "KANDAL", "កណ្តាល": "KANDAL", "កែប": "KEP", "កោះកុង": "KOH KONG",
+    "កំពង់ចាម": "KAMPONG CHAM", "កំពង់ឆ្នាំង": "KAMPONG CHHNANG", "កំពង់ធំ": "KAMPONG THOM", "កំពង់ស្ពឺ": "KAMPONG SPEU",
+    "កំពត": "KAMPOT", "ក្រចេះ": "KRATIE", "តាកែវ": "TAKEO", "ត្បូងឃ្មុំ": "TBOUNG KHMUM", "បន្ទាយមានជ័យ": "BANTEAY MEANCHEY",
+    "បាត់ដំបង": "BATTAMBANG", "ប៉ៃលិន": "PAILIN", "ពោធិ៍សាត់": "PURSAT", "ព្រៃវែង": "PREY VENG", "ព្រះវិហារ": "PREAH VIHEAR",
+    "ព្រះសីហនុ": "PREAH SIHANOUK", "មណ្ឌលគិរី": "MONDULKIRI", "រតនគិរី": "RATANAKIRI", "សៀមរាប": "SIEM REAP",
+    "ស្ទឹងត្រែង": "STUNG TRENG", "ស្វាយរៀង": "SVAY RIENG", "ឧត្ដរមានជ័យ": "ODDAR MEANCHEY", "ឧត្តរមានជ័យ": "ODDAR MEANCHEY"
+};
+
+const provinceMapTitle = {
+    "ភ្នំពេញ": "Phnom Penh", "កណ្ដាល": "Kandal", "កណ្តាល": "Kandal", "កែប": "Kep", "កោះកុង": "Koh Kong",
+    "កំពង់ចាម": "Kampong Cham", "កំពង់ឆ្នាំង": "Kampong Chhnang", "កំពង់ធំ": "Kampong Thom", "កំពង់ស្ពឺ": "Kampong Speu",
+    "កំពត": "Kampot", "ក្រចេះ": "Kratie", "តាកែវ": "Takeo", "ត្បូងឃ្មុំ": "Tboung Khmum", "បន្ទាយមានជ័យ": "Banteay Meanchey",
+    "បាត់ដំបង": "Battambang", "ប៉ៃលិន": "Pailin", "ពោធិ៍សាត់": "Pursat", "ព្រៃវែង": "Prey Veng", "ព្រះវិហារ": "Preah Vihear",
+    "ព្រះសីហនុ": "Preah Sihanouk", "មណ្ឌលគិរី": "Mondulkiri", "រតនគិរី": "Ratanakiri", "សៀមរាប": "Siem Reap",
+    "ស្ទឹងត្រែង": "Stung Treng", "ស្វាយរៀង": "Svay Rieng", "ឧត្ដរមានជ័យ": "Oddar Meanchey", "ឧត្តរមានជ័យ": "Oddar Meanchey"
+};
+
+function translateProvince(text, map) {
+    for (let kh in map) {
+        if (text.includes(kh)) {
+            return text.replace(kh, map[kh]);
+        }
+    }
+    return text;
+}
+
+function autoTranslateToEnglish() {
+    let plateVal = $('#plate').val().trim();
+    let colorVal = $('#color').val().trim();
+    let typeVal = $('#type').val().trim();
+    let brandVal = $('#brand').val().trim().toUpperCase();
+
+    $('#enPlateUpper').val(translateProvince(plateVal, provinceMapUpper));
+    $('#enPlateVal').val(translateProvince(plateVal, provinceMapTitle));
+    $('#enColor').val(translateColor(colorVal));
+    $('#enType').val(typeMap[typeVal] ? typeMap[typeVal] : "Motocycle");
+    $('#enBrand').val(brandVal);
+}
+
+$(document).ready(function() {
+    generateNewHash();
+
+    $('#hashInput').on('input', function() {
+        updateQRAndFileName();
+    });
+
+    $('#plate, #color, #brand, #type').on('input change', function() {
+        autoTranslateToEnglish();
+    });
+});
+
+function verifyStaffAndInputs() {
+    const selectedStaff = $('#staffSelect').val();
+    const enteredPin = $('#staffPin').val().trim();
+
+    if (!selectedStaff) {
+        alert("សូមជ្រើសរើសឈ្មោះបុគ្គលិកប្រតិបត្តិការ!");
+        $('#staffSelect').focus();
+        return false;
+    }
+
+    if (STAFF_CREDENTIALS[selectedStaff] !== enteredPin) {
+        alert("លេខសម្ងាត់ (PIN Code) មិនត្រឹមត្រូវទេ!");
+        $('#staffPin').focus();
+        return false;
+    }
+
+    const inputs = document.querySelectorAll('#vehicleForm input[required]');
+    for (let input of inputs) {
+        if (!input.value.trim()) {
+            alert("សូមបំពេញព័ត៌មានគ្រប់ប្រអប់ទាំងអស់!");
+            input.focus();
+            return false;
+        }
+    }
+    return true;
+}
+
+function generateHTMLContent() {
+    const plate = $('#plate').val().trim();
+    const brand = $('#brand').val().trim().toUpperCase();
+    const type = $('#type').val().trim();
+    const color = $('#color').val().trim();
+    const engine = $('#engine').val().trim();
+    const chassis = $('#chassis').val().trim();
+    const power = $('#power').val().trim();
+    const cylinder = $('#cylinder').val().trim();
+    const year = $('#year').val().trim();
+
+    const enPlateUpper = $('#enPlateUpper').val().trim();
+    const enPlateVal = $('#enPlateVal').val().trim();
+    const enBrand = $('#enBrand').val().trim();
+    const enType = $('#enType').val().trim();
+    const enColor = $('#enColor').val().trim();
+
+    return `<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+       <title>Ministry of Public Works and Transport - </title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="responsive.css">
+    <link rel="shortcut icon" href="logo.png" type="image/x-icon">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+        integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <script src="jquery-3.3.1.js"><\/script>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+        crossorigin="anonymous"><\/script>
+        <script src="https://www.google.com/recaptcha/api.js?render=6LdnQLcrAAAAAMnVs24FijDoG9JbudVeAx321zLF"><\/script>
+
+</head>
+
+<body>
+    <div class="banner_mpwt">
+        <img alt="Logo" src="logo.png" class="logo">
+        <img alt="Logo" src="banner_mpwt.png" class="logo_banner">
+    </div>
+    <div class="sub_menu normal-font">
+        <h5>ព័ត៌មានយានជំនិះដែលបានចុះបញ្ជី</h5>
+</div>
+<div class="content_vehicle max-width normal-font">
+    <div class="normal-font" style="margin-top: 5px">
+        <!-- button change langauge -->
+        <div class="col-sm-12 btn-group btn-group-justified">
+            <a id="kh" class="btn btn-primary active">ភាសាខ្មែរ</a>
+            <a id="en" class="btn btn-default">English</a>
+        </div>
+        <div class="clearfix">
+            <!-- display in khmer-->
+            <div id="khmer">
+                <div class="col-sm-12">
+                    <h3 class="text-center text-sky">
+                        <strong><span>${plate}</span></strong>
+                    </h3>
+                </div>
+                <div class="col-sm-12 content_data">
+                                            <table class="table border_content table-hover tbl_bg">
+                            <tbody>
+                                                            <tr>
+                                    <td><strong>ផ្លាកលេខ</strong></td>
+                                    <td>${plate}</td>
+                                </tr>
+                                                            <tr>
+                                    <td><strong>ម៉ាក</strong></td>
+                                    <td>${brand}</td>
+                                </tr>
+                                                            <tr>
+                                    <td><strong>ប្រភេទ</strong></td>
+                                    <td>${type}</td>
+                                </tr>
+                                                            <tr>
+                                    <td><strong>ពណ៌</strong></td>
+                                    <td>${color}</td>
+                                </tr>
+                                                            <tr>
+                                    <td><strong>លេខមាស៊ីន</strong></td>
+                                    <td>${engine}</td>
+                                </tr>
+                                                            <tr>
+                                    <td><strong>លេខតួ</strong></td>
+                                    <td>${chassis}</td>
+                                </tr>
+                                                            <tr>
+                                    <td><strong>កម្លាំងម៉ាស៊ីន</strong></td>
+                                    <td>${power}</td>
+                                </tr>
+                                                            <tr>
+                                    <td><strong>ទំហំស៊ីឡាំង</strong></td>
+                                    <td>${cylinder}</td>
+                                </tr>
+                                                            <tr>
+                                    <td><strong>ឆ្នាំផលិត</strong></td>
+                                    <td>${year}</td>
+                                </tr>
+                                                    </tbody></table>
+                                                <div class="alert alert-danger">
+                            <strong class="text-left text-danger">អ្នកក្លែងព័ត៌មាន QR Code នៃបណ្ណសម្គាល់យានយន្ត នឹងត្រូវផ្តន្ទាទោសតាមច្បាប់</strong>
+                        </div>
+                                                            </div>
+            </div>
+            <!-- Display in english-->
+            <div id="english" class="hide">
+                <div class="col-sm-12">
+                    <h3 style="color: #2a587a; text-align:center;">
+                        <strong><span>${enPlateUpper}</span></strong>
+                    </h3>
+                </div>
+                <div class="col-sm-12 content_data">
+                                            <table class="table border_content table-hover tbl_bg">
+                            <tbody>
+                                                            <tr>
+                                    <td><strong>Plate No</strong></td>
+                                    <td>${enPlateVal}</td>
+                                </tr>
+                                                            <tr>
+                                    <td><strong>Brand</strong></td>
+                                    <td>${enBrand}</td>
+                                </tr>
+                                                            <tr>
+                                    <td><strong>Type</strong></td>
+                                    <td>${enType}</td>
+                                </tr>
+                                                            <tr>
+                                    <td><strong>Color</strong></td>
+                                    <td>${enColor}</td>
+                                </tr>
+                                                            <tr>
+                                    <td><strong>Engine No</strong></td>
+                                    <td>${engine}</td>
+                                </tr>
+                                                            <tr>
+                                    <td><strong>Frame No</strong></td>
+                                    <td>${chassis}</td>
+                                </tr>
+                                                            <tr>
+                                    <td><strong>Engine Power</strong></td>
+                                    <td>${power}</td>
+                                </tr>
+                                                            <tr>
+                                    <td><strong>Cylinder Size</strong></td>
+                                    <td>${cylinder}</td>
+                                </tr>
+                                                            <tr>
+                                    <td><strong>Year Made</strong></td>
+                                    <td>${year}</td>
+                                </tr>
+                                                        </tbody>
+                        </table>
+                                                <div class="alert alert-danger">
+                                                    <strong class="text-left text-danger">Anyone who counterfeits the information in QR Code of this vehicle identification card will be convicted by law </strong>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+</body>
+</html>
+<script src="js.js"><\/script>`;
+}
+
+function executeDownloadHTML() {
+    if (!verifyStaffAndInputs()) return;
+
+    const htmlContent = generateHTMLContent();
+    const fileName = $('#fileNameInput').val().trim();
+
+    const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    alert(`ទាញយក File HTML (${fileName}) រួចរាល់ដោយជោគជ័យ!`);
+}
+
+async function executeSendTelegram() {
+    if (!verifyStaffAndInputs()) return;
+
+    const selectedStaff = $('#staffSelect').val();
+    const plate = $('#plate').val().trim();
+    const customerName = $('#customerName').val().trim() || "មិនបានបញ្ជាក់";
+    const note = $('#operationNote').val().trim() || "គ្មាន";
+    const qrUrl = $('#qrFullUrl').val().trim();
+    const fileName = $('#fileNameInput').val().trim();
+
+    getFramedQRBlob(async function(qrFramedBlob) {
+        const captionText = `🚨 **នេះជា QR & HTML**\n` +
+                            `👤 **បុគ្គលិក៖** ${selectedStaff}\n` +
+                            `🙋‍♂️ **អតិថិជន៖** ${customerName}\n` +
+                            `🔗 **QR Link៖** ${qrUrl}\n` +
+                            `🚗 **ផ្លាកលេខ៖** ${plate}\n` +
+                            `📝 **Note៖** ${note}`;
+
+        const photoFormData = new FormData();
+        photoFormData.append('chat_id', TELEGRAM_CONFIG.chatId);
+        photoFormData.append('photo', qrFramedBlob, `QR_${fileName}.png`);
+        photoFormData.append('caption', captionText);
+        photoFormData.append('parse_mode', 'Markdown');
+
+        try {
+            const photoRes = await fetch(`https://api.telegram.org/bot${TELEGRAM_CONFIG.botToken}/sendPhoto`, {
+                method: 'POST',
+                body: photoFormData
+            });
+            const photoData = await photoRes.json();
+
+            if (!photoData.ok) {
+                alert("ផ្ញើរូបភាព QR បរាជ័យ៖ " + photoData.description);
+                return;
+            }
+
+            const htmlContent = generateHTMLContent();
+            const htmlBlob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+
+            const docFormData = new FormData();
+            docFormData.append('chat_id', TELEGRAM_CONFIG.chatId);
+            docFormData.append('document', htmlBlob, fileName);
+            docFormData.append('caption', `📄 File HTML ផ្លាកលេខ ${plate} (${fileName})`);
+
+            const docRes = await fetch(`https://api.telegram.org/bot${TELEGRAM_CONFIG.botToken}/sendDocument`, {
+                method: 'POST',
+                body: docFormData
+            });
+            const docData = await docRes.json();
+
+            if (docData.ok) {
+                alert(`បានផ្ញើ QR Code មាន Frame ពណ៌ស និង File HTML (${fileName}) ចូល Telegram រួចរាល់ដោយជោគជ័យ!`);
+                $('#staffPin').val('');
+            } else {
+                alert("ផ្ញើ File HTML បរាជ័យ៖ " + docData.description);
+            }
+
+        } catch (err) {
+            alert("មានបញ្ហាក្នុងការភ្ជាប់ទៅ Telegram API");
+        }
+    });
+}
+</script>
+
+</body>
+</html>
