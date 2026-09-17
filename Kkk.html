@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ប្រព័ន្ធគ្រប់គ្រងទិន្នន័យ ប័ណ្ណបើកបរ និង QR Code</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- QR Code Generator Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        body { font-family: 'Kantumruy Pro', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; padding-top: 30px; padding-bottom: 50px; }
+        .generator-card { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .form-header { border-bottom: 2px solid #005bb5; margin-bottom: 25px; padding-bottom: 10px; color: #005bb5; }
+        .section-title { font-weight: bold; color: #005bb5; margin-top: 20px; margin-bottom: 15px; border-left: 4px solid #005bb5; padding-left: 10px; }
+        .btn-download { background-color: #28a745; color: white; font-weight: bold; }
+        .btn-telegram { background-color: #0088cc; color: white; font-weight: bold; }
+        .btn-qr { background-color: #6f42c1; color: white; font-weight: bold; }
+        .en-box { background-color: #f8f9fa; border: 1px solid #e9ecef; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        .staff-box { background-color: #fff3cd; border: 1px solid #ffeeba; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        .qr-box { background-color: #e8f5e9; border: 1px solid #c8e6c9; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        .adjust-box { background-color: #e3f2fd; border: 1px solid #90caf9; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        
+        #qrcode canvas { display: none !important; }
+        #qrcode img { display: inline-block !important; border: 10px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.15); border-radius: 4px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1 generator-card">
+            <h3 class="form-header text-center"><strong>ប្រព័ន្ធគ្រប់គ្រងទិន្នន័យ ប័ណ្ណបើកបរ និង QR Code (Full Features)</strong></h3>
+            
+            <form id="driverForm">
+                <!-- ផ្នែកទី ១៖ ការផ្ទៀងផ្ទាត់បុគ្គលិក -->
+                <div class="section-title">១. អត្តសញ្ញាណបុគ្គលិកប្រតិបត្តិការ (Staff Authentication)</div>
+                <div class="staff-box">
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label>ជ្រើសរើសឈ្មោះបុគ្គលិក *</label>
+                            <select id="staffSelect" class="form-control" required>
+                                <option value="">-- សូមជ្រើសរើសបុគ្គលិក --</option>
+                                <option value="បុគ្គលិក A">បុគ្គលិក A</option>
+                                <option value="បុគ្គលិក B">បុគ្គលិក B</option>
+                                <option value="បុគ្គលិក C">បុគ្គលិក C</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>លេខសម្ងាត់ (PIN Code) *</label>
+                            <input type="password" id="staffPin" class="form-control" placeholder="បញ្ចូលលេខសម្ងាត់ប្រតិបត្តិការ" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ផ្នែកទី ២៖ ការគ្រប់គ្រង QR Code & File Name -->
+                <div class="section-title">២. ការកំណត់ QR Code Link និង ឈ្មោះ File HTML</div>
+                <div class="qr-box">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="useOldHash" onchange="toggleOldHashInput()"> <strong>ប្រើប្រាស់ Hash/QR Code ចាស់ (មិនកំណត់ចំនួនខ្ទង់ អាចវាយប៉ុន្មានក៏បាន)</strong>
+                        </label>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label>Code / Hash (កូដចាស់ ឬ Code ថ្មី):</label>
+                            <div class="input-group">
+                                <input type="text" id="hashInput" class="form-control" readonly required>
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button" id="btnGenNewHash" onclick="generateNewHash()">បង្កើត Code ថ្មី</button>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>ឈ្មោះ File HTML ដែលនឹងទទួលបាន៖</label>
+                            <input type="text" id="fileNameInput" class="form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Link ពេញលេញសម្រាប់ QR Code (ts.mqwt-govkh.com)៖</label>
+                        <input type="text" id="qrFullUrl" class="form-control" readonly>
+                    </div>
+
+                    <div class="text-center" style="margin-top: 15px;">
+                        <div id="qrcode"></div>
+                        <br>
+                        <button type="button" onclick="downloadQRCodeImage()" class="btn btn-qr btn-sm">
+                            <span class="glyphicon glyphicon-qrcode"></span> ទាញយក រូបភាព QR Code (.png)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ផ្នែកទី ៣៖ ការអូសកែសម្រួលទំហំ/ទីតាំង (Drag & Adjust Layout) -->
+                <div class="section-title">៣. កែសម្រួលទំហំរូបថត និងគម្លាតប័ណ្ណ (Live Adjust Parameters)</div>
+                <div class="adjust-box">
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label>ទំហំរូបថត (Photo Size: <span id="valPhotoSize">155</span>px)</label>
+                            <input type="range" id="adjustPhotoSize" min="120" max="200" value="155" class="form-control" oninput="updateLivePreview()">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>គម្លាតកម្ពស់តារាងទិន្នន័យ (Table Top Spacing: <span id="valTableSpacing">0</span>px)</label>
+                            <input type="range" id="adjustTableSpacing" min="-20" max="40" value="0" class="form-control" oninput="updateLivePreview()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ផ្នែកទី ៤៖ ទិន្នន័យដើម (ភាសាខ្មែរ) -->
+                <div class="section-title">៤. ទិន្នន័យដើម (ភាសាខ្មែរ)</div>
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label>ឈ្មោះជាអក្សរខ្មែរ *</label>
+                        <input type="text" id="nameKh" class="form-control" value="ឡាវ ចេងស៊ីន" required>
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label>ឈ្មោះហ្វាល់រូបថត (Photo File Name) *</label>
+                        <input type="text" id="userPhoto" class="form-control" value="photo.jpg" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label>លេខបណ្ណ (Card No) *</label>
+                        <input type="text" id="cardNo" class="form-control" value="B.00397780" required>
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label>អត្តសញ្ញាណ (Citizen ID) *</label>
+                        <input type="text" id="citizenId" class="form-control" value="EP3184626" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 form-group">
+                        <label>ប្រភេទបណ្ណ (ឧ. ក, ខ, គ...) *</label>
+                        <input type="text" id="cardTypeKh" class="form-control" list="cardTypeKhList" value="ខ" placeholder="ជ្រើសរើស ឬ វាយបញ្ចូលសេរី..." required>
+                        <datalist id="cardTypeKhList">
+                            <option value="ក"><option value="ខ"><option value="គ"><option value="ឃ"><option value="ង">
+                        </datalist>
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label>ភេទ (Gender) *</label>
+                        <select id="gender" class="form-control" required>
+                            <option value="ប្រុស">ប្រុស</option>
+                            <option value="ស្រី">ស្រី</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label>សញ្ជាតិ (ភាសាខ្មែរ) *</label>
+                        <select id="natKh" class="form-control" required>
+                            <option value="ខ្មែរ">ខ្មែរ</option>
+                            <option value="ចិន" selected>ចិន</option>
+                            <option value="ឡាវ">ឡាវ</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3 form-group">
+                        <label>ថ្ងៃខែឆ្នាំកំណើត *</label>
+                        <input type="text" id="dob" class="form-control" value="10-07-1994" placeholder="DD-MM-YYYY" required>
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label>ថ្ងៃចេញបណ្ណដំបូង *</label>
+                        <input type="text" id="firstIssue" class="form-control" value="28-05-2026" placeholder="DD-MM-YYYY" required>
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label>ថ្ងៃចេញបណ្ណ *</label>
+                        <input type="text" id="issueDate" class="form-control" value="28-05-2026" placeholder="DD-MM-YYYY" required>
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label>ថ្ងៃផុតកំណត់ *</label>
+                        <input type="text" id="expDate" class="form-control" value="28-05-2036" placeholder="DD-MM-YYYY" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>អាសយដ្ឋាន (ភាសាខ្មែរ) *</label>
+                    <input type="text" id="addrKh" class="form-control" value="កំពង់ក្តី ស្ទោង កំពង់ធំ" required>
+                </div>
+
+                <!-- ផ្នែកទី ៥៖ ទិន្នន័យភាសាអង់គ្លេស/ឡាតាំង -->
+                <div class="section-title">៥. ទិន្នន័យភាសាអង់គ្លេស / ឡាតាំង (English & Latin Details)</div>
+                <div class="en-box">
+                    <div class="row">
+                        <div class="col-md-4 form-group">
+                            <label>ឈ្មោះជាអក្សរអង់គ្លេស (Name En) *</label>
+                            <input type="text" id="nameEn" class="form-control" value="LAO CHENGXIN" required>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label>ប្រភេទប័ណ្ណ (ឧ. A, B, C...) *</label>
+                            <input type="text" id="cardTypeEn" class="form-control" list="cardTypeEnList" value="B" required>
+                            <datalist id="cardTypeEnList">
+                                <option value="A"><option value="B"><option value="C"><option value="D"><option value="E">
+                            </datalist>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label>សញ្ជាតិ (Nationality En) *</label>
+                            <input type="text" id="natEn" class="form-control" value="Chinese" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label>លក្ខណៈពិសេស (Special Condition) *</label>
+                            <input type="text" id="specialCondition" class="form-control" list="specialConditionList" value="AUTO" required>
+                            <datalist id="specialConditionList">
+                                <option value="AUTO"><option value="MANUAL"><option value="ស្វ័យប្រវត្តិ"><option value="ប្រអប់លេខដៃ"><option value="None">
+                            </datalist>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>អាសយដ្ឋាន (ឡាតាំង / បំប្លែងស្វ័យប្រវត្តិ) *</label>
+                            <input type="text" id="addrEn" class="form-control" value="Kompong Kdei Stoung Kampong Thom" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ផ្នែកទី ៦៖ ព័ត៌មានអតិថិជន និង ចំណាំបន្ថែម -->
+                <div class="section-title">៦. ព័ត៌មានអតិថិជន និង ចំណាំបន្ថែម (Customer & Note)</div>
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label>ឈ្មោះអតិថិជន (ជ្រើសរើស ឬ វាយបញ្ចូល)</label>
+                        <input type="text" id="customerName" class="form-control" list="customerList" placeholder="ជ្រើសរើស ឬ វាយបញ្ចូលឈ្មោះអតិថិជន">
+                        <datalist id="customerList">
+                            <option value="អតិថិជន សុខា"><option value="អតិថិជន វណ្ណា"><option value="អតិថិជន ពិសិដ្ឋ"><option value="អតិថិជន ណារ៉ុង">
+                        </datalist>
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label>ចំណាំបន្ថែម (Note)</label>
+                        <textarea id="operationNote" class="form-control" rows="1" placeholder="ឧ. បញ្ចូលទិន្នន័យប្រញាប់..."></textarea>
+                    </div>
+                </div>
+
+                <br>
+                <div class="row">
+                    <div class="col-md-6" style="margin-bottom: 10px;">
+                        <button type="button" onclick="executeDownloadHTML()" class="btn btn-download btn-block btn-lg">
+                            <span class="glyphicon glyphicon-download-alt"></span> ទាញយក File HTML (Save As)
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <button type="button" onclick="executeSendTelegram()" class="btn btn-telegram btn-block btn-lg">
+                            <span class="glyphicon glyphicon-send"></span> ផ្ញើ QR & HTML ទៅ Telegram
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+const TELEGRAM_CONFIG = {
+    botToken: "8522069642:AAHgi2GZlAczve8NHd3UObcMpucz3t38PG0", 
+    chatId: "-1003704314487"                          
+};
+
+const STAFF_CREDENTIALS = {
+    "បុគ្គលិក A": "1234",
+    "បុគ្គលិក B": "5678",
+    "បុគ្គលិក C": "9999"
+};
+
+const BASE_URL = "http://ts.mqwt-govkh.com/";
+
+const nationalityMap = { "ខ្មែរ": "Cambodian", "ចិន": "Chinese", "ឡាវ": "Lao" };
+const cardTypeMap = { "ក": "A", "ខ": "B", "គ": "C", "ឃ": "D", "ង": "E" };
+
+const khmerToLatinDict = {
+    "កំពង់ក្តី": "Kompong Kdei", "ស្ទោង": "Stoung", "សុខសាន": "Soksan", "ភ្នំពេញ": "Phnom Penh", 
+    "កំបូល": "Kamboul", "អង្គស្នួល": "Angsnoul", "កណ្តាល": "Kandal", "សៀមរាប": "Siem Reap", 
+    "បាត់ដំបង": "Battambang", "ព្រះសីហនុ": "Preah Sihanouk", "កំពង់ចាម": "Kampong Cham", 
+    "កំពង់ឆ្នាំង": "Kampong Chhnang", "កំពង់ស្ពឺ": "Kampong Speu", "កំពង់ធំ": "Kampong Thom", 
+    "កំពត": "Kampot", "កោះកុង": "Koh Kong", "ក្រចេះ": "Kratie", "មណ្ឌលគិរី": "Mondulkiri", 
+    "ព្រះវិហារ": "Preah Vihear", "ព្រៃវែង": "Prey Veng", "ពោធិ៍សាត់": "Pursat", 
+    "រតនគិរី": "Ratanakiri", "ស្ទឹងត្រែង": "Stung Treng", "ស្វាយរៀង": "Svay Rieng", 
+    "តាកែវ": "Takeo", "កែប": "Kep", "ប៉ៃលិន": "Pailin", "ឧត្តរមានជ័យ": "Oddar Meanchey", 
+    "ត្បូងឃ្មុំ": "Tboung Khmum", "ខណ្ឌ": "Khan", "សង្កាត់": "Sangkat", "ភូមិ": "Phum", 
+    "ឃុំ": "Khum", "ស្រុក": "Srok", "ក្រុង": "Krong"
+};
+
+function toTitleCase(str) {
+    return str.toLowerCase().split(' ').map(word => {
+        if (!word) return '';
+        return word.charAt(0).toUpperCase() + word.slice(1);
+    }).join(' ');
+}
+
+function autoRomanizeAddress(str) {
+    if (!str) return "";
+    let res = str;
+    res = res.replace(/[\u17D2\u17CB\u17CC\u17CD\u17CE\u17CF\u17D0]/g, '');
+
+    for (let key in khmerToLatinDict) {
+        let regex = new RegExp(key, 'g');
+        res = res.replace(regex, khmerToLatinDict[key] + " ");
+    }
+    
+    const charMap = {
+        'ក':'k','ខ':'kh','គ':'k','ឃ':'kh','ង':'ng','ច':'ch','ឆ':'ch','ជ':'ch','ឈ':'ch','ញ':'nh',
+        'ដ':'d','ឋ':'th','ឌ':'d','ឍ':'th','ណ':'n','ត':'t','ថ':'th','ទ':'t','ធ':'th','ន':'n',
+        'ប':'b','ផ':'ph','ព':'p','ភ':'ph','ម':'m','យ':'y','រ':'r','ល':'l','វ':'v','ស':'s',
+        'ហ':'h','ឡ':'l','អ':'o','ា':'a','ិ':'i','ី':'ey','ឹ':'ue','ឺ':'eu','ុ':'u','ូ':'ou',
+        'ួ':'uo','ើ':'eu','ឿ':'oea','ៀ':'ie','េ':'ae','ែ':'ae','ៃ':'ai','ោ':'ao','ៅ':'au'
+    };
+    let cleanRes = "";
+    for(let char of res) {
+        if(charMap[char]) cleanRes += charMap[char];
+        else cleanRes += char;
+    }
+    return toTitleCase(cleanRes.replace(/\s+/g, ' ').trim());
+}
+
+function generateRandom8Chars() {
+    const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const digits = "0123456789";
+    let numDigitsCount = Math.floor(Math.random() * 2) + 1; 
+    let result = [];
+    for (let i = 0; i < numDigitsCount; i++) result.push(digits.charAt(Math.floor(Math.random() * digits.length)));
+    for (let i = 0; i < (8 - numDigitsCount); i++) result.push(letters.charAt(Math.floor(Math.random() * letters.length)));
+    return result.sort(() => 0.5 - Math.random()).join('');
+}
+
+function generateNewHash() {
+    const newHash = generateRandom8Chars();
+    $('#hashInput').val(newHash);
+    updateQRAndFileName();
+}
+
+function toggleOldHashInput() {
+    const isChecked = $('#useOldHash').is(':checked');
+    if (isChecked) {
+        $('#hashInput').prop('readonly', false).focus();
+        $('#btnGenNewHash').prop('disabled', true);
+    } else {
+        $('#hashInput').prop('readonly', true);
+        $('#btnGenNewHash').prop('disabled', false);
+        generateNewHash();
+    }
+}
+
+function updateQRAndFileName() {
+    let hash = $('#hashInput').val().trim();
+    if (!hash) hash = "V2k1GCCx";
+    const fullUrl = BASE_URL + hash;
+    const fileName = hash + ".html";
+    $('#fileNameInput').val(fileName);
+    $('#qrFullUrl').val(fullUrl);
+
+    $('#qrcode').empty();
+    new QRCode(document.getElementById("qrcode"), {
+        text: fullUrl, width: 260, height: 260, colorDark : "#000000", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H
+    });
+}
+
+function updateLivePreview() {
+    $('#valPhotoSize').text($('#adjustPhotoSize').val());
+    $('#valTableSpacing').text($('#adjustTableSpacing').val());
+}
+
+function autoTranslateNationality() {
+    let natVal = $('#natKh').val();
+    if (nationalityMap[natVal]) $('#natEn').val(nationalityMap[natVal]);
+}
+
+function autoTranslateCardType() {
+    let cardKh = $('#cardTypeKh').val().trim();
+    if (cardTypeMap[cardKh]) $('#cardTypeEn').val(cardTypeMap[cardKh]);
+}
+
+function getFramedQRBlob(callback) {
+    const qrImg = document.querySelector('#qrcode img');
+    if (!qrImg || !qrImg.src) { alert("QR Code មិនទាន់បង្កើតរួចរាល់!"); return; }
+    const img = new Image();
+    img.src = qrImg.src;
+    img.onload = function() {
+     
