@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - គ្រប់គ្រងមឺនុយ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #111827; --card-bg: #1f2937; --accent-color: #3b82f6;
+      --accent-gold: #fbbf24; --text-main: #f9fafb; --text-sub: #9ca3af;
+      --success: #10b981; --danger: #ef4444; --warning: #f59e0b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Kantumruy Pro', sans-serif; }
+    body { background: var(--bg-color); color: var(--text-main); padding: 15px; padding-bottom: 70px; min-height: 100vh; }
+    .container { max-width: 900px; margin: 0 auto; display: none; } 
+    
+    .expired-box { display: none; text-align: center; padding: 50px 20px; background: var(--card-bg); border-radius: 16px; margin: 40px auto; max-width: 500px; border: 1px solid rgba(239, 68, 68, 0.4); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    .expired-box h2 { color: var(--danger); font-size: 1.6rem; margin-bottom: 15px; }
+    .expired-box p { font-size: 1.1rem; line-height: 1.6; color: var(--text-main); margin-bottom: 20px; }
+    .phone-link { display: inline-block; background: var(--accent-color); color: #fff; padding: 12px 24px; border-radius: 30px; text-decoration: none; font-weight: 700; font-size: 1.2rem; }
+
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(17, 24, 39, 0.9); display: flex; justify-content: center; align-items: center; z-index: 1000; padding: 15px; }
+    .modal-box { background: var(--card-bg); padding: 25px; border-radius: 14px; width: 100%; max-width: 480px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); max-height: 90vh; overflow-y: auto; }
+    .modal-box h2 { font-size: 1.25rem; margin-bottom: 15px; color: var(--accent-gold); text-align: center; }
+    .modal-box p { font-size: 0.95rem; color: var(--text-main); margin-bottom: 15px; text-align: center; }
+    .modal-box input { width: 100%; padding: 12px; margin-bottom: 12px; background: #374151; border: 1px solid #4b5563; color: #fff; border-radius: 8px; font-size: 1rem; }
+    .modal-box .btn-group { display: flex; gap: 10px; margin-top: 10px; }
+    .modal-box button { width: 100%; padding: 12px; background: var(--accent-color); border: none; color: #fff; font-weight: 600; border-radius: 8px; cursor: pointer; font-size: 0.95rem; }
+    .modal-box button:disabled { background: #4b5563; cursor: not-allowed; opacity: 0.7; }
+    .modal-box button.btn-cancel { background: #4b5563; }
+
+    h1 { font-size: 1.4rem; margin-bottom: 15px; color: var(--accent-gold); text-align: center; }
+    
+    .header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+    .btn-add-main { background: #10b981; color: #fff; padding: 12px 20px; border-radius: 10px; font-weight: 700; font-size: 1rem; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); }
+    .btn-add-main:hover { background: #059669; }
+
+    .btn-license-main { background: #d97706; color: #fff; padding: 12px 20px; border-radius: 10px; font-weight: 700; font-size: 1rem; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(217, 119, 6, 0.3); display: inline-flex; align-items: center; gap: 6px; }
+    .btn-license-main:hover { background: #b45309; }
+
+    .license-popup-content { text-align: left; }
+    .license-row-info { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 0.95rem; }
+    .license-row-info span:last-child { font-weight: 700; color: var(--accent-gold); }
+    .countdown-box { background: #111827; padding: 12px; border-radius: 10px; text-align: center; margin-top: 15px; border: 1px solid rgba(59, 130, 246, 0.3); }
+    .countdown-timer { font-size: 1.15rem; font-weight: 800; color: #38bdf8; letter-spacing: 0.5px; margin-top: 5px; }
+
+    .card { background: var(--card-bg); padding: 18px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); margin-bottom: 20px; }
+    
+    .form-group { margin-bottom: 14px; text-align: left; }
+    label { display: block; font-size: 0.9rem; margin-bottom: 6px; color: var(--text-sub); font-weight: 500; }
+    input, select { width: 100%; padding: 12px; background: #374151; border: 1px solid #4b5563; color: #fff; border-radius: 8px; font-size: 0.95rem; }
+    
+    .price-group { display: flex; gap: 12px; }
+    .price-group .form-group { flex: 1; }
+
+    .filter-container { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
+    .filter-btn { background: #374151; color: var(--text-main); border: none; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; cursor: pointer; font-weight: 500; }
+    .filter-btn.active, .filter-btn:hover { background: var(--accent-color); color: #fff; }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 1rem; }
+    th, td { padding: 12px 10px; text-align: left; border-bottom: 1px solid #374151; vertical-align: middle; }
+    th { color: var(--accent-gold); font-size: 0.95rem; font-weight: 700; background: rgba(0,0,0,0.2); }
+    
+    .item-name { font-weight: 600; color: #fff; font-size: 1.05rem; }
+    .item-cat { color: var(--text-sub); font-size: 0.88rem; }
+    .price-txt { font-weight: 600; color: var(--accent-gold); }
+
+    .action-btns { display: flex; gap: 6px; }
+    .btn-edit { background: var(--warning); padding: 8px 12px; font-size: 0.85rem; color: #fff; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; }
+    .btn-delete { background: var(--danger); padding: 8px 12px; font-size: 0.85rem; border-radius: 6px; border: none; color: #fff; cursor: pointer; font-weight: 600; }
+    
+    .status-toggle { padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 0.88rem; font-weight: 600; border: none; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+    .st-in { background: var(--success); color: #fff; }
+    .st-out { background: var(--danger); color: #fff; }
+
+    .admin-img-square { width: 65px; height: 65px; object-fit: cover; border-radius: 8px; background: #374151; display: block; border: 1px solid rgba(255, 255, 255, 0.1); }
+
+    footer { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(17, 24, 39, 0.95); border-top: 1px solid rgba(255, 255, 255, 0.1); padding: 12px; text-align: center; font-size: 0.85rem; color: var(--text-sub); backdrop-filter: blur(8px); z-index: 100; }
+    footer .owner-name { color: var(--accent-color); font-weight: 600; }
+  </style>
+</head>
+<body>
+
+  <!-- Modal វាយពាក្យសម្ងាត់ -->
+  <div id="login-overlay" class="modal-overlay">
+    <div class="modal-box" style="text-align: center;">
+      <h2>🔒 បញ្ចូលពាក្យសម្ងាត់អតមីន</h2>
+      <input type="password" id="admin-pass" placeholder="ពាក្យសម្ងាត់ (ឧ. 1234)" style="text-align: center;">
+      <button onclick="checkPassword()">ចូលប្រើប្រាស់</button>
+    </div>
+  </div>
+
+  <!-- ផ្ទាំងបង្ហាញពេលផុតកំណត់ -->
+  <div id="admin-expired-content" class="expired-box">
+    <h2>⚠️ ប្រព័ន្ធគ្រប់គ្រងត្រូវផុតកំណត់!</h2>
+    <p>សូមអភ័យទោស រយៈពេលប្រើប្រាស់ប្រព័ន្ធបានបញ្ចប់ហើយ។ សូមទាក់ទងមកកាន់អ្នកផ្តល់សេវាកម្មដើម្បីបន្តអាជ្ញាប័ណ្ណប្រើប្រាស់។</p>
+    <a href="tel:0962828738" class="phone-link">📞 0962828738</a>
+  </div>
+
+  <!-- Modal ពិនិត្យ License -->
+  <div id="license-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-box">
+      <h2>📜 ព័ត៌មានអាជ្ញាប័ណ្ណ (System License)</h2>
+      <div class="license-popup-content">
+        <div class="license-row-info">
+          <span>ស្ថានភាពប្រព័ន្ធ៖</span>
+          <span id="popup-lic-status" style="color: var(--success);">🟢 សកម្ម (Active)</span>
+        </div>
+        <div class="license-row-info">
+          <span>ថ្ងៃផុតកំណត់៖</span>
+          <span id="popup-lic-expiry">--</span>
+        </div>
+        <div class="countdown-box">
+          <div style="font-size: 0.85rem; color: var(--text-sub);">ពេលវេលានៅសល់ (Countdown):</div>
+          <div id="countdown-display" class="countdown-timer">-- ថ្ងៃ -- ម៉ោង -- នាទី -- វិនាទី</div>
+        </div>
+      </div>
+      <div class="btn-group" style="margin-top: 20px;">
+        <button class="btn-cancel" onclick="closeLicenseModal()">បិទ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal បញ្ជាក់ការលុប -->
+  <div id="delete-overlay" class="modal-overlay" style="display: none;">
+    <div class="modal-box" style="text-align: center;">
+      <h2>⚠️ បញ្ជាក់ការលុប</h2>
+      <p id="delete-msg">តើអ្នកពិតជាចង់លុបទំនិញនេះមែនទេ?</p>
+      <input type="password" id="delete-pass" placeholder="ពាក្យសម្ងាត់អតមីន" style="text-align: center;">
+      <div class="btn-group">
+        <button class="btn-cancel" id="btn-cancel-del" onclick="closeDeleteModal()">បោះបង់</button>
+        <button id="btn-confirm-delete" onclick="confirmDeleteItem()" style="background: var(--danger);">យល់ព្រមលុប</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Form -->
+  <div id="form-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-box">
+      <h2 id="form-title">➕ បន្ថែមមុខទំនិញថ្មី</h2>
+      <input type="hidden" id="edit-id">
+      
+      <div class="form-group">
+        <label>ឈ្មោះមុខម្ហូប / ភេសជ្ជៈ</label>
+        <input type="text" id="add-name" placeholder="ឧ. ស្រាបៀរ ឬ បាយឆា">
+      </div>
+      
+      <div class="form-group">
+        <label>ប្រភេទ (Category)</label>
+        <select id="category-select" onchange="checkCategoryInput(this)">
+          <option value="">-- ជ្រើសរើសប្រភេទដែលមានស្រាប់ --</option>
+        </select>
+        <input type="text" id="add-category" placeholder="ឬវាយបញ្ចូលប្រភេទថ្មីទីនេះ..." style="margin-top: 8px;">
+      </div>
+
+      <div class="price-group">
+        <div class="form-group">
+          <label>តម្លៃទី១ ($)</label>
+          <input type="number" step="0.01" id="add-price1" placeholder="ឧ. 1.50">
+        </div>
+        <div class="form-group">
+          <label>តម្លៃទី២ ($) <small style="color:var(--text-sub);">(មិនចាំបាច់)</small></label>
+          <input type="number" step="0.01" id="add-price2" placeholder="ឧ. 8.00">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>ជ្រើសរើសរូបភាពពីទូរសព្ទ</label>
+        <input type="file" id="image-file" accept="image/*" style="padding: 10px; background: #374151; border: 1px solid #4b5563; border-radius: 8px; color: #fff; width: 100%;">
+        <input type="hidden" id="add-image">
+      </div>
+
+      <div class="btn-group">
+        <button class="btn-cancel" onclick="closeFormModal()">បោះបង់</button>
+        <button id="btn-add" onclick="saveItem()">រក្សាទុក</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container" id="main-container">
+    
+    <h1>⚙️ ផ្ទាំងគ្រប់គ្រងម្ហូប និងភេសជ្ជៈ (Admin Panel)</h1>
+
+    <div class="header-actions">
+      <button class="btn-add-main" onclick="openAddModal()">➕ បន្ថែមមុខទំនិញថ្មី</button>
+      <button class="btn-license-main" onclick="openLicenseModal()">📜 License</button>
+    </div>
+
+    <div class="card">
+      <div class="filter-container" id="filter-container">
+        <button class="filter-btn active" onclick="filterAdminTable('ទាំងអស់', this)">ទាំងអស់</button>
+      </div>
+
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr><th>រូបភាព</th><th>ឈ្មោះ និងប្រភេទ</th><th>តម្លៃទី១</th><th>តម្លៃទី២</th><th>ស្ថានភាព</th><th>សកម្មភាព</th></tr>
+          </thead>
+          <tbody id="admin-table-body">
+            <tr><td colspan="6" class="loading-overlay">⏳ កំពុងទាញទិន្នន័យ...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    គ្រប់គ្រងដោយ <span class="owner-name">Rithy Sak</span> | 📞 លេខទូរស័ព្ទ៖ 0962828738
+  </footer>
+
+  <script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycby7QML0v4bFjswDdo6LFqmC4TPPrFtDmWTYBWJnwMDMHy__7sIaFkx470yGxuJ2ex4O/exec';
+    const ADMIN_PASSWORD = '1234';
+    let items = [];
+    let currentCategoryFilter = 'ទាំងអស់';
+    let itemToDeleteId = null;
+    let licenseExpiryTimestamp = null;
+    let countdownInterval = null;
+    
+    let fetchedData = null; // រក្សាទុកទិន្នន័យដែលទាញបានទុកមុន
+    let isDataLoaded = false; // ប្រាប់ថាតើទាញទិន្នន័យរួចរាល់ហើយឬยัง
+
+    // ចាប់ផ្តើមទាញទិន្នន័យពី Server ភ្លាមៗពេលបើកវេបសាយ
+    async function preloadData() {
+      try {
+        const res = await fetch(API_URL);
+        fetchedData = await res.json();
+        isDataLoaded = true;
+      } catch (err) {
+        console.error('Error preloading data:', err);
+      }
+    }
+
+    // ហៅទាញទិន្នន័យភ្លាមពេលໂຫຼដ HTML រួច
+    preloadData();
+
+    async function checkPassword() {
+      const pass = document.getElementById('admin-pass').value;
+      if (pass === ADMIN_PASSWORD) {
+        // បើទិន្នន័យទាញមិនទាន់រួចទេ ទុកអោយបង្ហាញផ្ទាំងໂຫຼដសិន
+        if (!isDataLoaded) {
+          document.getElementById('admin-table-body').innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--accent-gold); padding: 20px;">⏳ កំពុងទាញទិន្នន័យ...</td></tr>`;
+          document.getElementById('login-overlay').style.display = 'none';
+          document.getElementById('main-container').style.display = 'block';
+          
+          // រង់ចាំរហូតដល់ទាញរួច
+          while (!isDataLoaded) {
+            await new Promise(resolve => setTimeout(resolve, 200));
+          }
+        }
+
+        document.getElementById('login-overlay').style.display = 'none';
+        processLoadedData(fetchedData);
+      } else {
+        alert('ពាក្យសម្ងាត់មិនត្រឹមត្រូវទេ!');
+        document.getElementById('admin-pass').value = '';
+      }
+    }
+
+    function processLoadedData(data) {
+      if (!data) {
+        document.getElementById('admin-table-body').innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--danger); padding: 20px;">មិនអាចទាញទិន្នន័យបានទេ!</td></tr>`;
+        document.getElementById('main-container').style.display = 'block';
+        return;
+      }
+
+      if (data.trial) {
+        licenseExpiryTimestamp = new Date(data.trial.expiryISO).getTime();
+        document.getElementById('popup-lic-expiry').innerText = data.trial.expiryDate || '--';
+        
+        if (data.trial.expired) {
+          document.getElementById('popup-lic-status').innerText = '🔴 ផុតកំណត់';
+          document.getElementById('popup-lic-status').style.color = 'var(--danger)';
+        }
+      }
+
+      if (data.trial && data.trial.expired) {
+        document.getElementById('main-container').style.display = 'none';
+        document.getElementById('admin-expired-content').style.display = 'block';
+        return;
+      }
+
+      document.getElementById('main-container').style.display = 'block';
+
+      items = data.items || [];
+      updateCategoryDropdown();
+      renderFilterButtons();
+      renderAdminTable();
+    }
+
+    // เผื่อករណីចង់ហៅ fetchItems ឡើងវិញ (ពេល Refresh ឬ Update)
+    async function fetchItems() {
+      isDataLoaded = false;
+      document.getElementById('admin-table-body').innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--accent-gold); padding: 20px;">⏳ កំពុងទាញទិន្នន័យ...</td></tr>`;
+      await preloadData();
+      processLoadedData(fetchedData);
+    }
+
+    function openLicenseModal() {
+      document.getElementById('license-modal').style.display = 'flex';
+      startCountdown();
+    }
+
+    function closeLicenseModal() {
+      document.getElementById('license-modal').style.display = 'none';
+      if (countdownInterval) clearInterval(countdownInterval);
+    }
+
+    function startCountdown() {
+      if (countdownInterval) clearInterval(countdownInterval);
+      updateTimerDisplay();
+      countdownInterval = setInterval(updateTimerDisplay, 1000);
+    }
+
+    function updateTimerDisplay() {
+      if (!licenseExpiryTimestamp) return;
+
+      const now = new Date().getTime();
+      const distance = licenseExpiryTimestamp - now;
+
+      const timerElem = document.getElementById('countdown-display');
+
+      if (distance < 0) {
+        timerElem.innerText = "ប្រព័ន្ធបានផុតកំណត់ហើយ!";
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      timerElem.innerText = `${days} ថ្ងៃ ${hours} ម៉ោង ${minutes} នាទី ${seconds} វិនាទី`;
+    }
+
+    function updateCategoryDropdown() {
+      const select = document.getElementById('category-select');
+      const categories = [...new Set(items.map(item => item.category))];
+      select.innerHTML = '<option value="">-- ជ្រើសរើសប្រភេទដែលមានស្រាប់ --</option>' +
+        categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+    }
+
+    function renderFilterButtons() {
+      const categories = ['ទាំងអស់', ...new Set(items.map(item => item.category))];
+      const container = document.getElementById('filter-container');
+      container.innerHTML = categories.map(cat => `
+        <button class="filter-btn ${currentCategoryFilter === cat ? 'active' : ''}" onclick="filterAdminTable('${cat}', this)">${cat}</button>
+      `).join('');
+    }
+
+    function filterAdminTable(category, btn) {
+      currentCategoryFilter = category;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderAdminTable();
+    }
+
+    function checkCategoryInput(select) {
+      if (select.value) {
+        document.getElementById('add-category').value = select.value;
+      }
+    }
+
+    async function syncToSheets() {
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify(items)
+      });
+      return await res.json();
+    }
+
+    function openAddModal() {
+      resetForm();
+      document.getElementById('form-title').innerText = '➕ បន្ថែមមុខទំនិញថ្មី';
+      document.getElementById('btn-add').innerText = 'រក្សាទុក';
+      document.getElementById('form-modal').style.display = 'flex';
+    }
+
+    function closeFormModal() {
+      document.getElementById('form-modal').style.display = 'none';
+      resetForm();
+    }
+
+    function convertFileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+      });
+    }
+
+    async function saveItem() {
+      const editId = document.getElementById('edit-id').value;
+      const name = document.getElementById('add-name').value.trim();
+      let category = document.getElementById('add-category').value.trim();
+      const price_1 = parseFloat(document.getElementById('add-price1').value);
+      const price_2_val = document.getElementById('add-price2').value.trim();
+      const price_2 = price_2_val !== '' ? parseFloat(price_2_val) : 0;
+      
+      let image_url = document.getElementById('add-image').value.trim();
+      const fileInput = document.getElementById('image-file');
+
+      if (!name || !category || isNaN(price_1)) {
+        alert('សូមបំពេញឈ្មោះ ប្រភេទ និងតម្លៃទី១ ឱ្យបានត្រឹមត្រូវ!');
+        return;
+      }
+
+      const btnAdd = document.getElementById('btn-add');
+      btnAdd.disabled = true;
+      btnAdd.innerText = '⏳ កំពុងដំណើរការ...';
+
+      try {
+        if (fileInput.files && fileInput.files[0]) {
+          image_url = await convertFileToBase64(fileInput.files[0]);
+        }
+
+        if (!image_url) {
+          image_url = 'https://placehold.co/300x200?text=Menu';
+        }
+
+        if (editId) {
+          const item = items.find(i => String(i.id) === String(editId));
+          if (item) {
+            item.name = name;
+            item.category = category;
+            item.price_1 = price_1;
+            item.price_2 = price_2;
+            item.image_url = image_url;
+          }
+        } else {
+          items.push({ 
+            id: Date.now().toString(), 
+            name, 
+            category, 
+            price_1: price_1, 
+            price_2: price_2, 
+            image_url, 
+            status: 'នៅមាន' 
+          });
+        }
+
+        const res = await syncToSheets();
+        if (res.result === 'expired') {
+          alert('ប្រព័ន្ធត្រូវបានផុតកំណត់ហើយ!');
+          fetchItems();
+          return;
+        }
+
+        await fetchItems();
+        closeFormModal();
+        alert('បានរក្សាទុកដោយជោគជ័យ!');
+      } catch (err) {
+        alert('មានបញ្ហាក្នុងការរក្សាទុក!');
+      } finally {
+        btnAdd.disabled = false;
+        btnAdd.innerText = 'រក្សាទុក';
+      }
+    }
+
+    function editItem(id) {
+      const item = items.find(i => String(i.id) === String(id));
+      if (!item) return;
+
+      document.getElementById('edit-id').value = item.id;
+      document.getElementById('add-name').value = item.name;
+      document.getElementById('add-category').value = item.category;
+      document.getElementById('category-select').value = item.category;
+      document.getElementById('add-price1').value = item.price_1;
+      document.getElementById('add-price2').value = (item.price_2 && item.price_2 > 0) ? item.price_2 : '';
+      document.getElementById('add-image').value = item.image_url;
+      document.getElementById('image-file').value = '';
+
+      document.getElementById('form-title').innerText = '✏️ កែប្រែមុខទំនិញ';
+      document.getElementById('btn-add').innerText = 'ធ្វើបច្ចុប្បន្នភាព';
+      document.getElementById('form-modal').style.display = 'flex';
+    }
+
+    function resetForm() {
+      document.getElementById('edit-id').value = '';
+      document.getElementById('add-name').value = '';
+      document.getElementById('add-category').value = '';
+      document.getElementById('category-select').value = '';
+      document.getElementById('add-price1').value = '';
+      document.getElementById('add-price2').value = '';
+      document.getElementById('add-image').value = '';
+      document.getElementById('image-file').value = '';
+    }
+
+    async function toggleStatus(id, btnElement) {
+      const item = items.find(i => String(i.id) === String(id));
+      if (!item) return;
+
+      btnElement.disabled = true;
+      const originalText = btnElement.innerHTML;
+      btnElement.innerHTML = `🔄 កំពុងប្តូរ...`;
+
+      item.status = item.status === 'នៅមាន' ? 'អស់ស្តុក' : 'នៅមាន';
+
+      try {
+        const res = await syncToSheets();
+        if (res.result === 'expired') {
+          alert('ប្រព័ន្ធត្រូវបានផុតកំណត់ហើយ!');
+          fetchItems();
+          return;
+        }
+        renderAdminTable();
+      } catch (err) {
+        alert('មានបញ្ហាក្នុងការធ្វើបច្ចុប្បន្នភាពស្តុក!');
+        item.status = item.status === 'នៅមាន' ? 'អស់ស្តុក' : 'នៅមាន';
+        btnElement.innerHTML = originalText;
+        btnElement.disabled = false;
+      }
+    }
+
+    function promptDelete(id) {
+      const item = items.find(i => String(i.id) === String(id));
+      if (!item) return;
+
+      itemToDeleteId = id;
+      document.getElementById('delete-msg').innerHTML = `តើអ្នកពិតជាចង់លុប <strong>"${item.name}"</strong> នេះមែនទេ?`;
+      document.getElementById('delete-pass').value = '';
+      document.getElementById('delete-overlay').style.display = 'flex';
+    }
+
+    function closeDeleteModal() {
+      document.getElementById('delete-overlay').style.display = 'none';
+      itemToDeleteId = null;
+    }
+
+    async function confirmDeleteItem() {
+      const pass = document.getElementById('delete-pass').value;
+      if (pass !== ADMIN_PASSWORD) {
+        alert('ពាក្យសម្ងាត់មិនត្រឹមត្រូវទេ!');
+        return;
+      }
+
+      const btnConfirm = document.getElementById('btn-confirm-delete');
+      const btnCancel = document.getElementById('btn-cancel-del');
+      
+      btnConfirm.disabled = true;
+      btnCancel.disabled = true;
+      btnConfirm.innerText = '⏳ កំពុងលុប...';
+
+      items = items.filter(i => String(i.id) !== String(itemToDeleteId));
+
+      try {
+        const res = await syncToSheets();
+        if (res.result === 'expired') {
+          alert('ប្រព័ន្ធត្រូវបានផុតកំណត់ហើយ!');
+          fetchItems();
+          return;
+        }
+        renderFilterButtons();
+        renderAdminTable();
+        closeDeleteModal();
+        alert('បានលុបដោយជោគជ័យ!');
+      } catch (err) {
+        alert('មិនអាចលុបបានទេ។');
+      } finally {
+        btnConfirm.disabled = false;
+        btnCancel.disabled = false;
+        btnConfirm.innerText = 'យល់ព្រមលុប';
+      }
+    }
+
+    function renderAdminTable() {
+      const tbody = document.getElementById('admin-table-body');
+      let filteredItems = currentCategoryFilter === 'ទាំងអស់' 
+        ? items 
+        : items.filter(i => i.category === currentCategoryFilter);
+
+      if (filteredItems.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 20px;">មិនមានទិន្នន័យទេ។</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filteredItems.map(item => `
+        <tr>
+          <td>
+            <img src="${item.image_url}" class="admin-img-square" onerror="this.src='https://placehold.co/100?text=Error'">
+          </td>
+          <td>
+            <div class="item-name">${item.name}</div>
+            <div class="item-cat">📂 ${item.category}</div>
+          </td>
+          <td><span class="price-txt">$${parseFloat(item.price_1 || 0).toFixed(2)}</span></td>
+          <td>${item.price_2 && parseFloat(item.price_2) > 0 ? '<span class="price-txt">$' + parseFloat(item.price_2).toFixed(2) + '</span>' : '<span style="color:var(--text-sub);">-</span>'}</td>
+          <td>
+            <button class="status-toggle ${item.status === 'នៅមាន' ? 'st-in' : 'st-out'}" onclick="toggleStatus('${item.id}', this)">
+              ${item.status === 'នៅមាន' ? '🟢 នៅមាន' : '🔴 អស់ស្តុក'}
+            </button>
+          </td>
+          <td>
+            <div class="action-btns">
+              <button class="btn-edit" onclick="editItem('${item.id}')">កែប្រែ</button>
+              <button class="btn-delete" onclick="promptDelete('${item.id}')">លុប</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+  </script>
+</body>
+</html>
