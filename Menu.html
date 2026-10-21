@@ -14,8 +14,8 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Kantumruy Pro', sans-serif; }
     body { background: var(--bg-color); color: var(--text-main); min-height: 100vh; padding-bottom: 70px; scroll-behavior: smooth; }
     
-    header { background: #1e293b; color: #fff; padding: 20px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.1); }
-    header h1 { font-size: 1.6rem; color: var(--accent-gold); font-weight: 700; }
+    header { background: #1e293b; color: #fff; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.1); }
+    header h1 { font-size: 1.3rem; color: var(--accent-gold); font-weight: 700; }
 
     /* ផ្ទាំងបង្ហាញពេលផុតកំណត់ */
     .expired-box { display: none; text-align: center; padding: 50px 20px; background: var(--card-bg); border-radius: 16px; margin: 40px auto; max-width: 500px; border: 1px solid rgba(239, 68, 68, 0.4); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
@@ -23,30 +23,35 @@
     .expired-box p { font-size: 1.1rem; line-height: 1.6; color: var(--text-main); margin-bottom: 20px; }
     .phone-link { display: inline-block; background: var(--primary); color: #fff; padding: 12px 24px; border-radius: 30px; text-decoration: none; font-weight: 700; font-size: 1.2rem; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); }
 
-    .container { max-width: 900px; margin: 20px auto; padding: 0 12px; }
+    .container { max-width: 900px; margin: 15px auto; padding: 0 10px; }
     
-    /* ធ្វើឱ្យប៊ូតុងប្រភេទនៅជាប់ផ្នែកខាងលើពេលអូស (Sticky Category Filter) */
+    /* Sticky Category Filter */
     .category-filter-wrapper {
       position: sticky;
-      top: 77px; /* ក្រោម header បន្តិច */
+      top: 65px;
       background: rgba(15, 23, 42, 0.95);
       backdrop-filter: blur(8px);
-      padding: 12px 0;
+      padding: 10px 0;
       z-index: 90;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
       border-bottom: 1px solid rgba(255,255,255,0.05);
     }
 
-    .category-filter { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+    .category-filter { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
     .category-filter::-webkit-scrollbar { display: none; }
-    .cat-btn { background: #1e293b; border: 1px solid #334155; padding: 10px 20px; border-radius: 25px; font-size: 1.05rem; cursor: pointer; white-space: nowrap; font-weight: 600; color: var(--text-sub); transition: all 0.2s; }
+    .cat-btn { background: #1e293b; border: 1px solid #334155; padding: 8px 16px; border-radius: 20px; font-size: 0.95rem; cursor: pointer; white-space: nowrap; font-weight: 600; color: var(--text-sub); transition: all 0.2s; }
     .cat-btn.active, .cat-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
 
-    .menu-section { margin-bottom: 35px; scroll-margin-top: 140px; }
-    .section-title { font-size: 1.35rem; color: var(--accent-gold); margin-bottom: 15px; padding-bottom: 6px; border-bottom: 2px solid #334155; display: flex; align-items: center; gap: 8px; font-weight: 700; }
+    .menu-section { margin-bottom: 25px; scroll-margin-top: 130px; }
+    .section-title { font-size: 1.15rem; color: var(--accent-gold); margin-bottom: 12px; padding-bottom: 4px; border-bottom: 2px solid #334155; display: flex; align-items: center; gap: 6px; font-weight: 700; }
 
-    .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
-    .menu-card { background: var(--card-bg); border-radius: 16px; overflow: hidden; box-shadow: 0 6px 18px rgba(0,0,0,0.4); display: flex; flex-direction: column; position: relative; border: 1px solid rgba(255,255,255,0.08); transition: transform 0.2s; }
+    /* កំណត់ឱ្យបង្ហាញ ២ ជួរនៅលើគ្រប់ទំហំអេក្រង់ទូរសព្ទ */
+    .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    @media (min-width: 768px) {
+      .menu-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+    }
+
+    .menu-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; flex-direction: column; position: relative; border: 1px solid rgba(255,255,255,0.08); }
     
     .menu-card.out-of-stock { opacity: 0.45; }
     .menu-card.out-of-stock .menu-img-container { filter: grayscale(80%) brightness(70%); }
@@ -54,22 +59,22 @@
     .menu-img-container { position: relative; width: 100%; aspect-ratio: 1 / 1; overflow: hidden; background: #334155; }
     .menu-img-main { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
 
-    .menu-content { padding: 18px; display: flex; flex-direction: column; flex-grow: 1; }
-    .menu-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 14px; color: #fff; line-height: 1.3; }
+    .menu-content { padding: 10px; display: flex; flex-direction: column; flex-grow: 1; }
+    .menu-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 8px; color: #fff; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     
-    .menu-price-container { margin-top: auto; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.12); display: flex; flex-direction: column; gap: 10px; }
-    .price-row { display: flex; justify-content: space-between; align-items: center; }
-    .price-label { font-size: 1.1rem; color: #f1f5f9; font-weight: 700; }
-    .price-values { display: flex; align-items: baseline; gap: 6px; }
-    .price-usd { color: #facc15; font-weight: 800; font-size: 1.3rem; }
-    .price-riel { color: #38bdf8; font-weight: 800; font-size: 1.15rem; }
+    .menu-price-container { margin-top: auto; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; gap: 6px; }
+    .price-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; }
+    .price-label { color: #cbd5e1; font-weight: 600; }
+    .price-values { display: flex; align-items: baseline; gap: 3px; }
+    .price-usd { color: #facc15; font-weight: 800; font-size: 0.95rem; }
+    .price-riel { color: #38bdf8; font-weight: 800; font-size: 0.85rem; }
 
-    .badge-out { position: absolute; top: 12px; right: 12px; background: var(--danger); color: #fff; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; box-shadow: 0 2px 6px rgba(0,0,0,0.4); z-index: 2; }
-    .badge-in { position: absolute; top: 12px; right: 12px; background: var(--success); color: #fff; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; box-shadow: 0 2px 6px rgba(0,0,0,0.4); z-index: 2; }
+    .badge-out { position: absolute; top: 8px; right: 8px; background: var(--danger); color: #fff; padding: 4px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; box-shadow: 0 2px 4px rgba(0,0,0,0.4); z-index: 2; }
+    .badge-in { position: absolute; top: 8px; right: 8px; background: var(--success); color: #fff; padding: 4px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; box-shadow: 0 2px 4px rgba(0,0,0,0.4); z-index: 2; }
 
-    .loading { text-align: center; padding: 50px; color: var(--accent-gold); font-weight: 600; grid-column: 1 / -1; font-size: 1.2rem; }
+    .loading { text-align: center; padding: 50px; color: var(--accent-gold); font-weight: 600; grid-column: 1 / -1; font-size: 1.1rem; }
 
-    footer { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(17, 24, 39, 0.95); border-top: 1px solid rgba(255, 255, 255, 0.1); padding: 14px; text-align: center; font-size: 0.95rem; color: var(--text-sub); backdrop-filter: blur(8px); z-index: 100; }
+    footer { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(17, 24, 39, 0.95); border-top: 1px solid rgba(255, 255, 255, 0.1); padding: 10px; text-align: center; font-size: 0.85rem; color: var(--text-sub); backdrop-filter: blur(8px); z-index: 100; }
     footer .owner-name { color: var(--accent-gold); font-weight: 700; }
   </style>
 </head>
@@ -81,7 +86,7 @@
 
   <div class="container" id="main-content">
     
-    <!-- Sticky Category Filter Wrapper -->
+    <!-- Sticky Category Filter -->
     <div class="category-filter-wrapper">
       <div class="category-filter" id="category-filter">
         <button class="cat-btn active" onclick="filterMenu('ទាំងអស់', this)">ទាំងអស់</button>
@@ -109,7 +114,7 @@
     const EXCHANGE_RATE = 4000;
     let menuItems = [];
     let currentCategory = 'ទាំងអស់';
-    let isManualClick = false; // ទប់ស្កាត់ការរត់ស្ទួនពេលចុចប៊ូតុង
+    let isManualClick = false;
 
     async function fetchMenu() {
       try {
@@ -125,7 +130,7 @@
         menuItems = data.items || [];
         renderCategories();
         renderMenu();
-        setupScrollSpy(); // ចាប់ផ្តើមស្តាប់ការអូស màn hình
+        setupScrollSpy();
       } catch (err) {
         document.getElementById('menu-container').innerHTML = `<div class="loading" style="color:var(--danger);">មិនអាចទាញទិន្នន័យបានទេ!</div>`;
       }
@@ -147,17 +152,9 @@
       document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
       if (btn) btn.classList.add('active');
 
-      // បើជ្រើសរើស "ទាំងអស់" គឺបង្ហាញឡើងលើสุด បើជ្រើសរើសប្រភេទផ្សេង គឺ Scroll ទៅរក Section នោះចំៗ
-      if (category === 'ទាំងអស់') {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } else {
-        const section = document.getElementById(`section-${category}`);
-        if (section) {
-          const yOffset = -130; // เผื่อความสูงของ sticky header & filter
-          const y = section.getBoundingClientRect().top + window.pageYOffset + yOffset;
-          window.scrollTo({ top: y, behavior: 'smooth' });
-        }
-      }
+      // បង្ហាញមឺនុយឡើងវិញតាមការចុច (បើ "ទាំងអស់" បង្ហាញគ្រប់ប្រភេទ បើប្រភេទផ្សេង បង្ហាញតែប្រភេទនោះមួយ)
+      renderMenu();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
 
       setTimeout(() => { isManualClick = false; }, 800);
     }
@@ -185,7 +182,7 @@
           <span class="price-label">${label1}</span>
           <div class="price-values">
             <span class="price-usd">$${val1.toFixed(2)}</span> 
-            <span style="color:#94a3b8; font-size:0.95rem;">(</span><span class="price-riel">${riel1}៛</span><span style="color:#94a3b8; font-size:0.95rem;">)</span>
+            <span style="color:#94a3b8; font-size:0.75rem;">(</span><span class="price-riel">${riel1}៛</span><span style="color:#94a3b8; font-size:0.75rem;">)</span>
           </div>
         </div>
       `;
@@ -197,7 +194,7 @@
             <span class="price-label">${label2}</span>
             <div class="price-values">
               <span class="price-usd">$${val2.toFixed(2)}</span> 
-              <span style="color:#94a3b8; font-size:0.95rem;">(</span><span class="price-riel">${riel2}៛</span><span style="color:#94a3b8; font-size:0.95rem;">)</span>
+              <span style="color:#94a3b8; font-size:0.75rem;">(</span><span class="price-riel">${riel2}៛</span><span style="color:#94a3b8; font-size:0.75rem;">)</span>
             </div>
           </div>
         `;
@@ -207,7 +204,11 @@
 
     function renderMenu() {
       const container = document.getElementById('menu-container');
-      const categories = [...new Set(menuItems.map(i => i.category))];
+      
+      // បើជ្រើសរើស "ទាំងអស់" គឺបង្ហាញគ្រប់ category ទាំងអស់ បើជ្រើសរើសប្រភេទផ្សេង បង្ហាញតែ category នោះមួយ
+      let categoriesToDisplay = currentCategory === 'ទាំងអស់' 
+        ? [...new Set(menuItems.map(i => i.category))] 
+        : [currentCategory];
 
       if (menuItems.length === 0) {
         container.innerHTML = `<div class="loading">មិនមានទិន្នន័យទេ។</div>`;
@@ -215,7 +216,7 @@
       }
 
       let htmlOutput = '';
-      categories.forEach(cat => {
+      categoriesToDisplay.forEach(cat => {
         let itemsInCat = menuItems.filter(i => i.category === cat);
         if (itemsInCat.length > 0) {
           htmlOutput += `
@@ -245,13 +246,13 @@
         }
       });
 
-      container.innerHTML = htmlOutput;
+      container.innerHTML = htmlOutput || `<div class="loading">មិនមានមុខម្ហូបក្នុងប្រភេទនេះទេ។</div>`;
     }
 
-    // មុខងារស្ដាប់ការអូស màn hình (Scroll Spy) ដើម្បីប្តូរពណ៌ប៊ូតុងស្វ័យប្រវត្តិ
+    // Scroll Spy ដំណើរការបានเฉพาะពេលចុច "ទាំងអស់"
     function setupScrollSpy() {
       window.addEventListener('scroll', () => {
-        if (isManualClick) return;
+        if (isManualClick || currentCategory !== 'ទាំងអស់') return;
 
         const sections = document.querySelectorAll('.menu-section');
         let scrollPos = window.scrollY + 180;
