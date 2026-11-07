@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>មឺនុយភោជនីយដ្ឋាន និងភេសជ្ជៈ</title>
+  <title>OS Menu - ប្រព័ន្ធគ្រប់គ្រងមឺនុយឌីជីថល</title>
   <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -12,21 +12,40 @@
       --danger: #ef4444; --success: #10b981; --riel-color: #38bdf8;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Kantumruy Pro', sans-serif; }
-    body { background: var(--bg-color); color: var(--text-main); min-height: 100vh; padding-bottom: 70px; scroll-behavior: smooth; }
+    body { background: var(--bg-color); color: var(--text-main); min-height: 100vh; padding-bottom: 70px; scroll-behavior: smooth; font-size: 16px; }
     
     header { background: #1e293b; color: #fff; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.1); }
-    header h1 { font-size: 1.3rem; color: var(--accent-gold); font-weight: 700; }
+    header h1 { font-size: 1.2rem; color: var(--accent-gold); font-weight: 700; }
+
+    /* ផ្ទាំងផ្សាយពាណិជ្ជកម្ម និងស្វាគមន៍ (Promo Banner) ឆ្លាតវៃ */
+    .promo-banner {
+      background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+      border: 1px solid rgba(251, 191, 36, 0.3);
+      border-radius: 16px;
+      padding: 25px 20px;
+      margin: 20px auto;
+      text-align: center;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      max-width: 650px;
+    }
+    .promo-banner h2 { color: var(--accent-gold); font-size: 1.3rem; margin-bottom: 10px; font-weight: 700; }
+    .promo-banner p { color: var(--text-sub); font-size: 0.95rem; line-height: 1.6; margin-bottom: 18px; }
+    .promo-features { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+    .feature-tag { background: rgba(59, 130, 246, 0.2); color: #60a5fa; padding: 6px 12px; border-radius: 20px; font-size: 0.82rem; font-weight: 600; border: 1px solid rgba(59, 130, 246, 0.3); }
+    .promo-btn { display: inline-block; background: var(--primary); color: #fff; padding: 12px 26px; border-radius: 30px; text-decoration: none; font-weight: 700; font-size: 1rem; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); transition: transform 0.2s; }
+    .promo-btn:hover { transform: translateY(-2px); }
 
     .expired-box { display: none; text-align: center; padding: 50px 20px; background: var(--card-bg); border-radius: 16px; margin: 40px auto; max-width: 500px; border: 1px solid rgba(239, 68, 68, 0.4); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-    .expired-box h2 { color: var(--danger); font-size: 1.6rem; margin-bottom: 15px; }
-    .expired-box p { font-size: 1.1rem; line-height: 1.6; color: var(--text-main); margin-bottom: 20px; }
-    .phone-link { display: inline-block; background: var(--primary); color: #fff; padding: 12px 24px; border-radius: 30px; text-decoration: none; font-weight: 700; font-size: 1.2rem; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); }
+    .expired-box h2 { color: var(--danger); font-size: 1.5rem; margin-bottom: 15px; }
+    .expired-box p { font-size: 1rem; line-height: 1.6; color: var(--text-main); margin-bottom: 20px; }
+    .phone-link { display: inline-block; background: var(--primary); color: #fff; padding: 12px 24px; border-radius: 30px; text-decoration: none; font-weight: 700; font-size: 1.1rem; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); }
 
-    .container { max-width: 900px; margin: 15px auto; padding: 0 10px; }
+    .container { max-width: 1100px; margin: 15px auto; padding: 0 12px; }
     
     .category-filter-wrapper {
+      display: none;
       position: sticky;
-      top: 65px;
+      top: 60px;
       background: rgba(15, 23, 42, 0.95);
       backdrop-filter: blur(8px);
       padding: 10px 0;
@@ -37,16 +56,14 @@
 
     .category-filter { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
     .category-filter::-webkit-scrollbar { display: none; }
-    .cat-btn { background: #1e293b; border: 1px solid #334155; padding: 8px 16px; border-radius: 20px; font-size: 0.95rem; cursor: pointer; white-space: nowrap; font-weight: 600; color: var(--text-sub); transition: all 0.2s; }
+    .cat-btn { background: #1e293b; border: 1px solid #334155; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; cursor: pointer; white-space: nowrap; font-weight: 600; color: var(--text-sub); transition: all 0.2s; }
     .cat-btn.active, .cat-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
 
     .menu-section { margin-bottom: 25px; scroll-margin-top: 130px; }
-    .section-title { font-size: 1.15rem; color: var(--accent-gold); margin-bottom: 12px; padding-bottom: 4px; border-bottom: 2px solid #334155; display: flex; align-items: center; gap: 6px; font-weight: 700; }
+    .section-title { font-size: 1.1rem; color: var(--accent-gold); margin-bottom: 12px; padding-bottom: 4px; border-bottom: 2px solid #334155; display: flex; align-items: center; gap: 6px; font-weight: 700; }
 
+    /* Mobile: 2 columns */
     .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-    @media (min-width: 768px) {
-      .menu-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
-    }
 
     .menu-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; flex-direction: column; position: relative; border: 1px solid rgba(255,255,255,0.08); }
     
@@ -57,40 +74,72 @@
     .menu-img-main { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
 
     .menu-content { padding: 10px; display: flex; flex-direction: column; flex-grow: 1; }
-    .menu-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 8px; color: #fff; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .menu-title { font-size: 0.9rem; font-weight: 700; margin-bottom: 8px; color: #fff; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     
     .menu-price-container { margin-top: auto; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; gap: 6px; }
-    .price-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; }
+    .price-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; }
     .price-label { color: #cbd5e1; font-weight: 600; }
     .price-values { display: flex; align-items: baseline; gap: 3px; }
-    .price-usd { color: #facc15; font-weight: 800; font-size: 0.95rem; }
-    .price-riel { color: #38bdf8; font-weight: 800; font-size: 0.85rem; }
+    .price-usd { color: #facc15; font-weight: 800; font-size: 0.9rem; }
+    .price-riel { color: #38bdf8; font-weight: 800; font-size: 0.8rem; }
 
-    .badge-out { position: absolute; top: 8px; right: 8px; background: var(--danger); color: #fff; padding: 4px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; box-shadow: 0 2px 4px rgba(0,0,0,0.4); z-index: 2; }
+    .badge-out { position: absolute; top: 8px; right: 8px; background: var(--danger); color: #fff; padding: 4px 10px; border-radius: 12px; font-size: 0.65rem; font-weight: 700; box-shadow: 0 2px 4px rgba(0,0,0,0.4); z-index: 2; }
 
-    .loading { text-align: center; padding: 50px; color: var(--accent-gold); font-weight: 600; grid-column: 1 / -1; font-size: 1.1rem; }
+    .loading { text-align: center; padding: 30px; color: var(--accent-gold); font-weight: 600; grid-column: 1 / -1; font-size: 1rem; }
 
-    footer { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(17, 24, 39, 0.95); border-top: 1px solid rgba(255, 255, 255, 0.1); padding: 10px; text-align: center; font-size: 0.85rem; color: var(--text-sub); backdrop-filter: blur(8px); z-index: 100; }
+    footer { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(17, 24, 39, 0.95); border-top: 1px solid rgba(255, 255, 255, 0.1); padding: 8px; text-align: center; font-size: 0.8rem; color: var(--text-sub); backdrop-filter: blur(8px); z-index: 100; }
     footer .owner-name { color: var(--accent-gold); font-weight: 700; }
+
+    /* 📱 កុម្មុយ៉ូទ័រ ឬ iPad (Tablet & Desktop Optimization) ឆ្លាតវៃ */
+    @media (min-width: 768px) {
+      body { font-size: 17px; }
+      header { padding: 18px; }
+      header h1 { font-size: 1.5rem; }
+      .container { max-width: 1200px; padding: 0 20px; }
+      .category-filter-wrapper { top: 68px; padding: 15px 0; }
+      .cat-btn { padding: 10px 20px; font-size: 1.05rem; }
+      .section-title { font-size: 1.35rem; margin-bottom: 15px; }
+      
+      /* Desktop: បង្ហាញជា 3 ឬ 4 ជួរ ស្អាតធំល្មមមិនតូចពេក */
+      .menu-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+      .menu-content { padding: 15px; }
+      .menu-title { font-size: 1.05rem; }
+      .price-row { font-size: 0.9rem; }
+      .price-usd { font-size: 1.1rem; }
+      .price-riel { font-size: 0.95rem; }
+      .badge-out { padding: 6px 12px; font-size: 0.8rem; }
+      footer { padding: 12px; font-size: 0.9rem; }
+    }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>🍲 <span id="shopHeaderTitle">ម៉ឺនុយហាង</span></h1>
+    <h1>🍲 <span id="shopHeaderTitle">OS Menu - ប្រព័ន្ធមឺនុយឌីជីថល</span></h1>
   </header>
 
   <div class="container" id="main-content">
     
-    <div class="category-filter-wrapper">
+    <!-- ផ្ទាំងផ្សាយពាណិជ្ជកម្ម និងសេវាកម្ម (OS Menu Promo) -->
+    <div id="promo-section" class="promo-banner">
+      <h2>✨ សូមស្វាគមន៍មកកាន់ OS Menu</h2>
+      <p>មានទទួលធ្វើប្រព័ន្ធមឺនុយគ្រប់គ្រងហាង តម្លៃសមរម្យ និងមានសេវាកម្មផ្សេងៗជាច្រើនទៀត! សម្រាប់ព័ត៌មានបន្ថែម សូមទាក់ទងមកកាន់ផ្ទាល់។</p>
+      <div class="promo-features">
+        <span class="feature-tag">🚀 ងាយស្រួលប្រើប្រាស់</span>
+        <span class="feature-tag">📱 គាំទ្រគ្រប់ទូរស័ព្ទ</span>
+        <span class="feature-tag">⚡ អាប់ដេតស្តុកទាន់ចិត្ត</span>
+        <span class="feature-tag">🔒 សុវត្ថិភាពខ្ពស់</span>
+      </div>
+      <a href="tel:0962828738" class="promo-btn">📞 លេខទូរស័ព្ទ៖ 096 28 28 738</a>
+    </div>
+
+    <div class="category-filter-wrapper" id="category-filter-wrapper">
       <div class="category-filter" id="category-filter">
         <button class="cat-btn active" onclick="filterMenu('ទាំងអស់', this)">ទាំងអស់</button>
       </div>
     </div>
 
-    <div id="menu-container">
-      <div class="loading">⏳ កំពុងទាញទិន្នន័យមឺនុយ...</div>
-    </div>
+    <div id="menu-container"></div>
   </div>
 
   <div id="expired-content" class="expired-box">
@@ -115,6 +164,11 @@
 
     async function fetchMenu() {
       try {
+        if (!shopOwner) {
+          document.getElementById('menu-container').innerHTML = '';
+          return;
+        }
+
         const res = await fetch(API_URL);
         const data = await res.json();
         
@@ -125,7 +179,6 @@
         }
 
         let allItems = [];
-        
         if (Array.isArray(data)) {
           allItems = data;
         } else if (data.items && Array.isArray(data.items)) {
@@ -139,22 +192,18 @@
           allItems = postData.menu || postData.items || [];
         }
         
-        if (shopOwner) {
-          menuItems = allItems.filter(i => String(i.owner || '').trim().toLowerCase() === shopOwner.trim().toLowerCase());
-          document.getElementById('shopHeaderTitle').textContent = `ម៉ឺនុយហាង៖ ${shopOwner}`;
+        menuItems = allItems.filter(i => String(i.owner || '').trim().toLowerCase() === shopOwner.trim().toLowerCase());
+        document.getElementById('shopHeaderTitle').textContent = `OS Menu - ហាង៖ ${shopOwner}`;
+
+        if (menuItems.length > 0) {
+          document.getElementById('promo-section').style.display = 'none';
+          document.getElementById('category-filter-wrapper').style.display = 'block';
+          renderCategories();
+          renderMenu();
+          setupScrollSpy();
         } else {
-          menuItems = allItems;
-          document.getElementById('shopHeaderTitle').textContent = 'ម៉ឺនុយភោជនីយដ្ឋាន និងភេសជ្ជៈ';
+          document.getElementById('menu-container').innerHTML = `<div class="loading" style="color:var(--warning);">រកមិនឃើញទិន្នន័យមឺនុយសម្រាប់ហាង "${shopOwner}" ទេ!</div>`;
         }
-
-        if (menuItems.length === 0) {
-          document.getElementById('menu-container').innerHTML = `<div class="loading" style="color:var(--warning);">មិនមានទិន្នន័យមឺនុយទេ!</div>`;
-          return;
-        }
-
-        renderCategories();
-        renderMenu();
-        setupScrollSpy();
       } catch (err) {
         console.error(err);
         document.getElementById('menu-container').innerHTML = `<div class="loading" style="color:var(--danger);">មិនអាចទាញទិន្នន័យបានទេ! សូមពិនិត្យការតភ្ជាប់។</div>`;
@@ -207,7 +256,7 @@
           <div class="price-row" style="justify-content: center; width: 100%;">
             <div class="price-values">
               <span class="price-usd">$${val1.toFixed(2)}</span> 
-              <span style="color:#94a3b8; font-size:0.75rem;">(</span><span class="price-riel">${riel1}៛</span><span style="color:#94a3b8; font-size:0.75rem;">)</span>
+              <span style="color:#94a3b8; font-size:0.7rem;">(</span><span class="price-riel">${riel1}៛</span><span style="color:#94a3b8; font-size:0.7rem;">)</span>
             </div>
           </div>
         `;
@@ -218,14 +267,14 @@
             <span class="price-label">${label1}</span>
             <div class="price-values">
               <span class="price-usd">$${val1.toFixed(2)}</span> 
-              <span style="color:#94a3b8; font-size:0.75rem;">(</span><span class="price-riel">${riel1}៛</span><span style="color:#94a3b8; font-size:0.75rem;">)</span>
+              <span style="color:#94a3b8; font-size:0.7rem;">(</span><span class="price-riel">${riel1}៛</span><span style="color:#94a3b8; font-size:0.7rem;">)</span>
             </div>
           </div>
           <div class="price-row">
             <span class="price-label">${label2}</span>
             <div class="price-values">
               <span class="price-usd">$${val2.toFixed(2)}</span> 
-              <span style="color:#94a3b8; font-size:0.75rem;">(</span><span class="price-riel">${riel2}៛</span><span style="color:#94a3b8; font-size:0.75rem;">)</span>
+              <span style="color:#94a3b8; font-size:0.7rem;">(</span><span class="price-riel">${riel2}៛</span><span style="color:#94a3b8; font-size:0.7rem;">)</span>
             </div>
           </div>
         `;
