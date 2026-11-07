@@ -45,7 +45,6 @@
     .menu-section { margin-bottom: 25px; scroll-margin-top: 130px; }
     .section-title { font-size: 1.15rem; color: var(--accent-gold); margin-bottom: 12px; padding-bottom: 4px; border-bottom: 2px solid #334155; display: flex; align-items: center; gap: 6px; font-weight: 700; }
 
-    /* កំណត់ឱ្យបង្ហាញ ២ ជួរនៅលើគ្រប់ទំហំអេក្រង់ទូរសព្ទ */
     .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
     @media (min-width: 768px) {
       .menu-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
@@ -70,7 +69,6 @@
     .price-riel { color: #38bdf8; font-weight: 800; font-size: 0.85rem; }
 
     .badge-out { position: absolute; top: 8px; right: 8px; background: var(--danger); color: #fff; padding: 4px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; box-shadow: 0 2px 4px rgba(0,0,0,0.4); z-index: 2; }
-    .badge-in { position: absolute; top: 8px; right: 8px; background: var(--success); color: #fff; padding: 4px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; box-shadow: 0 2px 4px rgba(0,0,0,0.4); z-index: 2; }
 
     .loading { text-align: center; padding: 50px; color: var(--accent-gold); font-weight: 600; grid-column: 1 / -1; font-size: 1.1rem; }
 
@@ -110,11 +108,15 @@
   </footer>
 
   <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycby7QML0v4bFjswDdo6LFqmC4TPPrFtDmWTYBWJnwMDMHy__7sIaFkx470yGxuJ2ex4O/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbz-zUKjZP7f3JtwW2LXFx7g9BlIt4LvFWI3uCzthnXU96dCUKccXRqGga7ESDW1rL26/exec';
     const EXCHANGE_RATE = 4000;
     let menuItems = [];
     let currentCategory = 'ទាំងអស់';
     let isManualClick = false;
+
+    // ទាញយក Username ពី URL Parameter (ឧ. Menu.html?shop=username)
+    const urlParams = new URLSearchParams(window.location.search);
+    const shopOwner = urlParams.get('shop') || '';
 
     async function fetchMenu() {
       try {
@@ -127,7 +129,15 @@
           return;
         }
 
-        menuItems = data.items || [];
+        let allItems = data.items || [];
+        
+        // បើមានការបញ្ជាក់ shop ក្នុង Link គឺទាញយកតែរបស់ហាងនោះទេ បើអត់ទេបង្ហាញទាំងអស់
+        if (shopOwner) {
+          menuItems = allItems.filter(i => String(i.owner).trim().toLowerCase() === shopOwner.trim().toLowerCase());
+        } else {
+          menuItems = allItems;
+        }
+
         renderCategories();
         renderMenu();
         setupScrollSpy();
@@ -152,7 +162,6 @@
       document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
       if (btn) btn.classList.add('active');
 
-      // បង្ហាញមឺនុយឡើងវិញតាមការចុច (បើ "ទាំងអស់" បង្ហាញគ្រប់ប្រភេទ បើប្រភេទផ្សេង បង្ហាញតែប្រភេទនោះមួយ)
       renderMenu();
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -164,7 +173,7 @@
       let val2 = parseFloat(item.price_2) || 0;
       let category = (item.category || '').toLowerCase();
 
-      let label1 = "ចានតូច";
+      let label1 = "តម្លៃ";
       let label2 = "ចានធំ";
 
       if (category.includes('ភេសជ្ជៈ') || category.includes('ស្រាបៀរ') || category.includes('beverage') || category.includes('beer')) {
@@ -177,17 +186,28 @@
 
       let html = '';
       let riel1 = Math.round(val1 * EXCHANGE_RATE).toLocaleString('km-KH');
-      html += `
-        <div class="price-row">
-          <span class="price-label">${label1}</span>
-          <div class="price-values">
-            <span class="price-usd">$${val1.toFixed(2)}</span> 
-            <span style="color:#94a3b8; font-size:0.75rem;">(</span><span class="price-riel">${riel1}៛</span><span style="color:#94a3b8; font-size:0.75rem;">)</span>
-          </div>
-        </div>
-      `;
 
-      if (val2 > 0) {
+      // ប្រសិនបើគ្មានតម្លៃទី២ (val2 <= 0) គឺបង្ហាញតែតម្លៃទីមួយ ដោយមិនបាច់បង្ហាញ label ចានតូច/ធំឡើយ
+      if (val2 <= 0) {
+        html += `
+          <div class="price-row" style="justify-content: center; width: 100%;">
+            <div class="price-values">
+              <span class="price-usd">$${val1.toFixed(2)}</span> 
+              <span style="color:#94a3b8; font-size:0.75rem;">(</span><span class="price-riel">${riel1}៛</span><span style="color:#94a3b8; font-size:0.75rem;">)</span>
+            </div>
+          </div>
+        `;
+      } else {
+        html += `
+          <div class="price-row">
+            <span class="price-label">${label1}</span>
+            <div class="price-values">
+              <span class="price-usd">$${val1.toFixed(2)}</span> 
+              <span style="color:#94a3b8; font-size:0.75rem;">(</span><span class="price-riel">${riel1}៛</span><span style="color:#94a3b8; font-size:0.75rem;">)</span>
+            </div>
+          </div>
+        `;
+
         let riel2 = Math.round(val2 * EXCHANGE_RATE).toLocaleString('km-KH');
         html += `
           <div class="price-row">
@@ -205,7 +225,6 @@
     function renderMenu() {
       const container = document.getElementById('menu-container');
       
-      // បើជ្រើសរើស "ទាំងអស់" គឺបង្ហាញគ្រប់ category ទាំងអស់ បើជ្រើសរើសប្រភេទផ្សេង បង្ហាញតែ category នោះមួយ
       let categoriesToDisplay = currentCategory === 'ទាំងអស់' 
         ? [...new Set(menuItems.map(i => i.category))] 
         : [currentCategory];
@@ -227,9 +246,9 @@
                   const isOut = item.status !== 'នៅមាន';
                   return `
                     <div class="menu-card ${isOut ? 'out-of-stock' : ''}">
-                      <span class="${isOut ? 'badge-out' : 'badge-in'}">${item.status}</span>
+                      ${isOut ? '<span class="badge-out">អស់ស្តុក</span>' : ''}
                       <div class="menu-img-container">
-                        <img src="${item.image_url}" class="menu-img-main" onerror="this.src='https://placehold.co/300x200?text=Menu'">
+                        <img src="${item.image_url || item.image_1}" class="menu-img-main" onerror="this.src='https://placehold.co/300x200?text=Menu'">
                       </div>
                       <div class="menu-content">
                         <h3 class="menu-title">${item.name}</h3>
@@ -249,7 +268,6 @@
       container.innerHTML = htmlOutput || `<div class="loading">មិនមានមុខម្ហូបក្នុងប្រភេទនេះទេ។</div>`;
     }
 
-    // Scroll Spy ដំណើរការបានเฉพาะពេលចុច "ទាំងអស់"
     function setupScrollSpy() {
       window.addEventListener('scroll', () => {
         if (isManualClick || currentCategory !== 'ទាំងអស់') return;
