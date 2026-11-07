@@ -17,7 +17,6 @@
     header { background: #1e293b; color: #fff; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.1); }
     header h1 { font-size: 1.3rem; color: var(--accent-gold); font-weight: 700; }
 
-    /* ផ្ទាំងបង្ហាញពេលផុតកំណត់ */
     .expired-box { display: none; text-align: center; padding: 50px 20px; background: var(--card-bg); border-radius: 16px; margin: 40px auto; max-width: 500px; border: 1px solid rgba(239, 68, 68, 0.4); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
     .expired-box h2 { color: var(--danger); font-size: 1.6rem; margin-bottom: 15px; }
     .expired-box p { font-size: 1.1rem; line-height: 1.6; color: var(--text-main); margin-bottom: 20px; }
@@ -25,7 +24,6 @@
 
     .container { max-width: 900px; margin: 15px auto; padding: 0 10px; }
     
-    /* Sticky Category Filter */
     .category-filter-wrapper {
       position: sticky;
       top: 65px;
@@ -79,12 +77,11 @@
 <body>
 
   <header>
-    <h1>🍲 ម៉ឺនុយភោជនីយដ្ឋាន និងភេសជ្ជៈ</h1>
+    <h1>🍲 <span id="shopHeaderTitle">ម៉ឺនុយហាង</span></h1>
   </header>
 
   <div class="container" id="main-content">
     
-    <!-- Sticky Category Filter -->
     <div class="category-filter-wrapper">
       <div class="category-filter" id="category-filter">
         <button class="cat-btn active" onclick="filterMenu('ទាំងអស់', this)">ទាំងអស់</button>
@@ -96,7 +93,6 @@
     </div>
   </div>
 
-  <!-- ផ្ទាំងបង្ហាញពេលផុតកំណត់ -->
   <div id="expired-content" class="expired-box">
     <h2>⚠️ រយៈពេលប្រើប្រាស់ត្រូវបានផុតកំណត់!</h2>
     <p>សូមអភ័យទោស ប្រព័ន្ធប្រើប្រាស់បានផុតកំណត់ហើយ។ សូមទាក់ទងមកកាន់អ្នកផ្តល់សេវាកម្មដើម្បីបន្តការប្រើប្រាស់។</p>
@@ -114,7 +110,6 @@
     let currentCategory = 'ទាំងអស់';
     let isManualClick = false;
 
-    // ទាញយក Username ពី URL Parameter (ឧ. Menu.html?shop=username)
     const urlParams = new URLSearchParams(window.location.search);
     const shopOwner = urlParams.get('shop') || '';
 
@@ -129,25 +124,45 @@
           return;
         }
 
-        let allItems = data.items || [];
+        let allItems = [];
         
-        // បើមានការបញ្ជាក់ shop ក្នុង Link គឺទាញយកតែរបស់ហាងនោះទេ បើអត់ទេបង្ហាញទាំងអស់
+        if (Array.isArray(data)) {
+          allItems = data;
+        } else if (data.items && Array.isArray(data.items)) {
+          allItems = data.items;
+        } else {
+          const postRes = await fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action: 'getPublicMenu', owner: shopOwner })
+          });
+          const postData = await postRes.json();
+          allItems = postData.menu || postData.items || [];
+        }
+        
         if (shopOwner) {
-          menuItems = allItems.filter(i => String(i.owner).trim().toLowerCase() === shopOwner.trim().toLowerCase());
+          menuItems = allItems.filter(i => String(i.owner || '').trim().toLowerCase() === shopOwner.trim().toLowerCase());
+          document.getElementById('shopHeaderTitle').textContent = `ម៉ឺនុយហាង៖ ${shopOwner}`;
         } else {
           menuItems = allItems;
+          document.getElementById('shopHeaderTitle').textContent = 'ម៉ឺនុយភោជនីយដ្ឋាន និងភេសជ្ជៈ';
+        }
+
+        if (menuItems.length === 0) {
+          document.getElementById('menu-container').innerHTML = `<div class="loading" style="color:var(--warning);">មិនមានទិន្នន័យមឺនុយទេ!</div>`;
+          return;
         }
 
         renderCategories();
         renderMenu();
         setupScrollSpy();
       } catch (err) {
-        document.getElementById('menu-container').innerHTML = `<div class="loading" style="color:var(--danger);">មិនអាចទាញទិន្នន័យបានទេ!</div>`;
+        console.error(err);
+        document.getElementById('menu-container').innerHTML = `<div class="loading" style="color:var(--danger);">មិនអាចទាញទិន្នន័យបានទេ! សូមពិនិត្យការតភ្ជាប់។</div>`;
       }
     }
 
     function renderCategories() {
-      const categories = [...new Set(menuItems.map(i => i.category))];
+      const categories = [...new Set(menuItems.map(i => i.category).filter(Boolean))];
       const filterContainer = document.getElementById('category-filter');
       
       let html = `<button class="cat-btn active" onclick="filterMenu('ទាំងអស់', this)">ទាំងអស់</button>`;
@@ -187,8 +202,7 @@
       let html = '';
       let riel1 = Math.round(val1 * EXCHANGE_RATE).toLocaleString('km-KH');
 
-      // ប្រសិនបើគ្មានតម្លៃទី២ (val2 <= 0) គឺបង្ហាញតែតម្លៃទីមួយ ដោយមិនបាច់បង្ហាញ label ចានតូច/ធំឡើយ
-      if (val2 <= 0) {
+      if (val2 <= 0 || isNaN(val2)) {
         html += `
           <div class="price-row" style="justify-content: center; width: 100%;">
             <div class="price-values">
@@ -198,6 +212,7 @@
           </div>
         `;
       } else {
+        let riel2 = Math.round(val2 * EXCHANGE_RATE).toLocaleString('km-KH');
         html += `
           <div class="price-row">
             <span class="price-label">${label1}</span>
@@ -206,10 +221,6 @@
               <span style="color:#94a3b8; font-size:0.75rem;">(</span><span class="price-riel">${riel1}៛</span><span style="color:#94a3b8; font-size:0.75rem;">)</span>
             </div>
           </div>
-        `;
-
-        let riel2 = Math.round(val2 * EXCHANGE_RATE).toLocaleString('km-KH');
-        html += `
           <div class="price-row">
             <span class="price-label">${label2}</span>
             <div class="price-values">
@@ -226,7 +237,7 @@
       const container = document.getElementById('menu-container');
       
       let categoriesToDisplay = currentCategory === 'ទាំងអស់' 
-        ? [...new Set(menuItems.map(i => i.category))] 
+        ? [...new Set(menuItems.map(i => i.category).filter(Boolean))] 
         : [currentCategory];
 
       if (menuItems.length === 0) {
@@ -243,15 +254,16 @@
               <h2 class="section-title">📂 ${cat}</h2>
               <div class="menu-grid">
                 ${itemsInCat.map(item => {
-                  const isOut = item.status !== 'នៅមាន';
+                  const isOut = item.status && item.status.trim() === 'អស់ស្តុក';
+                  let imgSrc = item.image_1 || item.image_url || 'https://placehold.co/300x200?text=Menu';
                   return `
                     <div class="menu-card ${isOut ? 'out-of-stock' : ''}">
                       ${isOut ? '<span class="badge-out">អស់ស្តុក</span>' : ''}
                       <div class="menu-img-container">
-                        <img src="${item.image_url || item.image_1}" class="menu-img-main" onerror="this.src='https://placehold.co/300x200?text=Menu'">
+                        <img src="${imgSrc}" class="menu-img-main" onerror="this.src='https://placehold.co/300x200?text=Menu'">
                       </div>
                       <div class="menu-content">
-                        <h3 class="menu-title">${item.name}</h3>
+                        <h3 class="menu-title">${item.name || ''}</h3>
                         <div class="menu-price-container">
                           ${formatPrice(item)}
                         </div>
